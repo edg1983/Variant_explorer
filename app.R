@@ -10,6 +10,8 @@ library(plotly)
 library(ggplot2)
 library(kinship2)
 library(tidyr)
+source("plotModule.R")
+source("downloadModule.R")
 
 #Set data dir containing variants tables and look for files
 data_dir <- "example_data"
@@ -119,13 +121,6 @@ RV <- reactiveValues(
 ### USER INTERFACE ###
 ######################
 
-downloadObjUI <- function(id) {
-    ns <- NS(id)
-    
-    downloadButton(ns("download_results"), label = "Download Results")
-}
-
-# Define UI for application that draws a histogram
 ui <- fluidPage(
 
     # Application title
@@ -200,10 +195,11 @@ ui <- fluidPage(
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    fluidRow(column(6, selectInput("variants_X_axis", h4("X axis:"), choices = variants_axes_options, selected = "MaxPopAF")),
-                             column(6, selectInput("variants_Y_axis", h4("Y axis:"), choices = variants_axes_options, selected = "DANN_DANN"))
-                    ),
-                    plotlyOutput("variants_scatter", width = "100%"),
+                    #fluidRow(column(6, selectInput("variants_X_axis", h4("X axis:"), choices = variants_axes_options, selected = "MaxPopAF")),
+                    #         column(6, selectInput("variants_Y_axis", h4("Y axis:"), choices = variants_axes_options, selected = "DANN_DANN"))
+                    #),
+                    #plotlyOutput("variants_scatter", width = "100%"),
+                    plotSelectedUI("scatter_plot", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=TRUE),
                     br(),
                     selectInput("variants_bar_axis", h4("Category:"), choices = variants_bar_options, selected = "Reg_type"),
                     plotlyOutput("variants_bar",width = "100%")
@@ -217,7 +213,7 @@ ui <- fluidPage(
                     DT::dataTableOutput("customGenesTable"),
                     hr(),
                     fluidRow(column(8), 
-                             column(3, offset=1,downloadObjUI(id = "download1")))
+                             column(3, offset=1,downloadObjUI(id = "save_results")))
                 ),
                 tabPanel("Gene details View",
                     fluidRow(
@@ -244,46 +240,6 @@ ui <- fluidPage(
         )
     )
 )
-
-########################
-### DOWNLOAD MODULE  ###
-########################
-
-downloadObj <- function(input, output, session, CaseCode, genes_output, customGenes_output, variants_output, comphet_output) {
-    output$download_results <- downloadHandler( 
-        filename =function() { 
-            paste0(CaseCode,".results.zip")
-        },
-        content = function(file) {
-            prefix <- paste0(tempdir(), "/", CaseCode)
-            tmp_file <- paste0(prefix,".genes.tsv")
-            write.table(genes_output, file=tmp_file, sep="\t", row.names=F, quote=F)
-            files <- tmp_file
-            
-            if (nrow(customGenes_output) > 0) {
-                tmp_file <- paste0(prefix,".customGenes.tsv")
-                write.table(customGenes_output, file=tmp_file, sep="\t", row.names=F, quote=F)
-                files <- c(files, tmp_file)
-            }
-            
-            tmp_file <- paste0(prefix,".variants.tsv")
-            variants_output <- as.data.frame(variants_output %>% filter(Class == "PASS", Gene %in% genes_output$Gene))
-            write.table(variants_output, file=tmp_file, sep="\t", row.names=F, quote=F) 
-            files <- c(files, tmp_file)
-            
-            comphet_output <- as.data.frame(comphet_output %>% filter(Class == "PASS", Gene %in% genes_output$Gene) %>% gather(key="Variant",value = "varID", var1:var2))
-            if (nrow(comphet_output)>0) {
-                comphet_output <- merge(comphet_output,RV$variants_df, by.x="varID",by.y="ID")
-                comphet_output <- as.data.frame(comphet_output %>% select(-Variant,-varID))
-                tmp_file <- paste0(prefix,".comphet.tsv")
-                write.table(comphet_output, file=tmp_file, sep="\t", row.names=F, quote=F)
-                files <- c(files, tmp_file)
-            } 
-            zip(file,files,flags = "-j")
-        }
-    )
-}
-
 
 ########################
 ### SERVER FUNCTIONS ###
@@ -339,70 +295,94 @@ server <- function(input, output) {
 
     })
     
+    segregating_vars_df <- reactive({
+        input$Apply_filters
+        
+        isolate(
+            as.data.frame(RV$segregation_df %>% filter(
+            recessive >= input$recessive_filter | 
+            dominant >= input$dominant_filter |
+            deNovo >= input$denovo_filter |
+            comphet >= input$comphet_filter) )
+        )
+    })
+    
+    variants_df <- reactive({
+        input$Apply_filters
+        
+        isolate(
+            as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
+                ID %in% segregating_vars_df()$ID &
+                d_score >= input$d_score_filter & 
+                Consequence %in% RV$accepted_consequence &
+                MaxPopAF <= input$MaxPopAF_filter &
+                cohortAF <= input$CohortAF_filter &
+                ((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing"),"PASS","FILTER")))
+        )
+    })
+    
+    comphet_df <- reactive({
+        filtered_vars_list <- variants_df()$ID[RV$variants_df$Class == "PASS"]
+        
+        as.data.frame(RV$comphet_df %>% mutate(Class = ifelse(
+            var1 %in% filtered_vars_list & 
+            var2 %in% filtered_vars_list &
+            ID %in% segregating_vars_df()$ID, "PASS", "FILTER")))
+    })
+    
+    genes_df <- reactive({
+        RV$filtered_vars_list <- unique(c(
+            variants_df()$ID[variants_df()$Class == "PASS"], 
+            comphet_df()$ID[comphet_df()$Class == "PASS"])) 
+            
+        as.data.frame(RV$genes_df %>% mutate(Class = ifelse(
+            Variants %in% RV$filtered_vars_list & 
+            GDI_phred <= input$GDI_filter &
+            pLI_gnomAD >= input$pLI_filter, "PASS", "FILTER")))    
+    })
+    
+    genes_scores <- reactive({
+        RV$filtered_genes_list <- unique(genes_df()$Gene[genes_df()$Class == "PASS"]) 
+        as.data.frame(RV$genes_scores %>% mutate(Class = ifelse(
+            Gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
+    })
+    
+    filters_summ_genes <- reactive ({
+        PASS_counts <- c(
+        genes_df() %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
+        genes_df() %>% filter(pLI_gnomAD >= input$pLI_filter) %>% nrow() )
+        
+        filters_summ_genes <- data.frame(Filter=c("pLI gnomAD","GDI phred"), 
+            PASS=PASS_counts, 
+            FILTERED=(nrow(RV$genes_df)-PASS_counts) )
+        filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)   
+    })
+    
+    filters_summ_vars <- reactive ({
+        tot_vars <- RV$variants_df %>% select(Chr,Pos,Ref,Alt) %>% nrow()
+        PASS_counts <- c(
+            variants_df() %>% filter(d_score >= input$d_score_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+            variants_df() %>% filter((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing") %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+            variants_df() %>% filter(MaxPopAF <= input$MaxPopAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+            variants_df() %>% filter(Consequence %in% RV$accepted_consequence) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+            variants_df() %>% filter(cohortAF <= input$CohortAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow()
+        )
+        filters_summ_vars <- data.frame(Filter=c("d score","SpliceAI","MaxPop AF","Consequence","cohort AF"),
+            PASS=PASS_counts, 
+            FILTERED=(tot_vars-PASS_counts))
+        filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
+    })
+    
     output$Loading_result <- renderText({
         RV$load_status
     })
     
     observeEvent(input$Apply_filters, {
         if (input$Consequence == "ALL") { 
-            accepted_consequence <- sort(unique(RV$variants_df$Consequence))    
+            RV$accepted_consequence <- sort(unique(RV$variants_df$Consequence))    
         } else {
-            accepted_consequence <- input$Consequence
+            RV$accepted_consequence <- input$Consequence
         }
-        
-        segregating_vars_list <- RV$segregation_df %>% filter(
-            recessive >= input$recessive_filter | 
-            dominant >= input$dominant_filter |
-            deNovo >= input$denovo_filter |
-            comphet >= input$comphet_filter) %>% select(ID)
-        segregating_vars_list <- segregating_vars_list$ID
-            
-        RV$variants_df <- as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
-            ID %in% segregating_vars_list &
-            d_score >= input$d_score_filter & 
-            Consequence %in% accepted_consequence &
-            MaxPopAF <= input$MaxPopAF_filter &
-            cohortAF <= input$CohortAF_filter &
-            ((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing"),"PASS","FILTER")))
-        filtered_vars_list <- RV$variants_df$ID[RV$variants_df$Class == "PASS"]
-        
-        RV$comphet_df <- as.data.frame(RV$comphet_df %>% mutate(Class = ifelse(
-            var1 %in% filtered_vars_list & 
-            var2 %in% filtered_vars_list &
-            ID %in% segregating_vars_list, "PASS", "FILTER")))
-        filtered_vars_list <- unique(c(filtered_vars_list, RV$comphet_df$ID[RV$comphet_df$Class == "PASS"]))
-        
-        RV$genes_df <- as.data.frame(RV$genes_df %>% mutate(Class = ifelse(
-            Variants %in% filtered_vars_list & 
-            GDI_phred <= input$GDI_filter &
-            pLI_gnomAD >= input$pLI_filter, "PASS", "FILTER")))
-        filtered_genes_list <- unique(RV$genes_df$Gene[RV$genes_df$Class == "PASS"])
-        
-        RV$genes_scores <- as.data.frame(RV$genes_scores %>% mutate(Class = ifelse(
-            Gene %in% filtered_genes_list, "PASS", "FILTER")))
-        
-        PASS_counts <- c(
-            RV$genes_df %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
-            RV$genes_df %>% filter(pLI_gnomAD >= input$pLI_filter) %>% nrow()
-        )
-        RV$filters_summ_genes <- data.frame(Filter=c("pLI gnomAD","GDI phred"), 
-            PASS=PASS_counts, 
-            FILTERED=(nrow(RV$genes_df)-PASS_counts))
-        RV$filters_summ_genes <- gather(RV$filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
-        
-        tot_vars <- RV$variants_df %>% select(Chr,Pos,Ref,Alt) %>% nrow()
-        PASS_counts <- c(
-            RV$variants_df %>% filter(d_score >= input$d_score_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-            RV$variants_df %>% filter((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing") %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-            RV$variants_df %>% filter(MaxPopAF <= input$MaxPopAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-            RV$variants_df %>% filter(Consequence %in% accepted_consequence) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-            RV$variants_df %>% filter(cohortAF <= input$CohortAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow()
-        )
-        RV$filters_summ_vars <- data.frame(Filter=c("d score","SpliceAI","MaxPop AF","Consequence","cohort AF"),
-            PASS=PASS_counts, 
-            FILTERED=(tot_vars-PASS_counts))
-        RV$filters_summ_vars <- gather(RV$filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
-        
         #TODO Make configurable set of columns names and dynamically create filter cursors
     })
     
@@ -510,29 +490,22 @@ server <- function(input, output) {
     })
     
     GADO_rank_plot <- eventReactive(c(input$Apply_filters, input$CaseCode),{
-        ggplot(RV$genes_scores, aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + scale_fill_brewer(palette="Set3") + scale_y_sqrt()
     })
     
     output$GADO_rank <- renderPlotly({
-        ggplotly(GADO_rank_plot())
-    })
-    
-    genesTable_df <- eventReactive(c(input$Apply_filters, input$CaseCode),{
-        as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        ggplotly(
+            ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + scale_fill_brewer(palette="Set3") + scale_y_sqrt()
+        )
     })
     
     output$genesTable <- DT::renderDataTable(selection="single", {
-        genesTable_df() 
+        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)) 
     })
     
     genesTable_proxy <- DT::dataTableProxy("genesTable")
     
-    customGenesTable_df <- eventReactive(c(input$Apply_filters,input$Load_file),{
-        as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% filter(Gene %in% RV$custom_genes) %>% select(-Class))
-    })
-    
     output$customGenesTable <- DT::renderDataTable(selection="single", {
-        customGenesTable_df()
+        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% filter(Gene %in% RV$custom_genes) %>% select(-Class))
     })
     
     observeEvent(input$customGenesTable_rows_selected, {
@@ -542,74 +515,64 @@ server <- function(input, output) {
         genesTable_proxy %>% selectRows(row_idx) 
     })
     
-    callModule(downloadObj, id = "download1",
-               CaseCode = input$CaseCode,
-               genes_output = genesTable_df(),
-               customGenes_output = customGenesTable_df(),
-               variants_output = RV$variants_df,
-               comphet_output = RV$comphet_df
+    callModule(downloadObj, id = "save_results",
+        output_prefix=input$CaseCode,
+        output_data = list(
+            "genes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)),
+            "customGenes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% filter(Gene %in% RV$custom_genes) %>% select(-Class)),
+            "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", Gene %in% RV$filtered_genes_list)),
+            "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", Gene %in% RV$filtered_genes_list) %>% 
+                                gather(key="Variant",value = "varID", var1:var2) %>% 
+                                inner_join(., RV$variants_df, by=c("varID"="ID")) %>%
+                                select(-Variant,-varID))),
+        zip_archive = paste0(input$CaseCode, ".results.zip")
     )
     
-    bars_variants_filters <- eventReactive(input$Apply_filters, {
-        ggplot(RV$filters_summ_vars, aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
-    })
-    
     output$summary_variants_filters <- renderPlotly({
-        ggplotly( bars_variants_filters() )
-    })
-    
-    bars_genes_filters <- eventReactive(input$Apply_filters, {
-        ggplot(RV$filters_summ_genes, aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        ggplotly(
+            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        )
     })
     
     output$summary_genes_filters <- renderPlotly({
-        ggplotly( bars_genes_filters() )
-    })
-    
-    genes_scatter_plot <- eventReactive(c(input$Apply_filters,input$genes_X_axis,input$genes_Y_axis),{
-        #TODO visualize filter threshold line
-        ggplot(RV$genes_scores, aes_string(x=input$genes_X_axis, y=input$genes_Y_axis, color="Class", label="Gene")) + geom_point(size=1) 
+        ggplotly(
+            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        )
     })
     
     output$genes_scatter <- renderPlotly({
-        ggplotly( genes_scatter_plot() )
+        ggplotly(
+            ggplot(genes_scores(), aes_string(x=input$genes_X_axis, y=input$genes_Y_axis, color="Class", label="Gene")) + geom_point(size=1) 
+        )
     })
     
-    variants_scatter_plot <- eventReactive(c(input$Apply_filters,input$variants_X_axis,input$variants_Y_axis),{
-        #TODO visualize filter threshold line
-        plot_df <- as.data.frame(RV$variants_df %>% select(Chr,Pos,Ref,Alt,Gene,input$variants_X_axis,input$variants_Y_axis,Class) %>% distinct())
-        ggplot(plot_df, aes_string(x=input$variants_X_axis, y=input$variants_Y_axis, color="Class", label="Gene")) + geom_point(size=1) 
-    })
-    
-    output$variants_scatter <- renderPlotly({
-        ggplotly( variants_scatter_plot() )
-    })
-    
-    variants_bar_plot <- eventReactive(c(input$Apply_filters, input$variants_bar_axis),{
-        RV$variants_df[,input$variants_bar_axis] <- as.factor(RV$variants_df[,input$variants_bar_axis])
-        ggplot(RV$variants_df, aes_string(x=input$variants_bar_axis, fill="Class")) + geom_bar() + scale_y_sqrt() + theme(axis.text.x = element_text(angle=45, hjust=1))
-    })
+    callModule(plotSelectedModule, "scatter_plot", plot_data = variants_df(), plotType = "scatter", variables = list("color"="Class"))
     
     output$variants_bar <- renderPlotly({
-        ggplotly( variants_bar_plot() )
+        plot_df <- variants_df()
+        plot_df[,input$variants_bar_axis] <- as.factor(plot_df[,input$variants_bar_axis])
+        
+        ggplotly( 
+            ggplot(plot_df, aes_string(x=input$variants_bar_axis, fill="Class")) + geom_bar() + scale_y_sqrt() + theme(axis.text.x = element_text(angle=45, hjust=1))
+        )
     })
     
     output$Gene_symbol <- renderText({
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         gene_name
     })
     
     output$Gene_name <- renderText({
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         genes_info[genes_info$symbol == gene_name, "name"]
     })
     
     output$GTeX_link <- renderUI({
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         ensg_id <- genes_info[genes_info$symbol == gene_name, "ensembl_gene_id"]
@@ -617,12 +580,12 @@ server <- function(input, output) {
     })
     
     output$geneDetail <- DT::renderDataTable(selection="none", {
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         genedetail_tab[input$genesTable_rows_selected,]
     })
     
     output$geneInfo <- DT::renderDataTable(selection="none", {
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         selected <- list()
@@ -642,7 +605,7 @@ server <- function(input, output) {
     })
     
     output$variantsTable <- DT::renderDataTable(selection="none", {
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS"))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS"))
         #validate(need(nrow(genedetail_tab)>0, 'No variants passing the filters'))
         
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
@@ -652,10 +615,10 @@ server <- function(input, output) {
     })
     
     output$comphetTable <- DT::renderDataTable(selection="none", {
-        genedetail_tab <- as.data.frame(RV$genes_scores %>% filter(Class == "PASS"))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS"))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
-        comphet_details <- RV$comphet_df %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", var1:var2)
+        comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", var1:var2)
         validate(need(nrow(comphet_details)>0, 'No compound het variants'))
         comphet_details <- merge(comphet_details,RV$variants_df, by.x="varID",by.y="ID")
         as.data.frame(comphet_details %>% select(-Gene,-Variant,-varID))
