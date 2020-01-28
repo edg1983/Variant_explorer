@@ -4,6 +4,9 @@
 
 # Input are tables from the VARAN V2 filtering and annotation
 
+# TODO Add ClinVar pathogenic gene filter
+# TODO Add separate table reporting all Clinvar pathogenic vars
+
 library(shiny)
 library(DT)
 library(plotly)
@@ -21,6 +24,21 @@ samplesID <- gsub("V2\\.|\\.var2reg.vars.tsv.gz","",files)
 
 #We can switch to read from a input table containing sampleID and ped locations...
 #samples_df <- data.frame(ID=samplesID,file=files)
+
+#################
+### FUNCTIONS ###
+#################
+
+readGMT <- function(input_file) {
+    out_list <- list()
+    con  <- file(input_file, open = "r")
+    while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
+        myvector <- (strsplit(oneLine, "\t"))
+        out_list[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
+    }
+    close(con) 
+    return(out_list)
+}
 
 #############################
 ### Load supporting files ###
@@ -43,41 +61,11 @@ genes_info_file <- "hgnc_complete_set.txt"
 genes_info <- read.table(genes_info_file, header=T, sep="\t", stringsAsFactors = F)
 
 ##Load pathways and GO groups (suppose .gmt file from MSigDB)
-pathway_file <- "c2.cp.v7.0.symbols.gmt"
-pathways <- list()
-con  <- file(pathway_file, open = "r")
-while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-    myvector <- (strsplit(oneLine, "\t"))
-    pathways[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
-}
-close(con)
-
-GO_file <- "c5.bp.v7.0.symbols.gmt"
-GO_bp <- list()
-con  <- file(GO_file, open = "r")
-while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-    myvector <- (strsplit(oneLine, "\t"))
-    GO_bp[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
-}
-close(con)
-
-GO_file <- "c5.cc.v7.0.symbols.gmt"
-GO_cc <- list()
-con  <- file(GO_file, open = "r")
-while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-    myvector <- (strsplit(oneLine, "\t"))
-    GO_cc[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
-}
-close(con)
-
-GO_file <- "c5.mf.v7.0.symbols.gmt"
-GO_mf <- list()
-con  <- file(GO_file, open = "r")
-while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-    myvector <- (strsplit(oneLine, "\t"))
-    GO_mf[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
-}
-close(con)
+gene_anno <- list()
+gene_anno[["pathways"]] <- readGMT("c2.cp.v7.0.symbols.gmt")
+gene_anno[["GO_BP"]] <- readGMT("c5.bp.v7.0.symbols.gmt")
+gene_anno[["GO_MF"]] <- readGMT("c5.mf.v7.0.symbols.gmt")
+gene_anno[["GO_CC"]] <- readGMT("c5.cc.v7.0.symbols.gmt")
 
 #######################
 ### Set environment ###
@@ -101,6 +89,9 @@ variants_bar_options <- c("PanelApp" = "PanelApp",
     "Variant consequence" = "Consequence",
     "Variant type" = "VarType",
     "Chromosome" = "Chr")
+
+##Plots formatting styles
+format1 <- theme(axis.text.x = element_text(angle=45, hjust=1))
 
 ##Names of columns where filter are applied
 filter_cols_gene <- c("pLI_gnomAD","GDI_phred")
@@ -195,15 +186,9 @@ ui <- fluidPage(
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    #fluidRow(column(6, selectInput("variants_X_axis", h4("X axis:"), choices = variants_axes_options, selected = "MaxPopAF")),
-                    #         column(6, selectInput("variants_Y_axis", h4("Y axis:"), choices = variants_axes_options, selected = "DANN_DANN"))
-                    #),
-                    #plotlyOutput("variants_scatter", width = "100%"),
-                    plotSelectedUI("scatter_plot", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=TRUE),
+                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=TRUE),
                     br(),
-                    selectInput("variants_bar_axis", h4("Category:"), choices = variants_bar_options, selected = "Reg_type"),
-                    plotlyOutput("variants_bar",width = "100%")
-                    
+                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=TRUE)
                 ),
                 tabPanel("Filter Results",
                     plotlyOutput("GADO_rank"),
@@ -244,8 +229,13 @@ ui <- fluidPage(
 ########################
 ### SERVER FUNCTIONS ###
 ########################
-# Define server logic required to draw a histogram
+
 server <- function(input, output) {
+    
+    ################
+    ### Load Files 
+    ################
+    
     observeEvent(input$CaseCode, {
         RV$load_status = ""
         RV$custom_genes = character()
@@ -292,8 +282,19 @@ server <- function(input, output) {
             RV$custom_genes <- scan(input$custom_file,what="",sep="\n")
             RV$load_status <- paste0(length(RV$custom_genes), " genes loaded")
         }
-
     })
+    
+    output$Loading_result <- renderText({
+        RV$load_status
+    })
+    
+    output$Disease <- renderText({
+        paste0(HPOs$Disease[HPOs$X.CaseID == input$CaseCode])
+    })
+    
+    #######################################
+    ### Data reactive tables configuration
+    #######################################
     
     segregating_vars_df <- reactive({
         input$Apply_filters
@@ -373,9 +374,38 @@ server <- function(input, output) {
         filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
     })
     
-    output$Loading_result <- renderText({
-        RV$load_status
+    ##################
+    ### Overview Tab
+    ##################
+    
+    output$Total_affected <- renderText({
+        paste0("Total number of affected individuals in this pedigree: ", RV$total_affected)
     })
+    
+    output$ped <- renderPlot({
+        plot.pedigree(all_peds[input$CaseCode], mar = c(5, 3, 5, 3))
+    })
+    
+    output$Var_consequence_plot <- renderPlot({
+        ggplot(RV$variants_df, aes(x=Consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    })
+    
+    output$Var_type_plot <- renderPlot({
+        ggplot(RV$variants_df, aes(x=VarType)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    })
+    
+    output$Var_PopAF_plot <- renderPlot({
+        ggplot(RV$variants_df, aes(x=MaxPopAF, y=cohortAF, color=VarType)) + geom_point()
+    })
+    
+    output$Gene_segregation_plot <- renderPlot({
+        gene_segregation_df <- as.data.frame(RV$genes_df %>% select(Gene,inh_model) %>% distinct())
+        ggplot(gene_segregation_df, aes(x=inh_model)) + geom_bar() + labs(y="genes count")
+    })
+    
+    #################
+    ### Filters tab
+    #################
     
     observeEvent(input$Apply_filters, {
         if (input$Consequence == "ALL") { 
@@ -460,42 +490,44 @@ server <- function(input, output) {
         selectInput("Consequence", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
     })
 
-    output$Disease <- renderText({
-        paste0(HPOs$Disease[HPOs$X.CaseID == input$CaseCode])
+    ########################
+    ### Filter Explorer tab
+    ########################
+    
+    output$summary_variants_filters <- renderPlotly({
+        ggplotly(
+            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        )
     })
     
-    output$Total_affected <- renderText({
-        paste0("Total number of affected individuals in this pedigree: ", RV$total_affected)
+    output$summary_genes_filters <- renderPlotly({
+        ggplotly(
+            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        )
     })
     
-    output$ped <- renderPlot({
-        plot.pedigree(all_peds[input$CaseCode], mar = c(5, 3, 5, 3))
+    output$genes_scatter <- renderPlotly({
+        ggplotly(
+            ggplot(genes_scores(), aes_string(x=input$genes_X_axis, y=input$genes_Y_axis, color="Class", label="Gene")) + geom_point(size=1) 
+        )
     })
     
-    output$Var_consequence_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=Consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    })
+    callModule(plotSelectedModule, "variants_scatter", plot_data = variants_df(), plotType = "scatter", variables = list("color"="Class"))
+    callModule(plotSelectedModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
     
-    output$Var_type_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=VarType)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    })
-    
-    output$Var_PopAF_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=MaxPopAF, y=cohortAF, color=VarType)) + geom_point()
-    })
-    
-    output$Gene_segregation_plot <- renderPlot({
-        gene_segregation_df <- as.data.frame(RV$genes_df %>% select(Gene,inh_model) %>% distinct())
-        ggplot(gene_segregation_df, aes(x=inh_model)) + geom_bar() + labs(y="genes count")
-    })
-    
-    GADO_rank_plot <- eventReactive(c(input$Apply_filters, input$CaseCode),{
-    })
+    ########################
+    ### Filter Results tab
+    ########################
     
     output$GADO_rank <- renderPlotly({
-        ggplotly(
-            ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + scale_fill_brewer(palette="Set3") + scale_y_sqrt()
-        )
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
+        if (length(input$genesTable_rows_selected) > 0) {
+            Zscore <- genedetail_tab[input$genesTable_rows_selected, "Gado_zscore"]
+            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + geom_vline(xintercept = Zscore, color="red") + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
+        } else {
+            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
+        }
+        ggplotly( GADO_plot )
     })
     
     output$genesTable <- DT::renderDataTable(selection="single", {
@@ -528,34 +560,9 @@ server <- function(input, output) {
         zip_archive = paste0(input$CaseCode, ".results.zip")
     )
     
-    output$summary_variants_filters <- renderPlotly({
-        ggplotly(
-            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        )
-    })
-    
-    output$summary_genes_filters <- renderPlotly({
-        ggplotly(
-            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        )
-    })
-    
-    output$genes_scatter <- renderPlotly({
-        ggplotly(
-            ggplot(genes_scores(), aes_string(x=input$genes_X_axis, y=input$genes_Y_axis, color="Class", label="Gene")) + geom_point(size=1) 
-        )
-    })
-    
-    callModule(plotSelectedModule, "scatter_plot", plot_data = variants_df(), plotType = "scatter", variables = list("color"="Class"))
-    
-    output$variants_bar <- renderPlotly({
-        plot_df <- variants_df()
-        plot_df[,input$variants_bar_axis] <- as.factor(plot_df[,input$variants_bar_axis])
-        
-        ggplotly( 
-            ggplot(plot_df, aes_string(x=input$variants_bar_axis, fill="Class")) + geom_bar() + scale_y_sqrt() + theme(axis.text.x = element_text(angle=45, hjust=1))
-        )
-    })
+    ####################
+    ### Gene detail tab
+    ####################
     
     output$Gene_symbol <- renderText({
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
@@ -589,18 +596,11 @@ server <- function(input, output) {
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         selected <- list()
-        pathways_list <- grep(gene_name, pathways)
-        selected[["pathways"]] <- names(pathways)[pathways_list]
         
-        GO_bp_list <- grep(gene_name, GO_bp)
-        selected[["GO_BP"]] <- names(GO_bp)[GO_bp_list]
-        
-        GO_mf_list <- grep(gene_name, GO_mf)
-        selected[["GO_MF"]] <- names(GO_mf)[GO_mf_list]
-        
-        GO_cc_list <- grep(gene_name, GO_cc)
-        selected[["GO_CC"]] <- names(GO_cc)[GO_cc_list]
-        
+        for (n in names(gene_anno)) {
+            id_list <- grep(gene_name, gene_anno[[n]])
+            selected[[n]] <- names(gene_anno[[n]])[id_list]
+        }
         Additional_info <- data.frame(lapply(selected, "length<-", max(lengths(selected))), stringsAsFactors = F)
     })
     

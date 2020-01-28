@@ -11,7 +11,7 @@
 # plot_data = data.frame
 # plotType = string for the plot type (see below)
 # plotOptions = named list of options to be passed to configure the plots (accepted size, position_dodge, scale, width)
-# additionalOptions = any ggplot configuration element (like theme or facet)
+# additionalOptions = list containing any ggplot configuration element (like scale, theme or facet)
 # variables = named list of variables to map in aes list("x"="colnamex", "y"="colnamey")
 
 # TO MADE USER CONFIGURABLE PLOTS
@@ -24,11 +24,11 @@
 selectPlot <- function(plotType, plotOptions) {
   switch(plotType,
          scatter = {p <- geom_point(size = ifelse(is.null(plotOptions[["size"]]),1,plotOptions[["size"]]))},
-         barplot = {p <- geom_bar(position = position_dodge(ifelse(is.null(plotOptions[["position_dodge"]]),0,plotOptions[["position_dodge"]])))},
+         barplot = {p <- geom_bar(aes(y=(..count..)), position = position_dodge(ifelse(is.null(plotOptions[["position_dodge"]]),0,plotOptions[["position_dodge"]])))},
          density = {p <- geom_density()},
          violin = {p <- geom_violin(scale = ifelse(is.null(plotOptions[["scale"]]),"width",plotOptions[["scale"]]))},
          boxplot = {p <- geom_boxplot(width = ifelse(is.null(plotOptions[["width"]]),1,plotOptions[["width"]]))},
-         boxplot = {p <- geom_jitter(width = ifelse(is.null(plotOptions[["width"]]),1,plotOptions[["width"]]))}
+         jitter = {p <- geom_jitter(width = ifelse(is.null(plotOptions[["width"]]),1,plotOptions[["width"]]))}
   )
   return(p) 
 }
@@ -62,16 +62,19 @@ plotFixedModule <- function(input, output, session, plot_data, plotType, variabl
   p <- selectPlot(plotType, plotOptions)
   
   output$plotly <- renderPlotly({
-        ggplotly( 
-          ggplot(plot_data, aes_string(x = variables[["x"]], y = variables[["y"]], color= variables[["color"]], size=variables[["size"]], fill=variables[["fill"]], shape=variables[["shape"]])) + 
-          p +
-          additionalOptions )
+    myplot <- ggplot(plot_data, aes_string(x = variables[["x"]], y = variables[["y"]], color= variables[["color"]], size=variables[["size"]], fill=variables[["fill"]], shape=variables[["shape"]])) + p     
+    for (opt in additionalOptions) {
+      myplot <- myplot + opt
+    }
+    ggplotly( myplot )
   })    
   
   output$plot <- renderPlot({
-        ggplot(plot_data, aes_string(x = variables[["x"]], y = variables[["y"]], color= variables[["color"]], size=variables[["size"]], fill=variables[["fill"]], shape=variables[["shape"]])) + 
-        p +
-        additionalOptions
+        myplot <- ggplot(plot_data, aes_string(x = variables[["x"]], y = variables[["y"]], color= variables[["color"]], size=variables[["size"]], fill=variables[["fill"]], shape=variables[["shape"]])) + p
+        for (opt in additionalOptions) {
+          myplot <- myplot + opt
+        }
+        myplot
   })
 }
 
@@ -103,27 +106,34 @@ plotSelectedModule <- function(input, output, session, plot_data, plotType, vari
   p <- selectPlot(plotType, plotOptions)
 
   output$plotly <- renderPlotly({
-    ggplotly (
-    ggplot(plot_data, 
-           aes_string(
-             x = setValue("x", input, variables),
-             y = setValue("y", input, variables),
-             color = setValue("color", input, variables),
-             size = setValue("size", input, variables),
-             fill = setValue("fill", input, variables),
-             shape = setValue("shape", input, variables)
-           )) + p + additionalOptions )
+    myplot <- ggplot(plot_data, 
+                     aes_string(
+                       x = setValue("x", input, variables),
+                       y = setValue("y", input, variables),
+                       color = setValue("color", input, variables),
+                       size = setValue("size", input, variables),
+                       fill = setValue("fill", input, variables),
+                       shape = setValue("shape", input, variables)
+                     )) + p
+    for (opt in additionalOptions) {
+      myplot <- myplot + opt
+    }
+    ggplotly ( myplot )
   })
 
   output$plot <- renderPlot({
-    ggplot(plot_data, 
-     aes_string(
-       x = setValue("x", input, variables),
-       y = setValue("y", input, variables),
-       color = setValue("color", input, variables),
-       size = setValue("size", input, variables),
-       fill = setValue("fill", input, variables),
-       shape = setValue("shape", input, variables)
-     )) + p + additionalOptions
+    myplot <- ggplot(plot_data, 
+                     aes_string(
+                       x = setValue("x", input, variables),
+                       y = setValue("y", input, variables),
+                       color = setValue("color", input, variables),
+                       size = setValue("size", input, variables),
+                       fill = setValue("fill", input, variables),
+                       shape = setValue("shape", input, variables)
+                     )) + p
+    for (opt in additionalOptions) {
+      myplot <- myplot + opt
+    }
+    myplot
   }) 
 }
