@@ -2,3 +2,4 @@ myexpr <- quo((!!(as.name(mycols[[1]]))) > myvalues[[1]] & (!!(as.name(mycols[[2
 myexpr2 <- quo((!!(as.name(mycols[[1]]))) > myvalues[[1]] & (!!(as.name(mycols[[2]]))) %in% myvalues[[3]])
 combined_expr <- quo((!!myexpr) | (!!myexpr2))
 filter(test_df, !!combined_expr)
+test_df %>% mutate(Class = if_else(!!combined_expr, "PASS","FILTER"))

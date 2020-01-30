@@ -13,6 +13,7 @@ library(plotly)
 library(ggplot2)
 library(kinship2)
 library(tidyr)
+library(shinydashboard)
 source("plotModule.R")
 source("downloadModule.R")
 
@@ -67,6 +68,10 @@ gene_anno[["GO_BP"]] <- readGMT("c5.bp.v7.0.symbols.gmt")
 gene_anno[["GO_MF"]] <- readGMT("c5.mf.v7.0.symbols.gmt")
 gene_anno[["GO_CC"]] <- readGMT("c5.cc.v7.0.symbols.gmt")
 
+## Load GTeX median expression
+GTeX_file <- gzfile("GTEx_v8_median_TPM.gct.gz")
+GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
+
 #######################
 ### Set environment ###
 #######################
@@ -112,75 +117,86 @@ RV <- reactiveValues(
 ### USER INTERFACE ###
 ######################
 
-ui <- fluidPage(
+ui <- dashboardPage(
+    dashboardHeader(
+        title = "Variant Explorer",
+        dropdownMenu(type = "notifications",
+                     notificationItem(
+                         text = "Beta version now working only on 004Int001",
+                         icon = icon("exclamation-triangle"),
+                         status = "warning"
+                     )
+        )
+    ),
 
-    # Application title
-    titlePanel(fluidRow(h1("Variant Explorer"), h3("Beta version now working only on 004Int001"))),
-
-    sidebarLayout(
-        ################    
-        # Side-bar Panel
-        ################
-        sidebarPanel(
-            #drop-down list of cases
-            selectInput("CaseCode", h3("Case code:"), choices = sort(unique(samplesID))),
-            
-            h3("Disease:"),
-            textOutput("Disease"),
-            
-            h3("Custom gene list"),
-            textInput(inputId = "custom_file",label = "File:",value = "", placeholder = "gene list file"),
-            actionButton(inputId = "Load_file", label = "Load file"),
-            textOutput("Loading_result")
-        ),
+    dashboardSidebar(
+        #drop-down list of cases
+        selectInput("CaseCode", h3("Case code:"), choices = sort(unique(samplesID))),
+        h3("Disease:"),
+        textOutput("Disease"),
         
-        ############
-        # Main-panel
-        ############
-        mainPanel(
-            tabsetPanel(id = "mainarea",
-                tabPanel("Overview",
+        h3("Custom gene list"),
+        textInput(inputId = "custom_file",label = "File:",value = "", placeholder = "gene list file"),
+        actionButton(inputId = "Load_file", label = "Load file"),
+        textOutput("Loading_result"),
+        sidebarMenu(
+            menuItem("Variants overview", tabName = "overview", icon = icon("th")),
+            menuItem("Filters settings", tabName = "filters", icon = icon("th")),
+            menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
+            menuItem("Filter results", tabName = "filter_results", icon = icon("th")),
+            menuItem("Gene details", tabName = "gene_details", icon = icon("th"))
+        )
+    ),
+    dashboardBody(
+        tabItems(
+            tabItem(tabName = "overview",
                     plotOutput("ped"),
                     plotOutput("Var_consequence_plot"),
                     plotOutput("Var_type_plot"),
                     plotOutput("Var_PopAF_plot"),
-                    plotOutput("Gene_segregation_plot")
-                ),
-                    tabPanel("Filters",
-                    br(),
-                    actionButton(inputId = "Apply_filters", label = "Apply filters"),
-                         
-                    h3("Variant filters"),
-                    uiOutput("d_score"),
-                    uiOutput("spliceAI"),
-                    uiOutput("Max_pop_AF"),
-                    uiOutput("Cohort_AF"),
-                    uiOutput("var_consequence"),
+                    plotOutput("Gene_segregation_plot")    
+            ),
+            tabItem(tabName = "filters",
+                    column(12, align="center", actionButton(inputId = "Apply_filters", label = "Apply filters")),
+                    fluidRow(hr()),
                     
-                    hr(), 
-                    h3("Gene filters"),
-                    uiOutput("pLI"),
-                    uiOutput("GDI"),
+                    fluidRow(
+                        box(title = "Variant filters", width = 12, status = "primary", solidHeader = TRUE,
+                        #tabPanel("General",
+                            uiOutput("d_score"),
+                            uiOutput("Max_pop_AF"),
+                            uiOutput("Cohort_AF"),
+                            uiOutput("var_consequence"),
+                            uiOutput("spliceAI")) ),
+                        #tabPanel("Splicing", uiOutput("spliceAI"))
+                    #) ),
                     
-                    hr(),
-                    h3("Segregation filters"),
-                    h4("Filters based on the number of affected individuals in which the variants follow the desired model"),
-                    h4("Works with OR logic"),
-                    textOutput("Total_affected"),
-                    br(),
-                    fillRow(flex=4,
-                            uiOutput("recessive"),
-                            uiOutput("dominant"),
-                            uiOutput("denovo"),
-                            uiOutput("comphet"))
-                ),
-                tabPanel("Filter Explorer",
+                    fluidRow(
+                        box(title = "Gene filters", id = "gene_filters", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE,
+                        uiOutput("pLI"),
+                        uiOutput("GDI") ),
+            
+                        box(title = "Segregation filters", id = "segregation_filters", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE,
+                        textOutput("Total_affected"),
+                        fluidRow(
+                                column(3, uiOutput("recessive")),
+                                column(3, uiOutput("dominant")),
+                                column(3, uiOutput("denovo")),
+                                column(3, uiOutput("comphet")) ),
+                        "Number of affected individuals in which a variants segregates",
+                        "Works with OR logic"
+                        ),
+                    )
+            ),
+            tabItem(tabName = "filter_explorer",
                     h3("Summary of filters effect"),
                     fluidRow(column(6,plotlyOutput("summary_variants_filters", width = "100%")), column(6,plotlyOutput("summary_genes_filters", width = "100%"))),
-                         
+                    
                     h3("Genes filter evaluation"),
                     fluidRow(column(6,selectInput("genes_X_axis", h4("X axis:"), choices = genes_axes_options, selected = "Gado_zscore")),
-                        column(6,selectInput("genes_Y_axis", h4("Y axis:"), choices = genes_axes_options, selected = "pLI_gnomAD"))
+                             column(6,selectInput("genes_Y_axis", h4("Y axis:"), choices = genes_axes_options, selected = "pLI_gnomAD"))
                     ),
                     plotlyOutput("genes_scatter",width = "100%"),
                     br(),
@@ -188,19 +204,18 @@ ui <- fluidPage(
                     h3("Variants filter evaluation"),
                     plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=TRUE),
                     br(),
-                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=TRUE)
-                ),
-                tabPanel("Filter Results",
+                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=TRUE)    
+            ),
+            tabItem(tabName = "filter_results",
                     plotlyOutput("GADO_rank"),
-                    #plotlyOutput("GADO_rank_filt"),
                     DT::dataTableOutput("genesTable"),
                     h3("Custom list genes"),
                     DT::dataTableOutput("customGenesTable"),
                     hr(),
                     fluidRow(column(8), 
-                             column(3, offset=1,downloadObjUI(id = "save_results")))
-                ),
-                tabPanel("Gene details View",
+                             column(3, offset=1,downloadObjUI(id = "save_results")))    
+            ),
+            tabItem(tabName = "gene_details",
                     fluidRow(
                         column(2, h4("Gene symbol:")) , column(9, offset = 1, textOutput("Gene_symbol"))
                     ),
@@ -210,17 +225,21 @@ ui <- fluidPage(
                     fluidRow(
                         column(2, h4("Link to GTeX:")) , column(9, offset = 1, uiOutput("GTeX_link"))
                     ),
-                    br(),
+                    fluidRow(br()),
                     h3("Scores for the selected gene"),
                     DT::dataTableOutput("geneDetail"),
                     h3("Filtered variants for the selected gene"),
                     DT::dataTableOutput("variantsTable"),
                     h3("Filtered compound hets for the selected gene"),
                     DT::dataTableOutput("comphetTable"),
-                    hr(),
-                    h3("Further details on the gene"),
-                    div(DT::dataTableOutput("geneInfo"),style="font-size: 75%")
-                )
+                    br(),
+                    box(title = "Pathways and ontology", id = "path_go_details", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        div(DT::dataTableOutput("geneInfo"),style="font-size: 75%") ),
+                    box(title = "GTeX median expression", id = "gtex_expression", status = "info", solidHeader = TRUE, width=12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        plotOutput("gtex_plot") )
+                    
             )
         )
     )
@@ -379,7 +398,7 @@ server <- function(input, output) {
     ##################
     
     output$Total_affected <- renderText({
-        paste0("Total number of affected individuals in this pedigree: ", RV$total_affected)
+        paste0("\tTotal number of affected individuals in this pedigree: ", RV$total_affected)
     })
     
     output$ped <- renderPlot({
@@ -602,6 +621,15 @@ server <- function(input, output) {
             selected[[n]] <- names(gene_anno[[n]])[id_list]
         }
         Additional_info <- data.frame(lapply(selected, "length<-", max(lengths(selected))), stringsAsFactors = F)
+    })
+    
+    output$gtex_plot <- renderPlot ({
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
+        gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
+        gene_exp <- GTeX_data[GTeX_data$Description == gene_name,]
+        validate(need(nrow(gene_exp)>0, "Gene not found in GTeX"))
+        gene_exp <- gather(gene_exp, key="tissue", value="median_TPM", 3:ncol(gene_exp))
+        ggplot(gene_exp, aes(x=tissue, y=median_TPM)) + geom_bar(stat="identity") + format1
     })
     
     output$variantsTable <- DT::renderDataTable(selection="none", {
