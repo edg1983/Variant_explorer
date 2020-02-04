@@ -9,6 +9,7 @@
 
 library(shiny)
 library(DT)
+library(dplyr)
 library(plotly)
 library(ggplot2)
 library(kinship2)
