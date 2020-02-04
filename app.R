@@ -76,6 +76,8 @@ GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
 ### Set environment ###
 #######################
 
+`%nin%` = Negate(`%in%`)
+
 ##Set axes options for plots
 genes_axes_options <- c(
     "GADO Zscore"= "Gado_zscore", 
@@ -89,10 +91,11 @@ variants_axes_options <- c("Maximum population AF"= "MaxPopAF",
     "ReMM score" = "ReMM_score",
     "SpliceAI score" = "SpliceAI_SpliceAI_max",
     "dbscSNV splice score" = "dbscSNV_ada")
-variants_bar_options <- c("PanelApp" = "PanelApp",
+variants_bar_options <- c(
     "Region type" = "Reg_type",
     "Variant consequence" = "Consequence",
     "Variant type" = "VarType",
+    "PanelApp" = "PanelApp",
     "Chromosome" = "Chr")
 
 ##Plots formatting styles
@@ -163,11 +166,17 @@ ui <- dashboardPage(
                     fluidRow(
                         box(title = "Variant filters", width = 12, status = "primary", solidHeader = TRUE,
                         #tabPanel("General",
-                            uiOutput("d_score"),
-                            uiOutput("Max_pop_AF"),
-                            uiOutput("Cohort_AF"),
-                            uiOutput("var_consequence"),
-                            uiOutput("spliceAI")) ),
+                            column(6,
+                                h4("General filters"),
+                                uiOutput("d_score"),
+                                uiOutput("Max_pop_AF"),
+                                uiOutput("Cohort_AF"),
+                                uiOutput("var_consequence") ),
+                            column(6,
+                                h4("Splice filters"),   
+                                uiOutput("spliceAI")) 
+                        ) 
+                    ),
                         #tabPanel("Splicing", uiOutput("spliceAI"))
                     #) ),
                     
@@ -266,25 +275,27 @@ server <- function(input, output) {
         
         RV$comphet_df <- read.table(comphet_file, header=T, sep="\t", stringsAsFactors=F)
         RV$comphet_df$Class <- "PASS"
+        
         RV$segregation_df <- read.table(segregation_file, header=T, sep="\t", stringsAsFactors=F)
         
         RV$variants_df <- read.table(variants_file, header=T, sep="\t", stringsAsFactors = F)
         RV$variants_df$MaxPopAF[is.na(RV$variants_df$MaxPopAF)] <- 0
         RV$variants_df$cohortAF[is.na(RV$variants_df$cohortAF)] <- 0
         RV$variants_df$SpliceAI_SpliceAI_max[is.na(RV$variants_df$SpliceAI_SpliceAI_max)] <- 0
+        RV$variants_df$Consequence[is.na(RV$variants_df$Consequence)] <- "non_coding_region"
         RV$variants_df$Class <- "PASS"
-        
+
         RV$genes_df <- read.table(genes_file, header=T, sep="\t", stringsAsFactors = F)
-        RV$genes_df <- as.data.frame(RV$genes_df %>% separate_rows(Variants))
+        RV$genes_df <- as.data.frame(RV$genes_df %>% separate_rows(Variants, sep=","))
         RV$genes_df$GDI_phred[is.na(RV$genes_df$GDI_phred)] <- max(RV$genes_df$GDI_phred, na.rm = T)
         RV$genes_df$pLI_gnomAD[is.na(RV$genes_df$pLI_gnomAD)] <- 0
         RV$genes_df$Class <- "PASS"
         
         ###TEMP - remove vars not following any seg model
-        RV$genes_df <- as.data.frame(RV$genes_df %>% filter(inh_model != "other"))
-        RV$variants_df <- as.data.frame(RV$variants_df %>% filter(ID %in% RV$genes_df$Variants))
+        #RV$genes_df <- as.data.frame(RV$genes_df %>% filter(Inh_model != "other"))
+        #RV$variants_df <- as.data.frame(RV$variants_df %>% filter(ID %in% RV$genes_df$Variants))
         ###
-        
+
         RV$genes_scores <- as.data.frame(RV$genes_df %>% select(Gene,Gado_zscore,Exomiser_GenePhenoScore,GDI_phred,pLI_gnomAD,Class) %>% distinct() %>% arrange(desc(Gado_zscore)))
         
         RV$total_affected <- sum(all_peds[input$CaseCode]$affected)
@@ -312,6 +323,80 @@ server <- function(input, output) {
     })
     
     #######################################
+    ### Apply filters on button click
+    #######################################
+        
+    observeEvent(input$Apply_filters, {
+        if ("ALL" %in% input$Consequence) { 
+            RV$accepted_consequence <- sort(unique(RV$variants_df$Consequence))    
+        } else {
+            RV$accepted_consequence <- input$Consequence
+        }
+    })    
+    #    RV$segregating_vars_df <- as.data.frame(RV$segregation_df %>% 
+    #        filter(
+    #            recessive >= input$recessive_filter | 
+    #            dominant >= input$dominant_filter |
+    #            deNovo >= input$denovo_filter |
+    #            comphet >= input$comphet_filter) )
+    #    cat(file=stderr(), "segregating df: ", length(RV$segregating_vars_df$ID),"\n")
+        
+    #    segregating_vars_list <- RV$segregating_vars_df$ID
+    #    comphet_single_vars <- RV$comphet_df %>% filter(ID %in% segregating_vars_list) %>% gather(key="Variant",value="VarID",var1:var2) %>% select(VarID)
+    #    segregating_vars_list <- unique(c(segregating_vars_list, comphet_single_vars$VarID))
+        
+    #    RV$variants_df <- as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
+    #        ID %in% segregating_vars_list &
+    #            d_score >= input$d_score_filter & 
+    #            Consequence %in% RV$accepted_consequence &
+    #            MaxPopAF <= input$MaxPopAF_filter &
+    #            cohortAF <= input$CohortAF_filter &
+    #            ((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing"),"PASS","FILTER")))
+    #    RV$filtered_vars_list <- RV$variants_df$ID[RV$variants_df$Class == "PASS"]
+        
+    #    RV$comphet_df <- as.data.frame(RV$comphet_df %>% mutate(Class = ifelse(
+    #        var1 %in% RV$filtered_vars_list & 
+    #            var2 %in% RV$filtered_vars_list &
+    #            ID %in% RV$segregating_vars_df$ID, "PASS", "FILTER")))
+    #    
+    #    RV$filtered_vars_list <- unique(c(
+    #        RV$variants_df$ID[RV$variants_df$Class == "PASS"], 
+    #        RV$comphet_df$ID[RV$comphet_df$Class == "PASS"])) 
+
+    #    RV$genes_df <- as.data.frame(RV$genes_df %>% mutate(Class = ifelse(
+    #        Variants %in% RV$filtered_vars_list & 
+    #            GDI_phred <= input$GDI_filter &
+    #            pLI_gnomAD >= input$pLI_filter, "PASS", "FILTER")))
+    #    
+    #    RV$filtered_genes_list <- unique(RV$genes_df$Gene[RV$genes_df$Class == "PASS"])
+        
+    #    RV$genes_scores <- as.data.frame(RV$genes_scores %>% mutate(Class = ifelse(
+    #        Gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
+    
+    #    PASS_counts <- c(
+    #        RV$genes_df %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
+    #        RV$genes_df %>% filter(pLI_gnomAD >= input$pLI_filter) %>% nrow() )
+        
+    #    RV$filters_summ_genes <- data.frame(Filter=c("pLI gnomAD","GDI phred"), 
+    #                                     PASS=PASS_counts, 
+    #                                     FILTERED=(nrow(RV$genes_df)-PASS_counts) )
+    #    RV$filters_summ_genes <- gather(RV$filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
+        
+    #    tot_vars <- RV$variants_df %>% select(Chr,Pos,Ref,Alt) %>% nrow()
+    #    PASS_counts <- c(
+    #        RV$variants_df %>% filter(d_score >= input$d_score_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+    #        RV$variants_df %>% filter((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing") %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+    #        RV$variants_df %>% filter(MaxPopAF <= input$MaxPopAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+    #        RV$variants_df %>% filter(Consequence %in% RV$accepted_consequence) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
+    #        RV$variants_df %>% filter(cohortAF <= input$CohortAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow()
+    #    )
+    #    RV$filters_summ_vars <- data.frame(Filter=c("d score","SpliceAI","MaxPop AF","Consequence","cohort AF"),
+    #                                    PASS=PASS_counts, 
+    #                                    FILTERED=(tot_vars-PASS_counts))
+    #    RV$filters_summ_vars <- gather(RV$filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
+    #})
+    
+    #######################################
     ### Data reactive tables configuration
     #######################################
     
@@ -330,19 +415,23 @@ server <- function(input, output) {
     variants_df <- reactive({
         input$Apply_filters
         
-        isolate(
+        isolate({
+            segregating_vars_list <- segregating_vars_df()$ID
+            comphet_single_vars <- RV$comphet_df %>% filter(ID %in% segregating_vars_list) %>% gather(key="Variant",value="VarID",var1:var2) %>% select(VarID)
+            segregating_vars_list <- unique(c(segregating_vars_list, comphet_single_vars$VarID))
+
             as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
-                ID %in% segregating_vars_df()$ID &
+                ID %in% segregating_vars_list &
                 d_score >= input$d_score_filter & 
                 Consequence %in% RV$accepted_consequence &
                 MaxPopAF <= input$MaxPopAF_filter &
                 cohortAF <= input$CohortAF_filter &
                 ((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing"),"PASS","FILTER")))
-        )
+        })
     })
     
     comphet_df <- reactive({
-        filtered_vars_list <- variants_df()$ID[RV$variants_df$Class == "PASS"]
+        filtered_vars_list <- variants_df()$ID[variants_df()$Class == "PASS"]
         
         as.data.frame(RV$comphet_df %>% mutate(Class = ifelse(
             var1 %in% filtered_vars_list & 
@@ -418,22 +507,13 @@ server <- function(input, output) {
     })
     
     output$Gene_segregation_plot <- renderPlot({
-        gene_segregation_df <- as.data.frame(RV$genes_df %>% select(Gene,inh_model) %>% distinct())
-        ggplot(gene_segregation_df, aes(x=inh_model)) + geom_bar() + labs(y="genes count")
+        gene_segregation_df <- as.data.frame(RV$genes_df %>% select(Gene,Inh_model) %>% distinct())
+        ggplot(gene_segregation_df, aes(x=Inh_model)) + geom_bar() + labs(y="genes count")
     })
     
     #################
     ### Filters tab
     #################
-    
-    observeEvent(input$Apply_filters, {
-        if (input$Consequence == "ALL") { 
-            RV$accepted_consequence <- sort(unique(RV$variants_df$Consequence))    
-        } else {
-            RV$accepted_consequence <- input$Consequence
-        }
-        #TODO Make configurable set of columns names and dynamically create filter cursors
-    })
     
     output$d_score <- renderUI({
         startvalue = 0
@@ -574,8 +654,8 @@ server <- function(input, output) {
             "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", Gene %in% RV$filtered_genes_list)),
             "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", Gene %in% RV$filtered_genes_list) %>% 
                                 gather(key="Variant",value = "varID", var1:var2) %>% 
-                                inner_join(., RV$variants_df, by=c("varID"="ID")) %>%
-                                select(-Variant,-varID))),
+                                inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="ID")) %>%
+                                select(-Class.x,-Class.y))),
         zip_archive = paste0(input$CaseCode, ".results.zip")
     )
     
@@ -632,24 +712,26 @@ server <- function(input, output) {
         ggplot(gene_exp, aes(x=tissue, y=median_TPM)) + geom_bar(stat="identity") + format1
     })
     
-    output$variantsTable <- DT::renderDataTable(selection="none", {
+    output$variantsTable <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS"))
-        #validate(need(nrow(genedetail_tab)>0, 'No variants passing the filters'))
-        
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
         
-        as.data.frame(RV$variants_df %>% filter(Class == "PASS", Gene == gene_name))
+        comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", var1:var2)
+        
+        #as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name))
+        as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name, ID %nin% comphet_details$varID))
     })
     
-    output$comphetTable <- DT::renderDataTable(selection="none", {
+    output$comphetTable <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS"))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
-        comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", var1:var2)
+        
+        comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", var1:var2) %>% select(-Gene, -Variant) %>% distinct()
         validate(need(nrow(comphet_details)>0, 'No compound het variants'))
-        comphet_details <- merge(comphet_details,RV$variants_df, by.x="varID",by.y="ID")
-        as.data.frame(comphet_details %>% select(-Gene,-Variant,-varID))
+        comphet_details <- merge(comphet_details,variants_df()[variants_df()$Class == "PASS",], by.x="varID",by.y="ID")
+        as.data.frame(comphet_details %>% select(-Class.x,-Class.y))
     })
 }
 
