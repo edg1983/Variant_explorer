@@ -1,0 +1,12 @@
+name: Variant_explorer
+title: Variant_explorer
+username:
+account: edg1983
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1794231
+bundleId: 2792570
+url: https://edg1983.shinyapps.io/Variant_explorer/
+when: 1581438345.97256
+asMultiple: FALSE
+asStatic: FALSE

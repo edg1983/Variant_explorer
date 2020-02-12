@@ -2,10 +2,11 @@
 # Author: Edoardo Giacopuzzi
 # Explore and filter annotated variants from V2
 
-# Input are tables from the VARAN V2 filtering and annotation
+# Input are tables from the VARAN V2 and var2reg
 
-# TODO Add ClinVar pathogenic gene filter
+# TODO Add ClinVar pathogenic gene and PanelApp genes report in a separated tab 
 # TODO Add separate table reporting all Clinvar pathogenic vars
+# TODO Set up configurable filters
 
 library(shiny)
 library(DT)
@@ -140,8 +141,8 @@ ui <- dashboardPage(
         textOutput("Disease"),
         
         h3("Custom gene list"),
-        textInput(inputId = "custom_file",label = "File:",value = "", placeholder = "gene list file"),
-        actionButton(inputId = "Load_file", label = "Load file"),
+        fileInput(inputId = "custom_file",label = "Custom gene list:", multiple=FALSE, accept="text/plain", placeholder = "gene list txt file"),
+        #actionButton(inputId = "Load_file", label = "Load file"),
         textOutput("Loading_result"),
         sidebarMenu(
             menuItem("Variants overview", tabName = "overview", icon = icon("th")),
@@ -304,15 +305,10 @@ server <- function(input, output) {
         names(RV$values_segregation) <- c("NOT_ACCEPTED", seq(1:RV$total_affected))
     })
     
-    observeEvent(input$Load_file, {
-        if (input$custom_file == "") {
-            RV$load_status = "Insert a file name"
-        } else if (!file.exists(input$custom_file)) {
-            RV$load_status = "File do not exists"
-        } else {
-            RV$custom_genes <- scan(input$custom_file,what="",sep="\n")
-            RV$load_status <- paste0(length(RV$custom_genes), " genes loaded")
-        }
+    observeEvent(input$custom_file, {
+        req(input$custom_file)
+        RV$custom_genes <- scan(input$custom_file$datapath,what="",sep="\n")
+        RV$load_status <- paste0(length(RV$custom_genes), " genes loaded")
     })
     
     output$Loading_result <- renderText({
@@ -636,8 +632,12 @@ server <- function(input, output) {
     
     genesTable_proxy <- DT::dataTableProxy("genesTable")
     
-    output$customGenesTable <- DT::renderDataTable(selection="single", {
+    customGenesTable_df <- reactive({
         as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% filter(Gene %in% RV$custom_genes) %>% select(-Class))
+    })
+    
+    output$customGenesTable <- DT::renderDataTable(selection="single", {
+        customGenesTable_df()
     })
     
     observeEvent(input$customGenesTable_rows_selected, {
