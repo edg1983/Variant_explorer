@@ -1,0 +1,17 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	115285918	115338236	NGF	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	156815640	156881850	NTRK1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	166195185	166375993	SCN9A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	219498867	219506989	GMPPA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	240713764	240820308	KIF1A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	38845769	38950561	SCN11A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	41744082	41748970	PHOX2B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	16473038	16617058	RETREG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	92031999	92115384	SPTLC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	108867517	108934116	ELP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	130664594	130682981	PRDM12	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	752593	911452	WNK1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	53307456	53324864	AAAS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	77505997	77616773	SPTLC2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31591726	31599021	TTR	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	4686236	4701590	PRNP	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

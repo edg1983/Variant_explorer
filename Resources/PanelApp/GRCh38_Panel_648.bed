@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	193122017	193253901	CDC73	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	43077027	43130351	RET	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	64803510	64811294	MEN1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	67483041	67491103	AIP	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	12715058	12722371	CDKN1B	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

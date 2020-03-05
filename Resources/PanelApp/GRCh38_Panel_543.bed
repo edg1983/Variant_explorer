@@ -1,0 +1,18 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	243256034	243500092	SDCCAG8	3		BIALLELIC, autosomal or pseudoautosomal
+2	63121383	63827843	WDPCP	2		BIALLELIC, autosomal or pseudoautosomal
+2	169479178	169506655	BBS5	3		BIALLELIC, autosomal or pseudoautosomal
+3	45823316	45916042	LZTFL1	3		BIALLELIC, autosomal or pseudoautosomal
+3	97764521	97801242	ARL6	3		BIALLELIC, autosomal or pseudoautosomal
+4	121824440	121870497	BBS7	3		BIALLELIC, autosomal or pseudoautosomal
+4	122732702	122744943	BBS12	3		BIALLELIC, autosomal or pseudoautosomal
+7	33129244	33606068	BBS9	3		BIALLELIC, autosomal or pseudoautosomal
+8	93754844	93819234	TMEM67	3		BIALLELIC, autosomal or pseudoautosomal
+11	66510606	66533627	BBS1	3		BIALLELIC, autosomal or pseudoautosomal
+12	76344474	76348442	BBS10	3		BIALLELIC, autosomal or pseudoautosomal
+14	88824153	88881078	TTC8	3		BIALLELIC, autosomal or pseudoautosomal
+15	72686179	72738476	BBS4	3		BIALLELIC, autosomal or pseudoautosomal
+16	56466836	56520283	BBS2	3		BIALLELIC, autosomal or pseudoautosomal
+17	58205437	58219605	MKS1	3		BIALLELIC, autosomal or pseudoautosomal
+20	10401009	10434222	MKKS	3		BIALLELIC, autosomal or pseudoautosomal
+22	36758202	36776256	IFT27	2		BIALLELIC, autosomal or pseudoautosomal

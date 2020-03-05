@@ -1,0 +1,33 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	235661041	235883640	LYST	3		BIALLELIC, autosomal or pseudoautosomal
+2	237485428	237555318	MLPH	2		BIALLELIC, autosomal or pseudoautosomal
+3	149129584	149173732	HPS3	3		BIALLELIC, autosomal or pseudoautosomal
+4	102631488	102760994	MANBA	2		BIALLELIC, autosomal or pseudoautosomal
+5	33944616	33984730	SLC45A2	3		BIALLELIC, autosomal or pseudoautosomal
+5	78000525	78294755	AP3B1	3		BIALLELIC, autosomal or pseudoautosomal
+6	15522801	15663058	DTNBP1	2		BIALLELIC, autosomal or pseudoautosomal
+6	35497874	35512938	TULP1	2		BIALLELIC, autosomal or pseudoautosomal
+7	17298622	17346152	AHR	2		BIALLELIC, autosomal or pseudoautosomal
+9	12685439	12710290	TYRP1	3		BIALLELIC, autosomal or pseudoautosomal
+9	132261356	132354985	SETX	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	75431453	76560167	LRMDA	3		BIALLELIC, autosomal or pseudoautosomal
+10	98416198	98446947	HPS1	3		BIALLELIC, autosomal or pseudoautosomal
+10	102065390	102068038	HPS6	3		BIALLELIC, autosomal or pseudoautosomal
+11	18278668	18322198	HPS5	3		BIALLELIC, autosomal or pseudoautosomal
+11	31784779	31818062	PAX6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	89177452	89295759	TYR	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+13	23328826	23411513	SACS	3		BIALLELIC, autosomal or pseudoautosomal
+15	27754875	28099358	OCA2	3		BIALLELIC, autosomal or pseudoautosomal
+15	45587123	45615999	BLOC1S6	2		BIALLELIC, autosomal or pseudoautosomal
+15	48120972	48142672	SLC24A5	3		BIALLELIC, autosomal or pseudoautosomal
+15	52307283	52529050	MYO5A	2		BIALLELIC, autosomal or pseudoautosomal
+15	55202966	55319113	RAB27A	3		BIALLELIC, autosomal or pseudoautosomal
+16	84009667	84042636	SLC38A8	3		BIALLELIC, autosomal or pseudoautosomal
+19	2100988	2164465	AP3D1	2		BIALLELIC, autosomal or pseudoautosomal
+19	13206442	13633025	CACNA1A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	45178745	45181801	BLOC1S3	2		BIALLELIC, autosomal or pseudoautosomal
+22	26443423	26483837	HPS4	3		BIALLELIC, autosomal or pseudoautosomal
+X	9725346	9786297	GPR143	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	41514934	41923463	CASK	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	49205063	49233371	CACNA1F	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	132076993	132128020	FRMD7	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

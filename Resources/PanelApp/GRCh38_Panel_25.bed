@@ -1,0 +1,81 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	1232265	1235041	B3GALT6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	26787472	26798398	PIGV	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	43705824	43931165	ST3GAL3	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	46188682	46220305	POMGNT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	63367590	63438562	ALG6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	63593276	63660245	PGM1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	66999332	67054099	SLC35D1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	155139891	155140595	DPM3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	160027673	160031991	PIGM	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	235449923	235504481	B3GALNT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	69319769	69387254	GFPT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	74461057	74465410	MOGS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	85837120	85905199	ST3GAL5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	130338241	130342349	CCDC115	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	165747591	165794682	GALNT3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	25718944	25790039	NGLY1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	43079232	43106076	POMGNT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	49716844	49723951	GMPPB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	53088483	53130462	RFT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	184242301	184249548	ALG3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	55346109	55373096	SRD5A3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	55395957	55453397	TMEM165	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	102251041	102431258	SLC39A8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	177600100	177610347	B4GALT7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	83161150	83193936	PGM3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	87470623	87512336	SLC35A1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	16087527	16421322	ISPD	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	107201555	107564514	COG5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	15417215	15766649	TUSC3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	117794490	118111853	EXT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	33104082	33167356	B4GALT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	35088688	35096601	PIGO	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	36214441	36277056	GNE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	105558130	105641118	FKTN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	128945530	128947619	DOLK	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	131502902	131523806	POMT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	137086927	137109187	MAN1B1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	71964365	72013564	CHST3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	3797724	3826371	PGAP2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	44095549	44245429	EXT2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	45804072	45813015	SLC35C1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	62615296	62622175	B3GAT3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	78100936	78139660	ALG8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	111782195	111871581	ALG9	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	119096503	119108331	DPAGT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	125591712	125625215	STT3A	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	63779803	63809558	TMEM5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	123712318	123761755	ATP6V0A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	31199936	31332276	B3GLCT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	39655627	39791665	COG6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	52012398	52029664	ALG11	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	49620795	49623481	MGAT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	65410592	65744121	FUT8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	77274956	77320884	POMT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	40470998	40474571	CHST14	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	74890005	74902219	MPI	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	101175723	101251932	CHSY1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	5033960	5087379	ALG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	8788823	8849331	PMM2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	17101769	17470881	XYLT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	23388493	23453180	COG7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	69320140	69339583	COG8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	70480568	70523565	COG4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	75472052	75495384	CHST6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	7583529	7592789	MPDU1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	16217191	16351797	PIGL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	39671122	39696797	PGAP3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	50346092	50363138	XYLT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	73192632	73208507	COG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	61905255	62187118	PIGN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	46746046	46776988	FKRP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	18507493	18561415	SEC23B	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+20	45416067	45456934	PIGT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	50934867	50958555	DPM1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	33162226	33922841	LARGE1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	49900229	49918458	ALG12	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	15319451	15335580	PIGA	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	48903180	48911958	SLC35A2	2	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	153793516	153798505	SSR4	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	154428632	154436516	ATP6AP1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

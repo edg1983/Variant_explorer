@@ -1,0 +1,29 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	115700007	115768781	CASQ2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	237042205	237833988	RYR2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	47160082	47176601	CALM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	47160082	47176601	CALM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	219627327	219641980	SLC4A3	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38548057	38649673	SCN5A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38548057	38649673	SCN5A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38548057	38649673	SCN5A	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	64275257	64409468	TECRL	2		BIALLELIC, autosomal or pseudoautosomal
+4	112818109	113383740	ANK2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	123216339	123637093	TRDN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	81946444	82443798	CACNA2D1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	150944961	150978315	KCNH2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	150944961	150978315	KCNH2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	150944961	150978315	KCNH2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	18140677	18541869	CACNB2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	2444684	2849109	KCNQ1	3	unknown	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	2444684	2849109	KCNQ1	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+12	1970786	2697950	CACNA1C	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	1970786	2697950	CACNA1C	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	90396502	90408261	CALM1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	90396502	90408261	CALM1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	70168673	70180048	KCNJ2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	70168673	70180048	KCNJ2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	46601074	46610793	CALM3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	46601074	46610793	CALM3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+21	34364024	34371389	KCNE2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+21	34446688	34512275	KCNE1	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal

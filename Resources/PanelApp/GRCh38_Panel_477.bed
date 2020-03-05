@@ -1,0 +1,155 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+0	0	0	AAAS	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ABCB7	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	ABHD12	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ADGRG1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	AFG3L2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	AMPD2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ANO10	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	AP1S2	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	APTX	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ARSA	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ATCAY	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ATM	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ATP1A3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	B3GALNT2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CA8	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CACNA1A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	CACNA1G	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	CAMTA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	CASK	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	CHMP1A	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CLCN2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	CLN6	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	COQ8A	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	COX20	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CP	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CTBP1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	CWF19L1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CYP27A1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CYP2U1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	DARS2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	DDHD2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	DKC1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+0	0	0	DNAJC19	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	DNAJC5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	DNMT1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	EIF2B1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EIF2B2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EIF2B3	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EIF2B4	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EIF2B5	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ELOVL4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	EPM2A	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EXOSC3	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FGF14	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	FKRP	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FKTN	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FLVCR1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FMR1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	FOLR1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FXN	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GBA2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GFAP	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	GJC2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GMPPB	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GOSR2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GPAA1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GRID2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GRM1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	HEXA	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	HEXB	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ISPD	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ITPR1	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+0	0	0	KCNA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	KCNC3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	KCND3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	KCNJ10	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	KIF1C	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	LARGE1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	MARS2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	MMACHC	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	MORC2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	MRE11	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	MT-ATP6	3		MITOCHONDRIAL
+0	0	0	MTTP	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	NHLRC1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	NKX6-2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	NPC1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	NPC2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	OPA3	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	OPHN1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	PAX6	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PDYN	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	PEX16	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PLA2G6	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PMPCA	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PNKP	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PNPLA6	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POLG	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	POLR3A	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POMGNT1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POMGNT2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POMT1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POMT2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PRKCG	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	PRNP	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	PRRT2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	PTF1A	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	RARS2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	RELN	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	RNF170	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	RNF216	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ROBO3	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SACS	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SAR1B	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SEPSECS	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SETX	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SIL1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SLC1A3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	SLC2A1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	SLC9A6	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	SNX14	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+0	0	0	SPG7	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SPTBN2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	SRD5A3	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	STUB1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SYNE1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TGM6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	TINF2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TMEM240	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	TMEM5	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TOE1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TPP1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TSEN2	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TSEN34	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TSEN54	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TTBK2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	TTC19	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TTPA	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TUBA1A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TUBB2B	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TUBB3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TUBB4A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	TWNK	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	VLDLR	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	VPS13D	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	VRK1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	WDR73	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	WDR81	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	WFS1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	WWOX	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ATP8A2	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	B4GAT1	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	COASY	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	COG5	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	DAG1	2		Unknown
+0	0	0	DCC	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	DMXL2	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	MVK	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PHGDH	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SMPD4	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TERT	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	TUBA8	2		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	VAMP1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	VPS53	2		BIALLELIC, autosomal or pseudoautosomal

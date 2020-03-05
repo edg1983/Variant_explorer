@@ -1,0 +1,20 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	73926826	73958961	DGUOK	3		BIALLELIC, autosomal or pseudoautosomal
+3	169764520	169765060	TERC	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	186567403	186585800	DNAJB11	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	15469865	15601557	CC2D2A	3		BIALLELIC, autosomal or pseudoautosomal
+4	88007668	88077777	PKD2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	1253147	1295069	TERT	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	51615300	52087625	PKHD1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	107867756	107958189	SEC63	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	93754844	93819234	TMEM67	3		BIALLELIC, autosomal or pseudoautosomal
+9	99222064	99230615	SEC61B	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	103882542	103918205	STN1	2		BIALLELIC, autosomal or pseudoautosomal
+11	62624826	62646726	GANAB	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	68312609	68449275	LRP5	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	78100936	78139660	ALG8	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	2088710	2135898	PKD1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	53597683	53703938	RPGRIP1L	3		BIALLELIC, autosomal or pseudoautosomal
+17	19337554	19378182	B9D1	2		BIALLELIC, autosomal or pseudoautosomal
+19	11435288	11450968	PRKCSH	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	63657810	63696253	RTEL1	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal

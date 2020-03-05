@@ -1,0 +1,69 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	18631006	18748866	PAX7	3		BIALLELIC, autosomal or pseudoautosomal
+1	25800176	25818224	SELENON	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	154155304	154194648	TPM3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	156082573	156140089	LMNA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	160190556	160201886	CASQ1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal
+1	201039512	201112566	CACNA1S	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	229431245	229434098	ACTA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	236686454	236764631	ACTN2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	127048027	127107355	BIN1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	151485336	151734487	NEB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	169509702	169526262	KLHL41	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	173075435	173268010	MAP3K20	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	178525989	178830802	TTN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	210290150	210315190	MYL1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	219434846	219498287	SPEG	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	232479827	232487828	ECEL1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	237324003	237414375	COL6A3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	9649433	9702393	MTMR14	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	42685519	42692544	KLHL40	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	69106872	69123032	LMOD3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	134603138	134651636	KY	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	180868141	180982753	FXR1	3		BIALLELIC, autosomal or pseudoautosomal
+4	3463311	3494483	DOK7	3		BIALLELIC, autosomal or pseudoautosomal
+4	105369077	105474081	PPA2	2		BIALLELIC, autosomal or pseudoautosomal
+4	185143241	185150382	SLC25A4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	127290831	127465737	MEGF10	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	75084326	75206051	COL12A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	123216339	123637093	TRDN	2		BIALLELIC, autosomal or pseudoautosomal
+7	30010587	30026684	FKBP14	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	128830377	128859274	FLNC	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	24950955	24957110	NEFL	2	Complete	MONOALLELIC, autosomal or pseudoautosomal
+9	35681992	35691020	TPM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	133514586	133528612	MYMK	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	17589032	17617377	HACD1	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	68106117	68212017	MYPN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	72367327	72626191	MICU1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	1838989	1841680	TNNI2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	1919562	1938706	TNNT3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	3854527	4093210	STIM1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	47331397	47352702	MYBPC3	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	21437615	21471252	PYROXD1	3		BIALLELIC, autosomal or pseudoautosomal
+12	40692442	41072418	CNTN1	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	57243453	57251193	STAC3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	80716912	80719673	MYF5	2		BIALLELIC, autosomal or pseudoautosomal
+12	101568353	101686018	MYBPC1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	121626550	121642677	ORAI1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	23412738	23435718	MYH7	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	34706769	34714823	CFL2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	104724186	104747325	ADSSL1	3	unknown	BIALLELIC, autosomal or pseudoautosomal
+15	33310945	33866121	RYR3	3		BIALLELIC, autosomal or pseudoautosomal
+15	64387748	64455303	TRIP4	3		BIALLELIC, autosomal or pseudoautosomal
+15	65076816	65078192	KBTBD13	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	722582	726954	CCDC78	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	10390322	10421950	MYH8	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	10521148	10549957	MYH2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	10628526	10657309	MYH3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	63938554	63972918	SCN4A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	10666483	11148762	PIEZO2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+18	45847609	45967274	EPG5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	10718079	10833488	DNM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	38433699	38587564	RYR1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	55132794	55149354	TNNT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	45981737	46005050	COL6A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+21	46098097	46132849	COL6A2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+22	25742144	26031041	MYO18B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	120427827	120469365	LAMP2	2	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	150568619	150673322	MTM1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	151396515	151409364	VMA21	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

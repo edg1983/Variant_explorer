@@ -1,0 +1,3 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+18	57548283	57586772	FECH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	55009055	55031064	ALAS2	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

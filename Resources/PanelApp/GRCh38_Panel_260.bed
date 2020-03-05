@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	26457203	26558698	OTOF	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	178451436	178461390	DFNB59	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	193593144	193697823	OPA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	59665583	60163987	DIAPH3	2	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	41966582	41997497	ATP1A3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

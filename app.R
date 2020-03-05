@@ -19,14 +19,9 @@ library(shinydashboard)
 source("plotModule.R")
 source("downloadModule.R")
 
-#Set data dir containing variants tables and look for files
-data_dir <- "example_data"
-
-files <- list.files(data_dir, pattern = "*.vars.tsv.gz")
-samplesID <- gsub("V2\\.|\\.var2reg.vars.tsv.gz","",files)
-
-#We can switch to read from a input table containing sampleID and ped locations...
-#samples_df <- data.frame(ID=samplesID,file=files)
+resource_dir <- "Resources"
+PanelApp_dir <- paste0(resource_dir, "/PanelApp")
+GeneLists_dir <- paste0(resource_dir, "/geneLists")
 
 #################
 ### FUNCTIONS ###
@@ -42,6 +37,12 @@ readGMT <- function(input_file) {
     close(con) 
     return(out_list)
 }
+getResource <- function(input_file, parent_dir=resource_dir) {
+    resource_file <- paste0(parent_dir,"/",input_file)
+    return(resource_file)
+}
+
+`%nin%` = Negate(`%in%`)
 
 #############################
 ### Load supporting files ###
@@ -60,25 +61,59 @@ load("Peds_and_HPOs.RData")
 #all_peds <- with(ped_df, pedigree(dadid = V3, momid = V4, affected = V6, sex = V5, famid =V1, missid = 0,id = V2))
 
 ##Load gene names and IDs
-genes_info_file <- "hgnc_complete_set.txt"
+genes_info_file <- getResource("/hgnc_complete_set.txt")
 genes_info <- read.table(genes_info_file, header=T, sep="\t", stringsAsFactors = F)
 
 ##Load pathways and GO groups (suppose .gmt file from MSigDB)
 gene_anno <- list()
-gene_anno[["pathways"]] <- readGMT("c2.cp.v7.0.symbols.gmt")
-gene_anno[["GO_BP"]] <- readGMT("c5.bp.v7.0.symbols.gmt")
-gene_anno[["GO_MF"]] <- readGMT("c5.mf.v7.0.symbols.gmt")
-gene_anno[["GO_CC"]] <- readGMT("c5.cc.v7.0.symbols.gmt")
+gene_anno[["pathways"]] <- readGMT(getResource("c2.cp.v7.0.symbols.gmt"))
+gene_anno[["GO_BP"]] <- readGMT(getResource("c5.bp.v7.0.symbols.gmt"))
+gene_anno[["GO_MF"]] <- readGMT(getResource("c5.mf.v7.0.symbols.gmt"))
+gene_anno[["GO_CC"]] <- readGMT(getResource("c5.cc.v7.0.symbols.gmt"))
 
 ## Load GTeX median expression
-GTeX_file <- gzfile("GTEx_v8_median_TPM.gct.gz")
+GTeX_file <- gzfile(getResource("GTEx_v8_median_TPM.gct.gz"))
 GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
+
+## Load PanelApp index table
+#PanelApp index table contains an id column with panel id number
+#Each panel file is then names GRCh38_Panel_[id].bed
+PanelApp_file <- getResource("PanelApp_index.tsv")
+PanelApp_data <- read.table(PanelApp_file, sep="\t", header = T, stringsAsFactors = F)
+
+PanelApp_genes <- data.frame(entity_name=character(), confidence_level=character(), panel_idx=character(), stringsAsFactors = F)
+
+for (id in PanelApp_data$id) {
+    filename <- paste0(PanelApp_dir,"/GRCh38_Panel_", id, ".bed")
+    mydf <- read.table(filename, sep="\t", header=T, stringsAsFactors = F, comment.char = "@")
+    mydf$panel_idx <- id
+    mydf <- mydf[,c("entity_name","confidence_level","panel_idx")]
+    PanelApp_genes <- rbind(PanelApp_genes, mydf)
+}
+
+## Load additional genes list
+#Expect a GeneLists_index.tsv file in the genelist folder
+#This file must contain an id column and this ids mus match lists file name
+#Example: list1.tsv, id=list1
+geneLists_file <- getResource("GeneLists_index.tsv")
+geneLists_data <- read.table(geneLists_file, sep="\t", header = T, stringsAsFactors = F)
+
+geneLists_genes <- data.frame(entity_name=character(), genelist_idx=character(), stringsAsFactors = F)
+
+for (id in geneLists_data$id) {
+    filename <- paste0(GeneLists_dir,"/", id, ".tsv")
+    mydf <- data.frame(entity_name=scan(filename, what="", sep="\n"), genelist_idx = id, stringsAsFactors = F)
+    geneLists_genes <- rbind(geneLists_genes, mydf)
+}
+
+## Load ClinVar pathogenic genes
+# Tab-separated file with gene symbol and list of diseases
+ClinVar_file <- getResource("clinvar_path_likelypath_20190704.tsv")
+ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors = F)
 
 #######################
 ### Set environment ###
 #######################
-
-`%nin%` = Negate(`%in%`)
 
 ##Set axes options for plots
 genes_axes_options <- c(
@@ -118,6 +153,19 @@ RV <- reactiveValues(
     filters_summ_genes = data.frame(),
     filters_summ_vars = data.frame())
 
+##########################
+### Read variants data ###
+##########################
+
+#Set data dir containing variants tables and look for files
+data_dir <- "example_data"
+
+files <- list.files(data_dir, pattern = "*.vars.tsv.gz")
+samplesID <- gsub("V2\\.|\\.var2reg.vars.tsv.gz","",files)
+
+#We can switch to read from a input table containing sampleID and ped locations...
+#samples_df <- data.frame(ID=samplesID,file=files)
+
 ######################
 ### USER INTERFACE ###
 ######################
@@ -127,7 +175,7 @@ ui <- dashboardPage(
         title = "Variant Explorer",
         dropdownMenu(type = "notifications",
                      notificationItem(
-                         text = "Beta version now working only on 004Int001",
+                         text = "Beta version, functionality limited and bugs expected",
                          icon = icon("exclamation-triangle"),
                          status = "warning"
                      )
@@ -149,6 +197,7 @@ ui <- dashboardPage(
             menuItem("Filters settings", tabName = "filters", icon = icon("th")),
             menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
             menuItem("Filter results", tabName = "filter_results", icon = icon("th")),
+            menuItem("PanelApp and gene lists", tabName = "gene_lists", icon = icon("th")),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th"))
         )
     ),
@@ -226,6 +275,20 @@ ui <- dashboardPage(
                     fluidRow(column(8), 
                              column(3, offset=1,downloadObjUI(id = "save_results")))    
             ),
+            tabItem(tabName = "gene_lists",
+                    box(title = "PanelApp panels", id = "PanelApp_panels", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = FALSE,
+                        DT::dataTableOutput("PanelApp_panels_table"),
+                        DT::dataTableOutput("PanelApp_genes_table") ),
+                    box(title = "ClinVar pathogenic/likely pathogenic", id = "ClinVar_path", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        DT::dataTableOutput("ClinVar_table") ),
+                    box(title = "Other genes lists", id = "Other_genes_lists", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        DT::dataTableOutput("geneLists_table"),
+                        DT::dataTableOutput("geneLists_genes_table") )
+
+            ),
             tabItem(tabName = "gene_details",
                     fluidRow(
                         column(2, h4("Gene symbol:")) , column(9, offset = 1, textOutput("Gene_symbol"))
@@ -291,6 +354,7 @@ server <- function(input, output) {
         RV$genes_df <- as.data.frame(RV$genes_df %>% separate_rows(Variants, sep=","))
         RV$genes_df$GDI_phred[is.na(RV$genes_df$GDI_phred)] <- max(RV$genes_df$GDI_phred, na.rm = T)
         RV$genes_df$pLI_gnomAD[is.na(RV$genes_df$pLI_gnomAD)] <- 0
+        RV$genes_df <- merge(RV$genes_df, PanelApp_genes, by.x="Gene", by.y="entity_name", all.x=T)
         RV$genes_df$Class <- "PASS"
         
         ###TEMP - remove vars not following any seg model
@@ -330,69 +394,7 @@ server <- function(input, output) {
             RV$accepted_consequence <- input$Consequence
         }
     })    
-    #    RV$segregating_vars_df <- as.data.frame(RV$segregation_df %>% 
-    #        filter(
-    #            recessive >= input$recessive_filter | 
-    #            dominant >= input$dominant_filter |
-    #            deNovo >= input$denovo_filter |
-    #            comphet >= input$comphet_filter) )
-    #    cat(file=stderr(), "segregating df: ", length(RV$segregating_vars_df$ID),"\n")
-        
-    #    segregating_vars_list <- RV$segregating_vars_df$ID
-    #    comphet_single_vars <- RV$comphet_df %>% filter(ID %in% segregating_vars_list) %>% gather(key="Variant",value="VarID",var1:var2) %>% select(VarID)
-    #    segregating_vars_list <- unique(c(segregating_vars_list, comphet_single_vars$VarID))
-        
-    #    RV$variants_df <- as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
-    #        ID %in% segregating_vars_list &
-    #            d_score >= input$d_score_filter & 
-    #            Consequence %in% RV$accepted_consequence &
-    #            MaxPopAF <= input$MaxPopAF_filter &
-    #            cohortAF <= input$CohortAF_filter &
-    #            ((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing"),"PASS","FILTER")))
-    #    RV$filtered_vars_list <- RV$variants_df$ID[RV$variants_df$Class == "PASS"]
-        
-    #    RV$comphet_df <- as.data.frame(RV$comphet_df %>% mutate(Class = ifelse(
-    #        var1 %in% RV$filtered_vars_list & 
-    #            var2 %in% RV$filtered_vars_list &
-    #            ID %in% RV$segregating_vars_df$ID, "PASS", "FILTER")))
-    #    
-    #    RV$filtered_vars_list <- unique(c(
-    #        RV$variants_df$ID[RV$variants_df$Class == "PASS"], 
-    #        RV$comphet_df$ID[RV$comphet_df$Class == "PASS"])) 
 
-    #    RV$genes_df <- as.data.frame(RV$genes_df %>% mutate(Class = ifelse(
-    #        Variants %in% RV$filtered_vars_list & 
-    #            GDI_phred <= input$GDI_filter &
-    #            pLI_gnomAD >= input$pLI_filter, "PASS", "FILTER")))
-    #    
-    #    RV$filtered_genes_list <- unique(RV$genes_df$Gene[RV$genes_df$Class == "PASS"])
-        
-    #    RV$genes_scores <- as.data.frame(RV$genes_scores %>% mutate(Class = ifelse(
-    #        Gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
-    
-    #    PASS_counts <- c(
-    #        RV$genes_df %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
-    #        RV$genes_df %>% filter(pLI_gnomAD >= input$pLI_filter) %>% nrow() )
-        
-    #    RV$filters_summ_genes <- data.frame(Filter=c("pLI gnomAD","GDI phred"), 
-    #                                     PASS=PASS_counts, 
-    #                                     FILTERED=(nrow(RV$genes_df)-PASS_counts) )
-    #    RV$filters_summ_genes <- gather(RV$filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
-        
-    #    tot_vars <- RV$variants_df %>% select(Chr,Pos,Ref,Alt) %>% nrow()
-    #    PASS_counts <- c(
-    #        RV$variants_df %>% filter(d_score >= input$d_score_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-    #        RV$variants_df %>% filter((Reg_type == "splicing" & SpliceAI_SpliceAI_max >= input$spliceAI_filter) | Reg_type != "splicing") %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-    #        RV$variants_df %>% filter(MaxPopAF <= input$MaxPopAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-    #        RV$variants_df %>% filter(Consequence %in% RV$accepted_consequence) %>% select(Chr,Pos,Ref,Alt) %>% nrow(),
-    #        RV$variants_df %>% filter(cohortAF <= input$CohortAF_filter) %>% select(Chr,Pos,Ref,Alt) %>% nrow()
-    #    )
-    #    RV$filters_summ_vars <- data.frame(Filter=c("d score","SpliceAI","MaxPop AF","Consequence","cohort AF"),
-    #                                    PASS=PASS_counts, 
-    #                                    FILTERED=(tot_vars-PASS_counts))
-    #    RV$filters_summ_vars <- gather(RV$filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
-    #})
-    
     #######################################
     ### Data reactive tables configuration
     #######################################
@@ -478,6 +480,20 @@ server <- function(input, output) {
             FILTERED=(tot_vars-PASS_counts))
         filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
     })
+    
+    PanelApp_panels_df <- reactive ({
+        panels_idx <- PanelApp_genes$panel_idx[PanelApp_genes$entity_name %in% RV$filtered_genes_list]
+        as.data.frame(PanelApp_data %>% filter(id %in% panels_idx))
+    })
+    
+    geneLists_df <- reactive ({
+        geneLists_idx <- geneLists_genes$genelist_idx[geneLists_genes$entity_name %in% RV$filtered_genes_list]
+        as.data.frame(geneLists_data %>% filter(id %in% geneLists_idx))
+    })
+    
+    ClinVar_df <- reactive ({
+        as.data.frame(ClinVar_genes %>% filter(gene %in% RV$filtered_genes_list))
+    }) 
     
     ##################
     ### Overview Tab
@@ -659,6 +675,40 @@ server <- function(input, output) {
                                 select(-Class.x,-Class.y))),
         zip_archive = paste0(input$CaseCode, ".results.zip")
     )
+
+    ################################
+    ### PanelApp and genes lists tab
+    ################################    
+    
+    output$PanelApp_panels_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+        PanelApp_panels_df()
+    })
+    
+    output$PanelApp_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+        validate(need(input$PanelApp_panels_table_rows_selected, "Select one panel"))
+        
+        panelID <- PanelApp_panels_df()[input$PanelApp_panels_table_rows_selected, "id"]
+
+        PanelApp_genes_df <- as.data.frame(PanelApp_genes %>% filter(panel_idx == panelID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "Gene")))
+        PanelApp_genes_df <- PanelApp_genes_df[order(PanelApp_genes_df$Gado_zscore, decreasing = TRUE),]        
+    })
+    
+    output$ClinVar_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+        ClinVar_df()
+    })
+    
+    output$geneLists_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+        geneLists_df()
+    })
+    
+    output$geneLists_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+        validate(need(input$PanelApp_panels_table_rows_selected, "Select one gene list"))
+        
+        listID <- geneLists_df()[input$geneLists_table_rows_selected, "id"]
+        
+        geneList_genes_df <- as.data.frame(geneLists_genes %>% filter(genelist_idx == listID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "Gene")))
+        geneList_genes_df <- geneList_genes_df[order(geneList_genes_df$Gado_zscore, decreasing = TRUE),]        
+    })
     
     ####################
     ### Gene detail tab

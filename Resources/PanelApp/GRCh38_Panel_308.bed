@@ -1,0 +1,16 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	112911847	112957013	SLC16A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	107989714	108035175	HADH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	44144271	44198170	GCK	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	87050486	87094866	GLUD1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	17385859	17389331	KCNJ11	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	17392885	17476845	ABCC8	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	49018975	49059774	KMT2D	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	120978543	121002512	HNF1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	8788823	8849331	PMM2	3		BIALLELIC, autosomal or pseudoautosomal
+19	7112255	7294034	INSR	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	40230317	40285536	AKT2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	22581005	22585455	FOXA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	44355700	44434596	HNF4A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	44873177	45112602	KDM6A	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	133535745	133985895	GPC3	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

@@ -1,0 +1,21 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	42925375	42959173	SLC2A1	3	Incomplete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+1	160115759	160143591	ATP1A2	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	72887360	72892158	SPR	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	151832768	152099475	CACNB4	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	165984641	166149214	SCN1A	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	218270392	218346793	PNKD	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	123282296	123449758	ADCY5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	157076057	157172090	GLRB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	36606355	36688334	SLC1A3	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	151822513	151924842	GLRA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+8	132120858	132481019	KCNQ3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	117197489	117210299	KCNK18	2	Complete	
+11	20599400	20659285	SLC6A5	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	4909893	4918256	KCNA1	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	51590266	51812864	SCN8A	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	51930436	52012125	ATP7B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	29811382	29815892	PRRT2	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	13206442	13633025	CACNA1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	41966582	41997497	ATP1A3	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	63400210	63472677	KCNQ2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

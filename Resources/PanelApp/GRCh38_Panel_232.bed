@@ -1,0 +1,28 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	1020123	1056118	AGRN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	94974407	95072945	ALG14	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	179882042	179925000	TOR1AIP1	2		BIALLELIC, autosomal or pseudoautosomal
+1	202590596	202710417	SYT2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	69319769	69387254	GFPT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	107986523	108013994	SLC5A7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	174747592	174787935	CHRNA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	232525993	232536667	CHRND	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	232539727	232546403	CHRNG	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	15450133	15521751	COLQ	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	49716844	49723951	GMPPB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	3463311	3494483	DOK7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	143915147	143976734	PLEC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	99216426	99221956	ALG2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	110668771	110801620	MUSK	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	49609095	49665104	CHAT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	49610301	49612720	SLC18A3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	69801931	69964275	COL13A1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	46856868	46918642	LRP4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	47437757	47449178	RAPSN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	119096503	119108331	DPAGT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	6462237	6470987	VAMP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	71822289	72118577	MYO9A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	4897774	4903074	CHRNE	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	7445061	7457707	CHRNB1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	63938554	63972918	SCN4A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	19175575	19178830	SLC25A1	3		BIALLELIC, autosomal or pseudoautosomal

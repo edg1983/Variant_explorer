@@ -1,0 +1,21 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	11106535	11262507	MTOR	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	243488233	243851079	AKT3	2		Other
+2	25227855	25342590	DNMT3A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	25733753	25878516	ASXL2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	179148114	179240093	PIK3CA	2	Complete	Other
+5	177133025	177300215	NSD1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	26156354	26157107	HIST1H1E	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	148807383	148884321	EZH2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, maternally imprinted (paternal allele expressed)
+9	14081843	14398983	NFIB	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	87863113	87971930	PTEN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	1995163	2001470	H19	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+11	2608328	2699994	KCNQ1OT1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+11	2883213	2885881	CDKN1C	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+11	86244544	86278813	EED	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	21385194	21456126	CHD8	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	12995608	13098796	NFIX	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	40230317	40285536	AKT2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	13734745	13769353	OFD1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	80670854	80809688	BRWD3	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	133535745	133985895	GPC3	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

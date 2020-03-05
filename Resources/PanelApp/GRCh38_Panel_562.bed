@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	49683947	49689501	MST1	2		
+4	40191053	40246967	RHOH	2		BIALLELIC, autosomal or pseudoautosomal
+8	78675743	78805523	IL7	2		BIALLELIC, autosomal or pseudoautosomal
+15	90229975	90234047	CIB1	3		BIALLELIC, autosomal or pseudoautosomal
+16	30182827	30189076	CORO1A	2		BIALLELIC, autosomal or pseudoautosomal
+17	78110458	78132407	TMC6	3		BIALLELIC, autosomal or pseudoautosomal
+17	78130770	78142968	TMC8	3		BIALLELIC, autosomal or pseudoautosomal

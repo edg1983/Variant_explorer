@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	11785723	11806920	MTHFR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	80626228	80654983	DHFR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	72189558	72196323	FOLR1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	28394756	28407197	SLC46A1	3	Complete	BIALLELIC, autosomal or pseudoautosomal

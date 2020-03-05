@@ -1,0 +1,32 @@
+id	list_name	n_genes	description
+fda_approved_drug_targets	FDA-approved drug targets	385	Genes whose protein products are known to be the mechanistic targets of FDA-approved drugs (*updated 2018-09-13*).
+drug_targets_nelson	Drug targets by Nelson et al 2012	201	Drug targets according to Nelson et al 2012, with reference to Russ & Lampel 2005.
+blekhman_ad	Autosomal dominant genes by Blekhman et al 2008	307	OMIM disease genes deemed to follow autosomal dominant inheritance according to extensive manual curation by Molly Przeworski's group.
+berg_ad	Autosomal dominant genes by Berg et al 2013	631	OMIM disease genes (as of June 2011) deemed to follow autosomal dominant inheritance according Berg et al, 2013.
+blekhman_ar	Autosomal recessive genes by Blekhman et al 2008	527	OMIM disease genes deemed to follow autosomal recessive inheritance according to extensive manual curation by Molly Przeworski's group.
+berg_ar	Autosomal recessive genes by Berg et al 2013	1073	OMIM disease genes (as of June 2011) deemed to follow autosomal recessive inheritance according Berg et al, 2013.
+blekhman_x	X-linked genes by Blekhman et al 2008	66	OMIM disease genes deemed to follow X-linked inheritance (dominant/recessive not specified) according to extensive manual curation by Molly Przeworski's group.
+berg_xr	X-linked recessive genes by Berg et al 2013	102	OMIM disease genes (as of June 2011) deemed to follow X-linked recessive inheritance according Berg et al, 2013.
+berg_xd	X-linked dominant genes by Berg et al 2013	34	OMIM disease genes (as of June 2011) deemed to follow X-linked dominant inheritance according Berg et al, 2013.
+x-linked_clinvar	X-linked ClinVar genes	61	X chromosome genes in the August 6, 2015 ClinVar release that have at least 3 reportedly pathogenic, non-conflicted variants in ClinVar with at least one submitter other than OMIM or GeneReviews. Code here(src/x-linked_clinvar.R).
+all_ad	All dominant genes	709	Currently the union of the Berg and Blekhman dominant lists, may add more lists later.
+all_ar	All recessive genes	1183	Currently the union of the Berg and Blekhman recessive lists, may add more lists later.
+homozygous_lof_tolerant_twohit	Homozygous LoF tolerant	330	Genes with at least two different high-confidence LoF variants found in a homozygous state in at least one individual in ExAC. By Konrad Karczewski.
+core_essentials_hart	Essential in culture	283	Genes deemed essential in multiple cultured cell lines based on shRNA screen data
+CEGv2_subset_universe	Essential in culture (CRISPR screening)	683	Genes deemed essential in multiple cultured cell lines based on CRISPR/Cas screen data
+NEGv1_subset_universe	Non-essential in culture (CRISPR screening)	913	Genes deemed non-essential in multiple cultured cell lines based on CRISPR/Cas screen data
+mgi_essential	Essential in mice	2454	Genes where homozygous knockout in mice results in pre-, peri- or post-natal lethality. The mouse phenotypes were reported by Jackson Labs Blake 2011, then essential gene list was extracted via manual review of phenotypes by Georgi 2013, and the essential/non-essential flag was put into dbNSFP Liu 2013. We extracted the genes from dbNSFP.
+gwascatalog	Genes nearest to GWAS peaks	6336	Closest gene to GWAS hits  with *P* < 5-e8 in the NHGRI GWAS catalog (MAPPED_GENE column) as of Sep 13, 2018
+DRG_WoodRD	DNA Repair Genes, WoodRD	178	An updated inventory of human DNA repair genes. (Last modified on Tuesday 15th April 2014). For details see src/DRG_WoodRD.R(src/DRG_WoodRD.R)
+DRG_KangJ	DNA Repair Genes, KangJ	151	Supplementary Table 1. 151 DNA repair genes. DNA repair genes from DNA repair pathways: ATM, BER, FA/HR, MMR, NHEJ, NER, TLS, XLR, RECQ, and other.
+clingen_level3_genes_2018_09_13	ClinGen haploinsufficient genes	294	Genes with sufficient evidence for dosage pathogenicity (level 3) as determined by the ClinGen Dosage Sensitivity Map as of Sep 13, 2018
+olfactory_receptors	Olfactory receptors	371	Olfactory receptors from the Mainland 2015's data release
+clinvar_path_likelypath	Genes with any disease association reported in ClinVar	3078	Using this simple script(src/clinvar_path_likelypath.tsv), downloaded the ClinVar tab-delimited summary as of May 12, 2015, and took all gene symbols for which there is at least one variant with an assertion of pathogenic or likely pathogenic in ClinVar.
+kinases	Kinases	347	From UniProt's pkinfam list
+gpcr_guide	GPCRs from guidetopharmacology	391	GPCR list from guidetopharmacology.org
+gpcr_uniprot	GPCRs from Uniprot	756	This query of the Uniprot database
+gpcr_union	GPCRs all	759	Union of the above two lists
+natural_product_targets	Natural product targets	37	List of hand-curated targets of natural products from supplement of Dancik 2010
+BROCA_Cancer_Risk_Panel	BROCA - Cancer Risk Panel	66	BROCA is useful for the evaluation of patients with a suspected hereditary cancer predisposition, with a focus on syndromes that include breast or ovarian cancer as one of the cancer types. Depending on the causative gene involved, these cancers may co-occur with other cancer types (such as colorectal, endometrial, pancreatic, endocrine, or melanoma).
+ACMG_list_2_0	ACMG V2.0	59	The minimum list of genes to be reported as incidental or secondary findings as published by the American College of Medical Genetics and Genomics (ACMG)
+gpi_anchored	GPI-anchored proteins	135	Gene symbols encoding proteins annotated by UniProt as being GPI-anchored.

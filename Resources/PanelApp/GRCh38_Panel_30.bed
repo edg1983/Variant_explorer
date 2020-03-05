@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	231241207	231277973	GNPAT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	177392644	177559299	AGPS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	136822564	136913937	PEX7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	2934632	2968310	ARSE	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	48521158	48528716	EBP	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

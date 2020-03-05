@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	155308748	155320666	FDPS	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	108522580	108561400	SART3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	109573255	109598117	MVK	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	88651935	88663161	MVD	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	62952647	62969585	SLC17A9	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

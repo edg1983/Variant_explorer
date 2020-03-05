@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	115700007	115768781	CASQ2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	237042205	237833988	RYR2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	47160082	47176601	CALM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	64275257	64409468	TECRL	2		BIALLELIC, autosomal or pseudoautosomal
+6	123216339	123637093	TRDN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	90396502	90408261	CALM1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	46601074	46610793	CALM3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

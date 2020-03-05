@@ -1,0 +1,39 @@
+{
+    "GROUPS": {
+        "missense": [
+            ["consequence", "%in%", ["missense_variant"]]
+        ],
+        "splice": [
+            ["consequence", "%in%", ["synoymous_variant","splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+            ["consequence", "%in%", ["intronic_variant"]]
+        ]
+    },
+    "FILTERS": {
+        "missense": {
+            "severe": [
+                ["Logic", "AND"],
+                ["CADD_phred", ">=", 20],
+                ["DANN_score", ">=", 0.9],
+                ["REVEL_score", ">=", 0.9]
+            ],
+            "moderate": [
+                ["Logic", "AND"],
+                ["CADD_phred", ">=", 15],
+                ["DANN_score", ">=", 0.8],
+                ["REVEL_score", ">=", 0.6]                
+            ]
+        },
+        "splice": {
+            "severe": [
+                ["Logic", "OR"],
+                ["spliceAI_spliceAI_SNP_max", ">=", 0.8],
+                ["spliceAI_spliceAI_DEL_max", ">=", 0.8]
+            ],
+            "moderate": [
+                ["Logic", "OR"],
+                ["spliceAI_spliceAI_SNP_max", ">=", 0.6],
+                ["spliceAI_spliceAI_DEL_max", ">=", 0.6]              
+            ]
+        }
+    }
+}

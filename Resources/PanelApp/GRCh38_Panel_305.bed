@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+6	32439842	32445046	HLA-DRA	2	Complete	Unknown
+12	56923154	56934405	SDR9C7	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	21839636	21885424	MBTPS2	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

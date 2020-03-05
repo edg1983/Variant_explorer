@@ -1,0 +1,28 @@
+{
+    "included_info_fields": [
+        "CADD_PhredScore",
+        "CADD_RawScore",
+        "DANN_DANN",
+        "CCR_pct",
+        "FIRE_FIRE",
+        "GDI_phred",
+        "GDI_score",
+        "LinSight",
+        "ReMM_score",
+        "SpliceAI_SpliceAI_max",
+        "dbscSNV_ada",
+        "dbscSNV_rf"
+    ],
+    "included_info_factors": [
+      "Consequence",
+      "VarType",
+      "Reg_type",
+      ""
+    ],
+    "included_info_flags": [
+        "LowMappability",
+        "LowComplexity",
+        "SegDup",
+        "RefSeqReg"
+    ]
+}

@@ -1,0 +1,25 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	5862811	5992473	NPHP4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	110122311	110205066	NPHP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	165857475	165953843	TTC21B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	10141008	10152220	VHL	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	132680609	132722442	NPHP3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	138061990	138115818	DZIP1L	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	186567403	186585800	DNAJB11	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	39182404	39285810	WDR19	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	88007668	88077777	PKD2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	51615300	52087625	PKHD1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	93754844	93819234	TMEM67	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	98731329	98796965	ANKS6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	100099256	100301000	INVS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	132891348	132944633	TSC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	62624826	62646726	GANAB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	117314557	117413268	CEP164	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	88049014	88142216	CEP290	2	Complete	
+12	94306449	94459988	CEP83	3		BIALLELIC, autosomal or pseudoautosomal
+13	110148963	110307149	COL4A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	41774434	41827855	MAPKBP1	3		BIALLELIC, autosomal or pseudoautosomal
+16	2047465	2088720	TSC2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	2088710	2135898	PKD1	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+16	20333052	20356301	UMOD	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	37686432	37745247	HNF1B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

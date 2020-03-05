@@ -1,0 +1,10 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+4	1793307	1808872	FGFR3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	192969	260745	FAM20C	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	60678778	60868028	CHD7	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	97853254	97856715	FOXE1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	121478334	121598458	FGFR2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	44849943	44899662	EFTUD2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	79970811	80033949	TXNL4A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	38244035	38292614	SPINT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	41085635	41236579	USP9X	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

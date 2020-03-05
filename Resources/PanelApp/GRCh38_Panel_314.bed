@@ -1,0 +1,15 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	224470150	224585397	CUL3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	148078762	148444698	NR3C2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	137617500	137736090	KLHL3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+5	143277931	143435512	NR3C1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	142872356	142879846	CYP11B1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	142910559	142917843	CYP11B2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	102830531	102837533	CYP17A1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	128891356	128921035	KCNJ5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	752593	911452	WNK1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	1153121	1221772	CACNA1H	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	23182715	23216883	SCNN1G	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	23278231	23381299	SCNN1B	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	67430652	67437553	HSD11B2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42780678	42796936	WNK4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

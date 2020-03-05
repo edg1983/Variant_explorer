@@ -1,0 +1,11 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	161222292	161223631	APOA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	154583126	154590766	FGA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	121207794	121332843	GSN	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+11	116829706	116833072	APOC3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	116835751	116837950	APOA1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	69348341	69354234	LYZ	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	44711477	44718877	B2M	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31591726	31599021	TTR	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	44945982	44949565	APOC2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	23626706	23638473	CST3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

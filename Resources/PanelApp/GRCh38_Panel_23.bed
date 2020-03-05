@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	160343272	160358952	NCSTN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	121478334	121598458	FGFR2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+13	20187470	20192898	GJB2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	73136418	73223691	PSEN1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	76993359	77037332	PSTPIP1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	35745114	35747519	PSENEN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

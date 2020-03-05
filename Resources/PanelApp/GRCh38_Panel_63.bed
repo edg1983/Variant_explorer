@@ -1,0 +1,24 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	21217247	21345504	ECE1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	144364364	144524583	ZEB2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	48636469	48662915	CELSR3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	41744082	41748970	PHOX2B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	37812677	37839686	GDNF	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	80742538	80922359	SEMA3C	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	84995553	85186855	SEMA3D	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	31639386	32767959	NRG1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	141117278	141195808	DENND3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	43077027	43130351	RET	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	68988721	69043544	KIF1BP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	70771239	70785401	TBATA	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	73995193	74121363	VCL	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	81875314	82987179	NRG3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	116056925	116273467	GFRA1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	3671083	3797792	NUP98	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	71428193	71452868	DHCR7	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	77895481	77919768	EDNRB	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+14	36516392	36521149	NKX2-1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	3185563	3209575	NCLN	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	59300427	59325992	EDN3	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+22	37970686	37987422	SOX10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	153861514	153909223	L1CAM	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

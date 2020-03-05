@@ -1,0 +1,20 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	183186238	183244900	LAMC2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	201283452	201332993	PKP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	209614870	209652466	LAMB3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	172427354	172506282	ITGA6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	48564073	48595267	COL7A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	183635568	183684477	KLHL24	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	7541575	7586717	DSP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	56457987	56954628	DST	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	143915147	143976734	PLEC	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	104031286	104086002	COL17A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	108505431	108593738	EXPH5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	52514575	52520687	KRT5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	43232595	43266857	TGM5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	41582279	41586921	KRT14	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	41754604	41786931	JUP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	50055968	50090481	ITGA3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	75721328	75757818	ITGB4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	23689443	23955066	LAMA3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	6074845	6123544	FERMT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal

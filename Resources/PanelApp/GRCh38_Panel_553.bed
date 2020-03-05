@@ -1,0 +1,39 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	161070995	161089599	NECTIN4	3		BIALLELIC, autosomal or pseudoautosomal
+1	201283452	201332993	PKP1	3		BIALLELIC, autosomal or pseudoautosomal
+1	203861603	203870550	SNRPE	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	236348257	236484914	EDARADD	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+2	108894471	108989372	EDAR	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+2	218880363	218899581	WNT10A	3		BIALLELIC, autosomal or pseudoautosomal
+3	185506262	185552613	LIPH	3		BIALLELIC, autosomal or pseudoautosomal
+3	189631416	189897279	TP63	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	4859666	4863936	MSX1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	31115090	31120446	CDSN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	32439842	32445046	HLA-DRA	2		Unknown
+8	22114415	22133384	HR	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	101492432	101669726	GRHL2	2		BIALLELIC, autosomal or pseudoautosomal
+9	35657751	35658018	RMRP	3		BIALLELIC, autosomal or pseudoautosomal
+10	102394110	102402529	NFKB2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	119623408	119729084	NECTIN1	3		BIALLELIC, autosomal or pseudoautosomal
+12	52285913	52291534	KRT81	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	52314301	52321398	KRT83	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	52360006	52367481	KRT85	3		BIALLELIC, autosomal or pseudoautosomal
+12	52543909	52553147	KRT71	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	52565782	52573825	KRT74	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	53938765	53946544	HOXC13	3		BIALLELIC, autosomal or pseudoautosomal
+12	56923154	56934405	SDR9C7	2		BIALLELIC, autosomal or pseudoautosomal
+13	20187470	20192898	GJB2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+13	20221971	20232395	GJB6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+13	48389567	48444704	LPAR6	3		BIALLELIC, autosomal or pseudoautosomal
+14	35401511	35404749	NFKBIA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	68636189	68722616	CDH3	3		BIALLELIC, autosomal or pseudoautosomal
+17	40748021	40755332	KRT25	3		BIALLELIC, autosomal or pseudoautosomal
+17	41582279	41586921	KRT14	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	10454628	10489948	APCDD1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31376777	31414912	DSG4	3		BIALLELIC, autosomal or pseudoautosomal
+20	958452	1002264	RSPO4	3		BIALLELIC, autosomal or pseudoautosomal
+21	44497892	44711580	TSPEAR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	21839636	21885424	MBTPS2	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	48508962	48520814	PORCN	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	69616067	70039469	EDA	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	154541199	154565046	IKBKG	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

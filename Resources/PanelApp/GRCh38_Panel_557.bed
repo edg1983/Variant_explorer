@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	157736444	157875862	ACVR1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	133932696	134052184	SLCO2A1	3		BIALLELIC, autosomal or pseudoautosomal
+4	174490177	174523154	HPGD	3		BIALLELIC, autosomal or pseudoautosomal

@@ -1,0 +1,21 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	11012344	11026420	TARDBP	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	74361154	74392087	DCTN1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	201700554	201781189	ALS2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	109691312	109825428	FIG4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	144354135	144361272	SLC52A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	34634722	34637809	SIGMAR1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	35056064	35073249	VCP	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	132261356	132354985	SETX	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	13099449	13138308	OPTN	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	54280193	54287088	HNRNPA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	64451880	64502108	TBK1	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	20684177	20698971	ANG	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	31180110	31194871	FUS	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	4945652	4949061	PFN1	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	760080	776015	SLC52A3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	58389122	58451101	VAPB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+21	31659622	31668931	SOD1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+22	29480230	29491390	NEFH	2	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	56563639	56567868	UBQLN2	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	67544032	67730619	AR	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

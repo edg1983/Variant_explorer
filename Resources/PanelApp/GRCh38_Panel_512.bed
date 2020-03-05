@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+4	108810721	109302657	COL25A1	2		BIALLELIC, autosomal or pseudoautosomal
+11	72239077	72245664	PHOX2A	3		BIALLELIC, autosomal or pseudoautosomal
+12	39293228	39443390	KIF21A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	89921392	89938761	TUBB3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

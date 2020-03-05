@@ -1,0 +1,13 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	160115759	160143591	ATP1A2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	188974320	189012746	COL3A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	48465811	48467645	TREX1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	1609972	1613897	FOXC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	122461525	122514908	HTRA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+13	110148963	110307149	COL4A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	110305812	110513027	COL4A2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	16148928	16223522	ABCC6	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	13206442	13633025	CACNA1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	15159038	15200981	NOTCH3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+21	25880550	26171128	APP	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+X	101397803	101407925	GLA	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

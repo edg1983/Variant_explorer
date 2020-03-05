@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	25543580	25568886	LDLRAP1	3		BIALLELIC, autosomal or pseudoautosomal
+1	55039548	55064852	PCSK9	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	21001429	21044073	APOB	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	11089362	11133816	LDLR	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	44905754	44909393	APOE	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

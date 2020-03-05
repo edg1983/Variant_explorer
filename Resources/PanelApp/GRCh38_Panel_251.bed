@@ -1,0 +1,44 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+0	0	0	BMP4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	CDC6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CDT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CHD7	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	DHODH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EDNRA	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	EFTUD2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	EIF4A3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EYA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	FGF10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	FGF3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FGFR2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	FGFR3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	FRAS1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	FREM2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GNAI3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	GRIP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GSC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	HMX1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	HOXA2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	HSPA9	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	KDM6A	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	KMT2D	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	OFD1	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+0	0	0	ORC1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ORC4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ORC6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	OTX2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	PLCB4	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	POLR1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	POLR1C	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	POLR1D	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SALL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SALL4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	SF3B4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SIX1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SLC26A4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SOX10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TCOF1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	TFAP2A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	GDF6	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	RPS28	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SIX5	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

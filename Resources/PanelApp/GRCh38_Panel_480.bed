@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	193122017	193253901	CDC73	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	122183683	122291629	CASR	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	10873223	10881941	GCM2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	43077027	43130351	RET	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	64803510	64811294	MEN1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	12715058	12722371	CDKN1B	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	46838136	46850992	AP2S1	3	unknown	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

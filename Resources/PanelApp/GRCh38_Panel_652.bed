@@ -1,0 +1,47 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	3069168	3438621	PRDM16	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	74235401	74544428	TNNI3K	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	77888513	77943895	NEXN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	156082573	156140089	LMNA	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	201359008	201377762	TNNT2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	236686454	236764631	ACTN2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	237042205	237833988	RYR2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	178525989	178830802	TTN	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	219418377	219426739	DES	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	14124940	14143679	TMEM43	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	38548057	38649673	SCN5A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	52451102	52454070	TNNC1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	112818109	113383740	ANK2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	155870344	156767788	SGCD	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+5	173232109	173235357	NKX2-5	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	7541575	7586717	DSP	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	118548298	118560730	PLN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	35202430	35254147	TBX20	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	128830377	128859274	FLNC	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	105558130	105641118	FKTN	2		BIALLELIC, autosomal or pseudoautosomal
+9	128945530	128947619	DOLK	3		BIALLELIC, autosomal or pseudoautosomal
+10	68106117	68212017	MYPN	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	73995193	74121363	VCL	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	86668449	86736068	LDB3	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	90912096	90921276	ANKRD1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	110644397	110839469	RBM20	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	119651370	119677819	BAG3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	19182030	19210573	CSRP3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	47331397	47352702	MYBPC3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	111908565	111923722	CRYAB	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	32790745	32896840	PKP2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	23381990	23408277	MYH6	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	23412738	23435718	MYH7	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	34788096	34796139	ACTC1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	63042632	63071915	TPM1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	39664187	39666555	TCAP	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	41754604	41786931	JUP	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+18	22169443	22202528	GATA6	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+18	27950966	28177446	CDH2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+18	31058840	31102415	DSC2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+18	31498043	31549008	DSG2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	46746046	46776988	FKRP	2		BIALLELIC, autosomal or pseudoautosomal
+19	55151767	55157773	TNNI3	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+X	31097677	33339441	DMD	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	120427827	120469365	LAMP2	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	154379197	154381523	EMD	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

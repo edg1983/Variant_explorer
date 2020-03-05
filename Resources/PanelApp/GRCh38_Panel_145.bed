@@ -1,0 +1,15 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	168281040	168314426	TBX19	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	43602692	43707405	NNT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	93099513	93118023	SAMD9	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	38143649	38151265	STAR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	47960185	47978160	MCM4	2	Complete	
+9	124481236	124507430	NR5A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	70815961	70881173	SGPL1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	2883213	2885881	CDKN1C	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+12	53307456	53324864	AAAS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	74337759	74367740	CYP11A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	13882044	13915707	MC2R	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	32291813	32314784	MRAP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	44285838	44298648	AIRE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	30304206	30309598	NR0B1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

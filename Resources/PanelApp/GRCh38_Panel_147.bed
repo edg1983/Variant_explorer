@@ -1,0 +1,31 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+0	0	0	ACTA2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	ACVRL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	CCM2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	COL3A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	ENG	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	GUCY1A3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	KRIT1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	PDCD10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	RASA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	RNF213	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	SAMHD1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SLC2A10	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	SMAD4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	YY1AP1	3		BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ADA2	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	ATR	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	CBL	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	CEP152	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	EPHB4	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	FLVCR2	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	GDF2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	HBB	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	MRVI1	2		Unknown
+0	0	0	MYH11	2	unknown	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	NF1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	PCNT	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+0	0	0	PKD1	2	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+0	0	0	PKD2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+0	0	0	SMAD9	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+0	0	0	THSD1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
