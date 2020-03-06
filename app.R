@@ -148,6 +148,9 @@ format1 <- theme(axis.text.x = element_text(angle=45, hjust=1))
 filter_cols_gene <- c("pLI_gnomAD","GDI_phred")
 filter_cols_vars <- c("d_score","SpliceAI_SpliceAI_max","MaxPopAF","Consequence","cohortAF")
 
+##Consequence for regulatory vars
+reg_vars <- c("enhancer_variant","promoter_variant","bivalent_variant","silencer_variant") 
+
 ##Set reactive objects
 RV <- reactiveValues(
     variant_df = data.frame(), 
@@ -225,16 +228,27 @@ ui <- dashboardPage(
                     fluidRow(
                         box(title = "Variant filters", width = 12, status = "primary", solidHeader = TRUE,
                         #tabPanel("General",
-                            column(6,
+                        fluidRow(
+                            column(4,
                                 h4("General filters"),
                                 uiOutput("d_score"),
                                 uiOutput("Max_pop_AF"),
                                 uiOutput("Cohort_AF"),
                                 uiOutput("var_consequence") ),
-                            column(6,
+                            column(4,
+                                h4("Missense filters"),
+                                uiOutput("CADD"),
+                                uiOutput("REVEL") ),
+                            column(4,
                                 h4("Splice filters"),   
-                                uiOutput("spliceAI")) 
-                        ) 
+                                uiOutput("spliceAI")) ),
+                        fluidRow(
+                            column(4, 
+                                h4("Regulatory filters"),
+                                uiOutput("DANN"),
+                                uiOutput("ReMM"),
+                                uiOutput("PhyloP100")) )
+                        )
                     ),
                         #tabPanel("Splicing", uiOutput("spliceAI"))
                     #) ),
@@ -352,11 +366,14 @@ server <- function(input, output) {
         RV$comphet_df$Class <- "PASS"
         
         RV$variants_df <- read.table(variants_file, header=T, sep="\t", stringsAsFactors = F)
+        
+        
         RV$variants_df$MaxPopAF[is.na(RV$variants_df$MaxPopAF)] <- 0
-        RV$variants_df$cohortAF[is.na(RV$variants_df$cohortAF)] <- 0
-        RV$variants_df$SpliceAI_SNP_SpliceAI_max[is.na(RV$variants_df$SpliceAI_SNP_SpliceAI_max)] <- 0
-        RV$variants_df$SpliceAI_DEL_SpliceAI_max[is.na(RV$variants_df$SpliceAI_DEL_SpliceAI_max)] <- 0
         RV$variants_df$Consequence[is.na(RV$variants_df$Consequence)] <- "non_coding_region"
+        RV$variants_df[is.na(RV$variants_df)] <- 0
+        #RV$variants_df$cohortAF[is.na(RV$variants_df$cohortAF)] <- 0
+        #RV$variants_df$SpliceAI_SNP_SpliceAI_max[is.na(RV$variants_df$SpliceAI_SNP_SpliceAI_max)] <- 0
+        #RV$variants_df$SpliceAI_DEL_SpliceAI_max[is.na(RV$variants_df$SpliceAI_DEL_SpliceAI_max)] <- 0
         RV$variants_df$Class <- "PASS"
 
         #RV$segregation_df <- read.table(segregation_file, header=T, sep="\t", stringsAsFactors=F)
@@ -440,17 +457,43 @@ server <- function(input, output) {
         input$Apply_filters
         
         isolate({
-            #segregating_vars_list <- segregating_vars_df()$ID
-            comphet_single_vars <- RV$comphet_df %>% filter(ID %in% segregating_vars()) %>% gather(key="Variant",value="VarID",V1:V2) %>% select(VarID)
+            #first select variants that pass the filters
+            filtered_vars <- as.data.frame(RV$variants_df %>% 
+                filter(! (
+                d_score < input$d_score_filter | 
+                    Consequence %nin% RV$accepted_consequence |
+                    MaxPopAF > input$MaxPopAF_filter |
+                    cohortAF > input$CohortAF_filter |
+                    (Reg_type == "splicing" & 
+                         (SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter & 
+                              SpliceAI_DEL_SpliceAI_max < input$spliceAI_filter) ) |
+                    (Consequence == "missense_variant" &
+                         (CADD_PhredScore < input$CADD_filter & 
+                              REVEL_score < input$REVEL_filter)) |
+                    (Consequence %in% reg_vars &
+                         (ReMM_score < input$ReMM_filter |
+                              DANN_DANN < input$DANN_filter |
+                              PhyloP100 < input$PhyloP100_filter))
+                )))
+            
+            #from comphet select combo when 
+            #both vars in the combo passed the filters
+            #the combo passed segregation filters
+            comphet_single_vars <- RV$comphet_df %>% filter(
+                ID %in% segregating_vars() &
+                V1 %in% filtered_vars$ID &
+                V2 %in% filtered_vars$ID) %>% gather(key="Variant",value="VarID",V1:V2) %>% select(VarID)
+            
+            #the list of segregating vars is now equal to
+            #single vars passing segregation filter
+            #vars part of a comphet passing filters + segregation
             segregating_vars_list <- unique(c(segregating_vars(), comphet_single_vars$VarID))
-
+            
+            #return variants dataframe with updated Class column (PASS/FILTER)
             as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
-                ID %in% segregating_vars_list &
-                d_score >= input$d_score_filter & 
-                Consequence %in% RV$accepted_consequence &
-                MaxPopAF <= input$MaxPopAF_filter &
-                cohortAF <= input$CohortAF_filter &
-                ((Reg_type == "splicing" & (SpliceAI_SNP_SpliceAI_max >= input$spliceAI_filter | SpliceAI_DEL_SpliceAI_max >= input$spliceAI_filter)) | Reg_type != "splicing"),"PASS","FILTER")))
+                ID %nin% segregating_vars_list |
+                ID %nin% filtered_vars$ID,
+                "FILTER","PASS") ) )
         })
     })
     
@@ -577,6 +620,51 @@ server <- function(input, output) {
                     step = 0.02)
     })
     
+    output$CADD <- renderUI({
+        startvalue = 0
+        sliderInput("CADD_filter", "Min CADD phred:",
+                    min = 0,
+                    max = max(RV$variants_df$CADD_PhredScore, na.rm = T),
+                    value = 0,
+                    step = 0.02)
+    })
+    
+    output$DANN <- renderUI({
+        startvalue = 0
+        sliderInput("DANN_filter", "Min DANN score:",
+                    min = 0,
+                    max = max(RV$variants_df$DANN_DANN, na.rm = T),
+                    value = 0,
+                    step = 0.02)
+    })
+    
+    output$ReMM <- renderUI({
+        startvalue = 0
+        sliderInput("ReMM_filter", "Min ReMM score:",
+                    min = 0,
+                    max = max(RV$variants_df$ReMM_score, na.rm = T),
+                    value = 0,
+                    step = 0.02)
+    })
+    
+    output$PhyloP100 <- renderUI({
+        startvalue = 0
+        sliderInput("PhyloP100_filter", "Min PhyloP100 score:",
+                    min = 0,
+                    max = max(RV$variants_df$PhyloP100, na.rm = T),
+                    value = 0,
+                    step = 0.02)
+    })
+    
+    output$REVEL <- renderUI({
+        startvalue = 0
+        sliderInput("REVEL_filter", "Min REVEL score:",
+                    min = 0,
+                    max = max(RV$variants_df$REVEL_score, na.rm = T),
+                    value = 0,
+                    step = 0.02)
+    })
+    
     output$Max_pop_AF <- renderUI({
         startvalue = 0
         sliderInput("MaxPopAF_filter", "Max gnomAD AF:",
@@ -616,19 +704,6 @@ server <- function(input, output) {
     output$segregation_controls <- renderUI({
         segregationUI("segregation", choices_affected = RV$values_affected, choices_unaffected=RV$values_unaffected)
     })
-    
-    #output$recessive <- renderUI({
-    #    selectInput("recessive_filter", "N recessive:", choices = RV$values_segregation, multiple=FALSE)
-    #})
-    #output$dominant <- renderUI({
-    #    selectInput("dominant_filter", "N dominant:", choices = RV$values_segregation, multiple=FALSE)
-    #})
-    #output$denovo <- renderUI({
-    #    selectInput("denovo_filter", "N denovo:", choices = RV$values_segregation, multiple=FALSE)
-    #})
-    #output$comphet <- renderUI({
-    #    selectInput("comphet_filter", "N comphet:", choices = RV$values_segregation, multiple=FALSE)
-    #})
     
     output$var_consequence <- renderUI({
         var_types <- sort(unique(RV$variants_df$Consequence))
@@ -776,7 +851,7 @@ server <- function(input, output) {
         genedetail_tab[input$genesTable_rows_selected,]
     })
     
-    output$geneInfo <- DT::renderDataTable(selection="none", {
+    output$geneInfo <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
         validate(need(gene_name != "", 'No gene selected'))
@@ -817,7 +892,7 @@ server <- function(input, output) {
         comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", V1:V2) %>% select(-Gene, -Variant) %>% distinct()
         validate(need(nrow(comphet_details)>0, 'No compound het variants'))
         comphet_details <- merge(comphet_details,variants_df()[variants_df()$Class == "PASS",], by.x="varID",by.y="ID")
-        as.data.frame(comphet_details %>% select(-Class.x,-Class.y))
+        as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(ID))
     })
 }
 
