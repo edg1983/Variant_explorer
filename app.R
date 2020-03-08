@@ -15,9 +15,11 @@ library(ggplot2)
 library(kinship2)
 library(tidyr)
 library(shinydashboard)
+library(GenomicRanges)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
+source("intersectBedModule.R")
 
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
@@ -28,6 +30,9 @@ segregation_cols <- c(
     "hom_affected" = "hom_aff", 
     "hom_unaffected" = "hom_unaff", 
     "comphet_affected" = "comphet_aff" )
+
+#Set data dir containing variants tables
+data_dir <- "example_data/new_tables"
 
 #################
 ### FUNCTIONS ###
@@ -118,7 +123,7 @@ ClinVar_file <- getResource("clinvar_path_likelypath_20190704.tsv")
 ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors = F)
 
 ##Load GADO distribution
-GADO_file <- gzfile(getResource("GADO_distribution.RData"))
+GADO_file <- gzfile(getResource("GADO_distribution.tsv.gz"))
 gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors = F)
 
 #######################
@@ -172,9 +177,7 @@ RV <- reactiveValues(
 ### Read variants data ###
 ##########################
 
-#Set data dir containing variants tables and look for files
-data_dir <- "example_data/new_tables"
-
+#and look for files in data_dir
 files <- list.files(data_dir, pattern = "*.vars.tsv.gz")
 samplesID <- gsub("V2\\.|\\.var2reg.vars.tsv.gz","",files)
 
@@ -191,6 +194,11 @@ ui <- dashboardPage(
         dropdownMenu(type = "notifications",
                      notificationItem(
                          text = "Beta version, functionality limited and bugs expected",
+                         icon = icon("exclamation-triangle"),
+                         status = "warning"
+                     ),
+                     notificationItem(
+                         text = "ROH regions are loaded for test and do not correpond to this sample!",
                          icon = icon("exclamation-triangle"),
                          status = "warning"
                      )
@@ -278,7 +286,11 @@ ui <- dashboardPage(
                                 #column(3, uiOutput("comphet")) ),
                         "Number of affected / unaffected carrying the variant with the given genotype",
                         "Homozygous and heterozygous conditions evaluated as AND, comphet as OR"
-                        ),
+                        ) 
+                    ),
+                    fluidRow(box(title = "ROH regions filter", id = "ROH_filters_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE,
+                        uiOutput("ROH_filters_UI") )
                     )
             ),
             tabItem(tabName = "filter_explorer",
@@ -366,8 +378,10 @@ server <- function(input, output) {
     observeEvent(input$CaseCode, {
         RV$load_status = ""
         RV$custom_genes = character()
+        RV$ROH_ranges <- NULL
         #reset("custom_file")
         
+        ROH_file <- paste0(data_dir, "/", paste0(input$CaseCode,".ROH.txt.gz"))
         gado_file <- paste0(data_dir, "/", paste0(input$CaseCode,".txt"))
         variants_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.vars.tsv.gz")))
         genes_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.genes.tsv.gz")))
@@ -381,6 +395,7 @@ server <- function(input, output) {
         RV$comphet_df$Class <- "PASS"
         
         RV$variants_df <- read.table(variants_file, header=T, sep="\t", stringsAsFactors = F)
+        RV$variants_ranges <- GRanges(seqnames = RV$variants_df$Chr, ranges = IRanges(RV$variants_df$Pos, end=RV$variants_df$End),ID=RV$variants_df$Var_id)
         
         RV$variants_df$MaxPopAF[is.na(RV$variants_df$MaxPopAF)] <- 0
         RV$variants_df$Consequence[is.na(RV$variants_df$Consequence)] <- "non_coding_region"
@@ -390,7 +405,7 @@ server <- function(input, output) {
         seg_df1 <- as.data.frame(
             RV$comphet_df %>% select(ID,num_aff) %>% 
                 mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0) %>%
-                rename(comphet_aff = num_aff) )
+                dplyr::rename(comphet_aff = num_aff) )
         seg_df2 <- as.data.frame(
             RV$variants_df %>% select(ID,hom_aff,hom_unaff,het_aff,het_unaff) %>%
                 mutate(comphet_aff = 0) )
@@ -417,6 +432,16 @@ server <- function(input, output) {
         #RV$variants_df <- as.data.frame(RV$variants_df %>% filter(ID %in% RV$genes_df$Variants))
         ###
         
+        if (file.exists(ROH_file)) {
+            ROH_file <- gzfile(ROH_file)
+            ROH_df <- read.table(ROH_file, sep="\t", header=T, stringsAsFactors = F)
+            RV$ROH_ranges <- GRanges(
+                seqnames = ROH_df$Chromosome, 
+                ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
+                ID = paste0("ROH_", 1:nrow(ROH_df)),
+                value = ROH_df$End - ROH_df$Start)
+        }
+        
         RV$total_affected <- sum(all_peds[input$CaseCode]$affected)
         RV$total_unaffected <- length(all_peds[input$CaseCode]$id) - RV$total_affected 
         RV$values_affected <- seq(0,RV$total_affected)
@@ -429,6 +454,12 @@ server <- function(input, output) {
         req(input$custom_file)
         RV$custom_genes <- scan(input$custom_file$datapath,what="",sep="\n")
         RV$load_status <- paste0(length(RV$custom_genes), " genes loaded")
+    })
+    
+    observeEvent(input$custom_bed, {
+        req(input$custom_bed)
+        RV$customBed_ranges <- GRanges(seqnames = ROH_regions$Chromosome, ranges = IRanges(ROH_regions$Start, end=ROH_regions$End), ID = paste0("ROH_", 1:nrow(ROH_regions)))
+        RV$load_status <- paste0(length(RV$customBed_ranges), " genes loaded")
     })
     
     output$Loading_result <- renderText({
@@ -473,8 +504,17 @@ server <- function(input, output) {
         input$Apply_filters
         
         isolate({
+            
+            #if bedtools / ROH filters are in action select only vars in the bed regions
+            if (!is.null(RV$ROH_ranges)) {
+                vars_in_regions_ids <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$variants_ranges, bed_ranges=RV$ROH_ranges, multiplier=1000)
+                vars_in_regions <- as.data.frame(RV$variants_df %>% filter(Var_id %in% vars_in_regions_ids))
+            } else {
+                vars_in_regions <- RV$variants_df
+            }
+            
             #first select variants that pass the filters
-            pass_vars <- as.data.frame(RV$variants_df %>% 
+            pass_vars <- as.data.frame(vars_in_regions %>% 
                 filter(! (
                 d_score < input$d_score_filter | 
                     Consequence %nin% RV$accepted_consequence |
@@ -749,6 +789,18 @@ server <- function(input, output) {
         names(var_types) <- sort(unique(RV$variants_df$Consequence))
         var_types <- c("ALL" = "ALL", var_types)
         selectInput("comphet_consequence_filter", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
+    })
+    
+    output$ROH_filters_UI <- renderUI({ 
+        validate(need(!is.null(RV$ROH_ranges), "No ROH regions loaded"))
+        bedcontrolUI("ROH_filter", label = "Select only vars in ROH regions", 
+            filter_config = c(
+                "label" = "ROH min dimension (kb)",
+                "min" = 0,
+                "max" = max(RV$ROH_ranges$value) / 1000,
+                "step" = 10,
+                "value" = 250
+            ))
     })
 
     ########################
