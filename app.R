@@ -117,6 +117,10 @@ for (id in geneLists_data$id) {
 ClinVar_file <- getResource("clinvar_path_likelypath_20190704.tsv")
 ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors = F)
 
+##Load GADO distribution
+GADO_file <- gzfile(getResource("GADO_distribution.RData"))
+gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors = F)
+
 #######################
 ### Set environment ###
 #######################
@@ -247,7 +251,11 @@ ui <- dashboardPage(
                                 h4("Regulatory filters"),
                                 uiOutput("DANN"),
                                 uiOutput("ReMM"),
-                                uiOutput("PhyloP100")) )
+                                uiOutput("PhyloP100") ),
+                            column(4,
+                                h4("Compound het filter"),
+                                "At least one of the variant must have the selected consequence",
+                                uiOutput("comphet_consequence") ) )
                         )
                     ),
                         #tabPanel("Splicing", uiOutput("spliceAI"))
@@ -268,8 +276,8 @@ ui <- dashboardPage(
                                 #column(3, uiOutput("dominant")),
                                 #column(3, uiOutput("denovo")),
                                 #column(3, uiOutput("comphet")) ),
-                        "Number of affected individuals in which a variants segregates",
-                        "Works with OR logic"
+                        "Number of affected / unaffected carrying the variant with the given genotype",
+                        "Homozygous and heterozygous conditions evaluated as AND, comphet as OR"
                         ),
                     )
             ),
@@ -290,7 +298,10 @@ ui <- dashboardPage(
                     plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=TRUE)    
             ),
             tabItem(tabName = "filter_results",
-                    plotlyOutput("GADO_rank"),
+                    fluidRow(
+                        column(8, plotlyOutput("GADO_rank")),
+                        column(4, plotlyOutput("GADO_distribution"))
+                    ),
                     DT::dataTableOutput("genesTable"),
                     h3("Custom list genes"),
                     DT::dataTableOutput("customGenesTable"),
@@ -356,10 +367,14 @@ server <- function(input, output) {
         RV$load_status = ""
         RV$custom_genes = character()
         #reset("custom_file")
+        
+        gado_file <- paste0(data_dir, "/", paste0(input$CaseCode,".txt"))
         variants_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.vars.tsv.gz")))
         genes_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.genes.tsv.gz")))
         comphet_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.comphet.tsv.gz")))
-        #segregation_file <- gzfile(paste0(data_dir, "/", paste0("V2.",input$CaseCode,".var2reg.segregation.tsv.gz")))
+
+        gado_score <- read.table(gado_file, sep="\t", header=T, stringsAsFactors = F)
+        RV$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
         
         RV$comphet_df <- read.table(comphet_file, header=T, sep="\t", stringsAsFactors=F)
         RV$comphet_df$ID <- paste0("CompHet_", RV$comphet_df$ID)
@@ -367,16 +382,11 @@ server <- function(input, output) {
         
         RV$variants_df <- read.table(variants_file, header=T, sep="\t", stringsAsFactors = F)
         
-        
         RV$variants_df$MaxPopAF[is.na(RV$variants_df$MaxPopAF)] <- 0
         RV$variants_df$Consequence[is.na(RV$variants_df$Consequence)] <- "non_coding_region"
         RV$variants_df[is.na(RV$variants_df)] <- 0
-        #RV$variants_df$cohortAF[is.na(RV$variants_df$cohortAF)] <- 0
-        #RV$variants_df$SpliceAI_SNP_SpliceAI_max[is.na(RV$variants_df$SpliceAI_SNP_SpliceAI_max)] <- 0
-        #RV$variants_df$SpliceAI_DEL_SpliceAI_max[is.na(RV$variants_df$SpliceAI_DEL_SpliceAI_max)] <- 0
         RV$variants_df$Class <- "PASS"
 
-        #RV$segregation_df <- read.table(segregation_file, header=T, sep="\t", stringsAsFactors=F)
         seg_df1 <- as.data.frame(
             RV$comphet_df %>% select(ID,num_aff) %>% 
                 mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0) %>%
@@ -439,6 +449,12 @@ server <- function(input, output) {
         } else {
             RV$accepted_consequence <- input$Consequence
         }
+        
+        if ("ALL" %in% input$comphet_consequence_filter) { 
+            RV$comphet_consequence <- sort(unique(RV$variants_df$Consequence))    
+        } else {
+            RV$comphet_consequence <- input$comphet_consequence_filter
+        }
     })    
 
     #######################################
@@ -458,7 +474,7 @@ server <- function(input, output) {
         
         isolate({
             #first select variants that pass the filters
-            filtered_vars <- as.data.frame(RV$variants_df %>% 
+            pass_vars <- as.data.frame(RV$variants_df %>% 
                 filter(! (
                 d_score < input$d_score_filter | 
                     Consequence %nin% RV$accepted_consequence |
@@ -476,24 +492,40 @@ server <- function(input, output) {
                               PhyloP100 < input$PhyloP100_filter))
                 )))
             
-            #from comphet select combo when 
-            #both vars in the combo passed the filters
-            #the combo passed segregation filters
-            comphet_single_vars <- RV$comphet_df %>% filter(
-                ID %in% segregating_vars() &
-                V1 %in% filtered_vars$ID &
-                V2 %in% filtered_vars$ID) %>% gather(key="Variant",value="VarID",V1:V2) %>% select(VarID)
+            #COMPHET FILTERING
+            #Select comphet where both vars pass variants filters
+            comphet_accepted <- RV$comphet_df %>% filter(
+                    V1 %in% pass_vars$ID &
+                    V2 %in% pass_vars$ID)
             
-            #the list of segregating vars is now equal to
-            #single vars passing segregation filter
-            #vars part of a comphet passing filters + segregation
-            segregating_vars_list <- unique(c(segregating_vars(), comphet_single_vars$VarID))
+            #COMPHET specific consequence
+            #This filter allow to select comphet where at least 1 var as the given consequence
+            #From pass vars select only the ones with accepted consequence
+            #based on the comphet consequence filter
+            comphet_accepted_vars <- as.data.frame(pass_vars %>%
+                filter(Consequence %in% RV$comphet_consequence) )
+            
+            #Get the final list of vars in accepted comphet
+            #from comphet select combo when: 
+            #both vars in the combo passed the general variants filters (comphet_accepted df)
+            #at least one var in the combo pass the comphet consequence filter
+            #the combo passed segregation filters
+            comphet_single_vars <- comphet_accepted %>% filter(
+                ID %in% segregating_vars() &
+                (V1 %in% comphet_accepted_vars$ID |
+                V2 %in% comphet_accepted_vars$ID) ) %>% gather(key="Variant",value="VarID",V1:V2) %>% select(VarID)
+            
+            #GET THE FINAL LIST OF ACCEPTED VARS
+            #the final list of segregating accepted vars is now equal to
+            #single vars passing filters and segregation
+            #vars part of a comphet passing all filters + segregation
+            accepted_vars_list <- intersect(segregating_vars(), pass_vars$ID)
+            accepted_vars_list <- unique(c(accepted_vars_list, comphet_single_vars$VarID))
             
             #return variants dataframe with updated Class column (PASS/FILTER)
             as.data.frame(RV$variants_df %>% mutate(Class = ifelse(
-                ID %nin% segregating_vars_list |
-                ID %nin% filtered_vars$ID,
-                "FILTER","PASS") ) )
+                ID %in% accepted_vars_list,
+                "PASS","FILTER") ) )
         })
     })
     
@@ -711,6 +743,13 @@ server <- function(input, output) {
         var_types <- c("ALL" = "ALL", var_types)
         selectInput("Consequence", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
     })
+    
+    output$comphet_consequence <- renderUI({
+        var_types <- sort(unique(RV$variants_df$Consequence))
+        names(var_types) <- sort(unique(RV$variants_df$Consequence))
+        var_types <- c("ALL" = "ALL", var_types)
+        selectInput("comphet_consequence_filter", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
+    })
 
     ########################
     ### Filter Explorer tab
@@ -745,12 +784,24 @@ server <- function(input, output) {
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         if (length(input$genesTable_rows_selected) > 0) {
             Zscore <- genedetail_tab[input$genesTable_rows_selected, "Gado_zscore"]
-            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + geom_vline(xintercept = Zscore, color="red") + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
+            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + geom_vline(xintercept = Zscore, color="red") + geom_vline(xintercept = RV$gado90, linetype = "dashed") + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
         } else {
-            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
+            GADO_plot <- ggplot(genes_scores(), aes(x=Gado_zscore, fill=Class)) + geom_histogram(bins=100) + geom_vline(xintercept = RV$gado90, linetype = "dashed") + scale_fill_brewer(palette="Set3") + scale_y_sqrt() 
         }
         ggplotly( GADO_plot )
     })
+    
+    output$GADO_distribution <- renderPlotly({
+        validate(need(input$genesTable_rows_selected, "Select a gene"))
+        genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
+        gene_name <- genedetail_tab[input$genesTable_rows_selected, "Gene"]
+        Zscore <- genedetail_tab[input$genesTable_rows_selected, "Gado_zscore"]
+        GADO_dist <- ggplot(gado_distribution[gado_distribution$Hgnc == gene_name,], aes(x=Zscore)) + 
+            geom_histogram(bins = max(gado_distribution$Zscore[gado_distribution$Hgnc == gene_name])*10) + 
+            geom_vline(xintercept = Zscore, color = "red") +
+            scale_x_continuous(breaks=round(seq(min(gado_distribution$Zscore[gado_distribution$Hgnc == gene_name]),max(gado_distribution$Zscore[gado_distribution$Hgnc == gene_name]),1)))
+        ggplotly( GADO_dist )
+     })
     
     output$genesTable <- DT::renderDataTable(selection="single", {
         as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)) 
