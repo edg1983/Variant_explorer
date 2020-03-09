@@ -7,6 +7,8 @@
 # TODO Add separate table reporting all Clinvar pathogenic vars
 # TODO Set up configurable filters
 
+#options(repos = BiocManager::repositories())
+#getOption("repos")
 library(shiny)
 library(DT)
 library(dplyr)
