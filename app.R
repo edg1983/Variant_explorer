@@ -18,6 +18,7 @@ library(kinship2)
 library(tidyr)
 library(shinydashboard)
 library(GenomicRanges)
+library(gridExtra)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
@@ -229,11 +230,24 @@ ui <- dashboardPage(
     dashboardBody(
         tabItems(
             tabItem(tabName = "overview",
-                    plotOutput("ped"),
-                    plotOutput("Var_consequence_plot"),
-                    plotOutput("Var_type_plot"),
-                    plotOutput("Var_PopAF_plot"),
-                    plotOutput("Gene_segregation_plot")    
+                    fluidRow(
+                        box(title = "Pedigree", width=6, status = "primary", solidHeader = TRUE,
+                            plotOutput("ped")
+                        ),
+                        box(title = "Variant types", width=6, status = "primary", solidHeader = TRUE,
+                            plotOutput("Var_type_plot")
+                        )
+                    ),
+                    fluidRow(
+                        box(title = "Variant consequences", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                            plotOutput("Var_consequence_plot")
+                        )
+                    ),
+                    fluidRow(
+                        box(title = "Variant AF", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                            plotOutput("Var_PopAF_plot")
+                        )
+                    )
             ),
             tabItem(tabName = "filters",
                     column(12, align="center", actionButton(inputId = "Apply_filters", label = "Apply filters")),
@@ -241,7 +255,6 @@ ui <- dashboardPage(
                     
                     fluidRow(
                         box(title = "Variant filters", width = 12, status = "primary", solidHeader = TRUE,
-                        #tabPanel("General",
                         fluidRow(
                             column(4,
                                 h4("General filters"),
@@ -268,9 +281,7 @@ ui <- dashboardPage(
                                 uiOutput("comphet_consequence") ) )
                         )
                     ),
-                        #tabPanel("Splicing", uiOutput("spliceAI"))
-                    #) ),
-                    
+
                     fluidRow(
                         box(title = "Gene filters", id = "gene_filters", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
@@ -461,7 +472,7 @@ server <- function(input, output) {
     observeEvent(input$custom_bed, {
         req(input$custom_bed)
         RV$customBed_ranges <- GRanges(seqnames = ROH_regions$Chromosome, ranges = IRanges(ROH_regions$Start, end=ROH_regions$End), ID = paste0("ROH_", 1:nrow(ROH_regions)))
-        RV$load_status <- paste0(length(RV$customBed_ranges), " genes loaded")
+        RV$load_status <- paste0(length(RV$customBed_ranges), " regions loaded")
     })
     
     output$Loading_result <- renderText({
@@ -656,20 +667,25 @@ server <- function(input, output) {
     })
     
     output$Var_consequence_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=Consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        var_data <- RV$variants_df %>% select(Var_id, Consequence) %>% distinct()
+        ggplot(var_data, aes(x=Consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
     })
     
     output$Var_type_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=VarType)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        ggplot(RV$variants_df, aes(x=VarType)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
     })
     
     output$Var_PopAF_plot <- renderPlot({
-        ggplot(RV$variants_df, aes(x=MaxPopAF, y=cohortAF, color=VarType)) + geom_point()
-    })
-    
-    output$Gene_segregation_plot <- renderPlot({
-        gene_segregation_df <- as.data.frame(RV$genes_df %>% select(Gene,Inh_model) %>% distinct())
-        ggplot(gene_segregation_df, aes(x=Inh_model)) + geom_bar() + labs(y="genes count")
+        AF_data <- RV$variants_df %>% select(Var_id, MaxPopAF, cohortAF, VarType) %>% distinct()
+        AF_data$PopAF_level <- cut(AF_data$MaxPopAF, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
+        AF_data$CohortAF_level <- cut(AF_data$cohortAF, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
+        
+        cohortAF_p <- ggplot(AF_data, aes(x=CohortAF_level, fill=CohortAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Cohort AF distribution") + theme(legend.position = "none")
+        PopAF_p <- ggplot(AF_data, aes(x=PopAF_level, fill=PopAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Max pop AF distribution") + theme(legend.position = "none")
+        AF_scatter <- ggplot(AF_data, aes(x=MaxPopAF, y=cohortAF, color=VarType)) + geom_point() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(title = "AF comparison") + theme(legend.position = "none")
+        plot_layout <- rbind(c(1,1,2,2),c(NA,3,3,NA))
+        grid.arrange(cohortAF_p, PopAF_p, AF_scatter, layout_matrix = plot_layout)
+        
     })
     
     #################
