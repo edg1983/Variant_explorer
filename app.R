@@ -2,15 +2,15 @@
 # Author: Edoardo Giacopuzzi
 # Explore and filter annotated variants from V2
 
-# Input are tables from the VARAN V2 and var2reg
+# Input are encrypted RData objects created with Prepare_data.R
+# Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
 
-# TODO Add separate table reporting all Clinvar pathogenic vars
 # TODO Set up configurable filters
 
 #Install needed packages if missing
-#list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "GenomicRanges", "gridExtra", "ggplot2")
-#new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-#if(length(new.packages)) {install.packages(new.packages)}
+list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "GenomicRanges", "gridExtra", "ggplot2")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) {install.packages(new.packages)}
 
 #options(repos = BiocManager::repositories())
 #getOption("repos")
@@ -30,15 +30,10 @@ source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
 
+APP_VERSION <- "1.0"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
-segregation_cols <- c(
-    "het_affected" = "het_aff", 
-    "het_unaffected" = "het_unaff", 
-    "hom_affected" = "hom_aff", 
-    "hom_unaffected" = "hom_unaff", 
-    "comphet_affected" = "comphet_aff" )
 
 #Set data dir containing variants tables
 data_dir <- "encrypt_data"
@@ -199,6 +194,14 @@ reg_sources <- list(
         "Hi-C screening" = "JungEtAl2019")
 )
 
+##Set segregation columns names
+segregation_cols <- c(
+    "het_affected" = "het_aff", 
+    "het_unaffected" = "het_unaff", 
+    "hom_affected" = "hom_aff", 
+    "hom_unaffected" = "hom_unaff", 
+    "comphet_affected" = "comphet_aff" )
+
 ##Set reactive objects
 RV <- reactiveValues(
     notifications = list(),
@@ -225,7 +228,7 @@ samplesID <- gsub("\\.RData","",files)
 
 ui <- dashboardPage(
     dashboardHeader(
-        title = "Variant Explorer",
+        title = paste0("Variant Explorer v", APP_VERSION),
         dropdownMenuOutput("NotificationMenu")
     ),
 
