@@ -1,30 +1,37 @@
-# MODULE FOR FILTERS MANAGMENT
-# Allow to configure groups of filters
-# return a quotation object containing AND concatened filters 
+# MODULE FOR VARIANT FILTERS MANAGEMENT
+# Allow to configure define groups of vars and apply specific filters to each group
+# Suppose a variants table containing various annotations columns
+# returns a quotation object containing concatened filters for selecting FILTERED VARS
+# Practical use to obtain PASS variants is to negate this in dplyr filter(!(!!!returned_object))
+# Returned filters are configured as follows:
+# global_filters | (var in group1 & (group1 filters)) | (var in group1 & (group1 filters)) ...
 
-# variables: list with names corresponding to varID (name of variable/column to apply filter).
-# Each element contain a sublist with names
-#   label = string to be used as label for the control
-#   selected = the value selected when control is initialized
-#   values = a vector of possible choices or a vector with min,max,step for numeric scales
-#   filter = string containing one of <, >, >=, <=, %in% (filter to be applied)
-#   type = slider or multichoice
+# Filter configuration is defined in 2 json files
+# definitions:  contains 3 groups for numerical, factors and binary columns
+#               each groups define column names and the associated label to show.
+#               for numerical columns the operator of filter is also provided like >,<
+#               for factors columnd %in% is used
+# settings:     allow to define filters groups and presets
 
-# UI can be configured passing ncols and variables arguments
+# UI aspect can be configured passing ncols
 # ncols set the number of columns to arrange the controls in fluidRow
+# One separated column is created for each filter group defined in settings
+# Two additional multichoice ar added per group 
+#   - AND / OR logic
+#   - Preset if present in settings json
 
 selectFilter <- function(var,operator,value) {
   switch(operator,
     ">" = { myexpr <- quo((!!(as.name(var))) > !!(as.numeric(value))) },
     "<" = { myexpr <- quo((!!(as.name(var))) < !!(as.numeric(value))) },
     ">=" = { myexpr <- quo((!!(as.name(var))) >= !!(as.numeric(value))) },
-    "<=" = { myexpr <- quo((!!(as.name(var))) <= !!(as.numeric(value))) },
-    "%in%" = { myexpr <- quo((!!(as.name(var))) %in% !!value) }
+    "<=" = { myexpr <- quo((!!(as.name(var))) <= !!(as.numeric(value))) }
+#    "%in%" = { myexpr <- quo((!!(as.name(var))) %in% !!value) }
   )
   return(myexpr)
 }
 
-filtersGroupUI <- function(id,variables,ncols) {
+filtersGroupUI <- function(id,filters_def,filters_set,ncols) {
   ns <- NS(id)
   
   col_size <- 12/ncols

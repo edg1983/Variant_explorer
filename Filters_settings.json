@@ -1,39 +1,67 @@
 {
-    "GROUPS": {
-        "missense": [
-            ["consequence", "%in%", ["missense_variant"]]
-        ],
-        "splice": [
-            ["consequence", "%in%", ["synoymous_variant","splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
-            ["consequence", "%in%", ["intronic_variant"]]
-        ]
+"GENES":
+    {
+        "GROUPS": {
+            "global": {
+                "associated_values": ["pLI_gnomad", "GDI_phred"]    
+            }
+        }
     },
-    "FILTERS": {
-        "missense": {
-            "severe": [
-                ["Logic", "AND"],
-                ["CADD_phred", ">=", 20],
-                ["DANN_score", ">=", 0.9],
-                ["REVEL_score", ">=", 0.9]
-            ],
-            "moderate": [
-                ["Logic", "AND"],
-                ["CADD_phred", ">=", 15],
-                ["DANN_score", ">=", 0.8],
-                ["REVEL_score", ">=", 0.6]                
-            ]
+
+"VARIANTS":
+    {
+        "GROUPS": {
+            "global": {
+                 "associated_values": ["Consequence", "Max_pop_AF", "d_score"]
+            },
+            "missense": {
+                "definition": ["consequence", ["missense_variant"]],
+                "associated_values": ["CADD_PhredScore", "DANN_DANN", "REVEL_score"]
+            },
+            "splice": {
+                "definition": ["consequence", "%in%", ["intronic_variant","synoymous_variant","splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+                "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_DEL_SpliceAI_max", "dbscSNV_ada", "dbscSNV_rf"]
+            },
+            "regulatory": {
+                "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant"]],
+                "associated_values": ["ReMM_score", "FIRE_FIRE", "DANN_DANN", "LinSight"]
+            }
         },
-        "splice": {
-            "severe": [
-                ["Logic", "OR"],
-                ["spliceAI_spliceAI_SNP_max", ">=", 0.8],
-                ["spliceAI_spliceAI_DEL_max", ">=", 0.8]
-            ],
-            "moderate": [
-                ["Logic", "OR"],
-                ["spliceAI_spliceAI_SNP_max", ">=", 0.6],
-                ["spliceAI_spliceAI_DEL_max", ">=", 0.6]              
-            ]
+        "PRESETS": {
+            "missense": {
+                "severe": {
+                    "Logic": "AND",
+                    "values": {
+                        "CADD_phred": 20,
+                        "DANN_score": 0.9,
+                        "REVEL_score": 0.9
+                    }
+                },
+                "moderate": {
+                    "Logic": "AND",
+                    "values": {
+                        "CADD_phred": 15,
+                        "DANN_score": 0.8,
+                        "REVEL_score": 0.6
+                    }
+                }
+            },
+            "splice": {
+                "severe": {
+                    "Logic": "OR",
+                    "values": {
+                        "spliceAI_spliceAI_SNP_max": 0.8,
+                        "spliceAI_spliceAI_DEL_max": 0.8
+                    }
+                },
+                "moderate": {
+                    "Logic": "OR",
+                    "values": {
+                        "spliceAI_spliceAI_SNP_max": 0.6,
+                        "spliceAI_spliceAI_DEL_max": 0.6
+                    }
+                }
+            }
         }
     }
 }

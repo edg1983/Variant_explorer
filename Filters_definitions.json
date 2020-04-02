@@ -1,0 +1,24 @@
+{
+    "numeric_fields": { 
+        "CADD_PhredScore": ["CADD Phred", ">="],
+        "DANN_DANN": ["DANN score",">="],
+        "CCR_pct": ["Conserved Coding Region pct",">="],
+        "FIRE_FIRE": ["FIRE score",">="],
+        "LinSight": ["LinSight score",">="],
+        "ReMM_score": ["ReMM score",">="],
+        "SpliceAI_SNP_SpliceAI_max": ["SpliceAI score",">="],
+        "dbscSNV_ada": ["dbscSNV ada",">="],
+        "dbscSNV_rf": ["dbscSNV rf",">="]
+    },
+    "factors_fields": {
+      "Consequence": "Conseuquence",
+      "VarType": "Variant type",
+      "Db_source": "Data source"
+    },
+    "binary_fields": {
+        "LowMappability": "Low mappability regions",
+        "LowComplexity": "Low complexity regions",
+        "SegDup": "Segmental Duplication",
+        "RefSeqReg": "RefSeq Regulatory DB"
+    }
+}
