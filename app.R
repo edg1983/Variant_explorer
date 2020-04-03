@@ -52,6 +52,7 @@ readGMT <- function(input_file) {
     close(con) 
     return(out_list)
 }
+
 getResource <- function(input_file, parent_dir=resource_dir) {
     resource_file <- paste0(parent_dir,"/",input_file)
     return(resource_file)
@@ -68,6 +69,25 @@ decrypt_datafile = function(inf, pwd) {
         return(0)
     })
     return (d)
+}
+
+makeBoolean <- function(myvalues,myvector, logic="include") {
+    if (logic=="include") { 
+        true_value <- 1
+    }
+    if (logic=="exclude") { 
+        true_value <- 0
+    }
+    
+    outlist <- list()
+    for (v in myvalues) {
+        if (v %in% myvector) {
+            outlist[[v]] = true_value
+        } else {
+            outlist[[v]] = c(0,1)
+        }
+    }
+    return(outlist)
 }
 
 `%nin%` = Negate(`%in%`)
@@ -294,10 +314,15 @@ ui <- dashboardPage(
                                 uiOutput("d_score"),
                                 uiOutput("Max_pop_AF"),
                                 uiOutput("Cohort_AF"),
-                                uiOutput("var_consequence") ),
+                                uiOutput("var_consequence"),
+                                checkboxGroupInput("vars_anno_regions","Exclude from:", 
+                                                   choices = c("Segmental duplications" = "SegDup", "Low complexity regions" = "LowComplexity", "Highly variable genes" = "TopVariableGenes"),
+                                                   inline = FALSE) ),
                             column(4,
                                 h4("Missense filters"),
                                 uiOutput("CADD"),
+                                uiOutput("DANN"),
+                                uiOutput("MCAP"),
                                 uiOutput("REVEL") ),
                             column(4,
                                 h4("Splice filters"),   
@@ -309,7 +334,10 @@ ui <- dashboardPage(
                                 selectInput("reg_connected_gene", "Gene connection:", choices = c("ALL" = "ALL", "Closest gene" = "closest_gene", "From database" = "reg_db"), multiple = TRUE, selected="ALL"),
                                 uiOutput("LinSight"),
                                 uiOutput("ReMM"),
-                                uiOutput("PhyloP100") ),
+                                uiOutput("PhyloP100"),
+                                checkboxGroupInput("NC_anno_regions","Included in:", 
+                                                   choices = c("TFBS" = "TFBS", "DNase peak" = "DNase", "Ultra-conserved element" = "UCNE"),
+                                                   inline = TRUE) ),
                             column(4,
                                 h4("Compound het filter"),
                                 "At least one of the variant must have the selected consequence",
@@ -537,6 +565,10 @@ server <- function(input, output) {
             #Get rec_id for reg variants in accepted db sources
             accepted_reg_recid <- RV$data$variants_df$rec_id[grep(paste(RV$accepted_reg_db, collapse="|"), RV$data$variants_df$db_source)]
             
+            #Read which regions are selected from checkboxes and convert to 0/1 values
+            NC_reg_anno <- makeBoolean(c("TFBS","DNase","UCNE"), input$NC_anno_regions, logic = "include")
+            var_reg_anno <- makeBoolean(c("SegDup","LowComplexity","TopVariableGenes"), input$vars_anno_regions, logic = "exclude")
+            
             #if ROH regions are provided call the bed regions module with this
             if (!is.null(RV$data$ROH_ranges)) {
                 message("call bed module")
@@ -549,22 +581,30 @@ server <- function(input, output) {
             #first select variants that pass the filters
             pass_vars <- as.data.frame(vars_in_regions %>% 
                 filter(! (
-                d_score < input$d_score_filter | 
+                    d_score < input$d_score_filter | 
                     consequence %nin% RV$accepted_consequence |
                     max_pop_af > input$MaxPopAF_filter |
                     cohort_af > input$CohortAF_filter |
+                    SegDup %nin% var_reg_anno$SegDup |
+                    LowComplexity %nin% var_reg_anno$LowComplexity |
+                    TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
                     (reg_type == "splicing" & 
                          (SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter & 
                               SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) ) |
                     (consequence == "missense_variant" &
                          (CADD_PhredScore < input$CADD_filter & 
-                              REVEL_score < input$REVEL_filter)) |
+                              REVEL_score < input$REVEL_filter &
+                              MCAP_score < input$MCAP_filter &
+                              DANN_score < input$DANN_filter)) |
                     (consequence %in% reg_vars &
                          (ReMM_score < input$ReMM_filter |
                               LinSight < input$LinSight_filter |
                               PhyloP100 < input$PhyloP100_filter) &
                          rec_id %nin% accepted_reg_recid &
-                         reg_type %nin% RV$accepted_connected_gene)
+                         reg_type %nin% RV$accepted_connected_gene &
+                         TFBS %nin% NC_reg_anno$TFBS &
+                         DNase %nin% NC_reg_anno$DNase &
+                         UCNE %nin% NC_reg_anno$UCNE)
                 )))
             
             #COMPHET FILTERING
@@ -814,7 +854,23 @@ server <- function(input, output) {
                     min = 0,
                     max = max(RV$data$variants_df$REVEL_score, na.rm = T),
                     value = 0,
-                    step = 0.02)
+                    step = 0.01)
+    })
+    
+    output$DANN <- renderUI({
+        sliderInput("DANN_filter", "Min DANN score:",
+                    min = 0,
+                    max = max(RV$data$variants_df$DANN_score, na.rm = T),
+                    value = 0,
+                    step = 0.01)
+    })
+    
+    output$MCAP <- renderUI({
+        sliderInput("MCAP_filter", "Min M-CAP score:",
+                    min = 0,
+                    max = max(RV$data$variants_df$MCAP_score, na.rm = T),
+                    value = 0,
+                    step = 0.01)
     })
     
     output$Max_pop_AF <- renderUI({
