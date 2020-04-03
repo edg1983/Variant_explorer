@@ -8,9 +8,14 @@
 # TODO Set up configurable filters
 
 #Install needed packages if missing
-list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "GenomicRanges", "gridExtra", "ggplot2")
+list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
+
+if(!("GenomicRanges" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {install.packages("BiocManager")}
+    BiocManager::install("GenomicRanges")
+}
 
 #options(repos = BiocManager::repositories())
 #getOption("repos")
