@@ -11,7 +11,7 @@ library(GenomicRanges)
 library(kinship2)
 library(dplyr)
 library(tidyr)
-pwd="Unlock_HICF2"
+pwd="HICF2_hg38_newdata"
 
 # load (gziped) data file
 loadData <- function(dataF, append="", header=T, sep="\t", source=NA) {
@@ -103,7 +103,7 @@ if (from_config==TRUE) {
   roh_suffix <- "_ROH_full"
   ExpHunter_dir <- paste0(project_dir,"/Expansion_hunter")
 
-  idx_file <- paste0(var2reg_dir, "/V2.var2reg.idx.tsv.gz")
+  idx_file <- paste0(var2reg_dir, "/cohort_deepvariant.v2r.idx.tsv.gz")
   idx_df <- loadData(idx_file)
   message("Loaded var2reg idx file containing ", nrow(idx_df), " dataset")
   
@@ -119,6 +119,11 @@ if (from_config==TRUE) {
     
     #convert idx df to list
     newlist <- as.list(idx_df[n,])
+    #message(newlist$pedigree)
+    
+    #Set out file and skip if already present
+    out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
+    if (file_test("-f", out_file)) {next}
     
     #split samples ids into vectors
     newlist$all_samples <- strsplit(newlist$all_samples, ",")[[1]]
@@ -138,15 +143,14 @@ if (from_config==TRUE) {
     newlist$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
     
     #load comphet data
-    comphet_df <- loadData(paste0(newlist$comphet_file,".gz"))
+    comphet_df <- loadData(paste0(newlist$comphet_file))
+    if (nrow(comphet_df) == 0) {next} #skip loading data if comphet empty
     comphet_df$ID <- paste0("CompHet_", comphet_df$rec_id)
     comphet_df$Class <- "PASS"
     newlist$comphet_df <- comphet_df
     
     #load variants data and set pop AD to zero when missing
-    variants_df <- loadData(paste0(newlist$variant_file,".gz"))
-    variants_df$max_pop_af[is.na(variants_df$max_pop_af)] <- 0
-    variants_df[is.na(variants_df)] <- 0
+    variants_df <- loadData(paste0(newlist$variant_file))
     variants_df$Class <- "PASS"
     variants_ranges <- GRanges(seqnames = variants_df$chr, ranges = IRanges(variants_df$start, end=variants_df$end),ID=variants_df$rec_id)
     newlist$variants_df <- variants_df
@@ -164,7 +168,7 @@ if (from_config==TRUE) {
     
     #Load genes table. Gene scores are moved to a separate table
     #Missing scores are set to zero
-    genes_df <- loadData(paste0(newlist$gene_file,".gz"))
+    genes_df <- loadData(paste0(newlist$gene_file))
     genes_df$Class <- "PASS"
     genes_scores <- as.data.frame(genes_df %>% select(gene,gado_zscore,exomiser_gene_pheno_score,pLI_exac,pLI_gnomad,Class) %>% distinct() %>% arrange(desc(gado_zscore)))
     genes_df <- as.data.frame(genes_df %>% select(gene,inh_model,variants_n,variants,Class))
@@ -188,18 +192,22 @@ if (from_config==TRUE) {
     newlist$ExpHunter <- list()
     for (s in newlist$all_samples) {
       ROH_file <- paste0(roh_dir, "/",s,roh_suffix,".txt")
-      ROH_df <- loadData(ROH_file)
-      newlist$ROH_ranges[[s]] <- GRanges(
-        seqnames = ROH_df$Chromosome, 
-        ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
-        ID = paste0("ROH_", 1:nrow(ROH_df)),
-        value = ROH_df$End - ROH_df$Start)
+      if (file_test("-f", ROH_file)) {
+        ROH_df <- loadData(ROH_file)
+        newlist$ROH_ranges[[s]] <- GRanges(
+          seqnames = ROH_df$Chromosome, 
+          ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
+          ID = paste0("ROH_", 1:nrow(ROH_df)),
+          value = ROH_df$End - ROH_df$Start)
+        
+        ROH_df$Sample <- s
+        newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
+      }
       
-      ROH_df$Sample <- s
-      newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
-
       ExpHunter_file <- paste0(ExpHunter_dir, "/", s, ".json")
-      newlist$ExpHunter[[s]] <- read_json(ExpHunter_file)
+      if (file_test("-f", ExpHunter_file)) {
+        newlist$ExpHunter[[s]] <- read_json(ExpHunter_file)
+      }
     }
     
     #Prepare ExpHunter table
@@ -215,9 +223,11 @@ if (from_config==TRUE) {
           #colnames(mydf) <- col_names
           if (!is.null(mydf$Genotype)) {single_vars <- rbind(single_vars,mydf)}
         }
-        single_vars$LocusId <- newlist$ExpHunter[[sID]]$LocusResults[[gene]]$LocusId
-        single_vars$Coverage <- newlist$ExpHunter[[sID]]$LocusResults[[gene]]$Coverage
-        locus_vars <- rbind(locus_vars,single_vars)
+        if (!is.null(single_vars)) {
+          single_vars$LocusId <- newlist$ExpHunter[[sID]]$LocusResults[[gene]]$LocusId
+          single_vars$Coverage <- newlist$ExpHunter[[sID]]$LocusResults[[gene]]$Coverage
+          locus_vars <- rbind(locus_vars,single_vars)
+        }
       }
       locus_vars$sampleID <- sID
       locus_vars$sex <- newlist$ExpHunter[[sID]]$SampleParameters$Sex
@@ -252,7 +262,6 @@ if (from_config==TRUE) {
     })
       
     #Save encrypted object
-    out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
     save_results <- encrypt_datafile(newlist,outf=out_file,pwd = pwd)
     if (save_results == 1) {
       saved_files = saved_files + 1

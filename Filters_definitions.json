@@ -20,5 +20,26 @@
         "LowComplexity": "Low complexity regions",
         "SegDup": "Segmental Duplication",
         "RefSeqReg": "RefSeq Regulatory DB"
+    },
+    "fill_na" : {
+      "max_pop_af": 0,
+      "cohort_af": 0,
+      "DANN_score": 99,
+      "CADD_PhredScore": 99,
+      "LoF_tolerance": -99,
+      "FIRE_score": 99,
+      "LinSight": 99,
+      "ReMM_score": 99,
+      "dbscSNV_ada": 99,
+      "dbscSNV_rf": 99,
+      "PhyloP100": -99,
+      "REVEL_score": 99,
+      "ExPECTO_MAX_VALUE": 99,
+      "NCBoost_score": 99,
+      "dbNSFP_PP2_HDIV": 99,
+      "dbNSFP_PP2_HVAR": 99,
+      "SpliceAI_SNP_SpliceAI_max": 99,
+      "SpliceAI_INDEL_SpliceAI_max": 99,
+      "MCAP_score": 99
     }
 }

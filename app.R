@@ -8,7 +8,7 @@
 # TODO Set up configurable filters
 
 #Install needed packages if missing
-list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2")
+list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -30,6 +30,7 @@ library(tidyr)
 library(shinydashboard)
 library(GenomicRanges)
 library(gridExtra)
+library(jsonlite)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
@@ -237,15 +238,15 @@ RV <- reactiveValues(
     selected_vars_region = "NONE",
     accepted_reg_db = NULL)
 
-##########################
-### Read variants data ###
-##########################
+############################################
+### Read variants data and filter config ###
+############################################
 
-# TODO change this to read from either var2reg tables alone or encrypted objects
-# We need multiple validate to avoid nasty error messages when ROH or ExpHunter data missing
 #and look for files in data_dir
 files <- list.files(data_dir, pattern = ".RData")
 samplesID <- gsub("\\.RData","",files)
+
+filter_definitions <- read_json("Filters_definitions.json")
 
 ######################
 ### USER INTERFACE ###
@@ -340,6 +341,7 @@ ui <- dashboardPage(
                                 uiOutput("LinSight"),
                                 uiOutput("ReMM"),
                                 uiOutput("PhyloP100"),
+                                uiOutput("LoF_tolerance"),
                                 checkboxGroupInput("NC_anno_regions","Included in:", 
                                                    choices = c("TFBS" = "TFBS", "DNase peak" = "DNase", "Ultra-conserved element" = "UCNE"),
                                                    inline = TRUE) ),
@@ -462,6 +464,7 @@ server <- function(input, output) {
         
         RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData"), pwd = input$pwd)
         if (inherits(RV$data, "list")) {
+            RV$data$variants_df <- RV$data$variants_df %>% replace_na(filter_definitions$fill_na)
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
@@ -604,7 +607,8 @@ server <- function(input, output) {
                     (consequence %in% reg_vars &
                          (ReMM_score < input$ReMM_filter |
                               LinSight < input$LinSight_filter |
-                              PhyloP100 < input$PhyloP100_filter) &
+                              PhyloP100 < input$PhyloP100_filter |
+                              LoF_tolerance > input$LoFtolerance_filter) &
                          rec_id %nin% accepted_reg_recid &
                          reg_type %nin% RV$accepted_connected_gene &
                          TFBS %nin% NC_reg_anno$TFBS &
@@ -730,7 +734,8 @@ server <- function(input, output) {
     
     output$ped <- renderPlot({
         shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-        shiny::validate(need(!is.null(RV$data$ped), "No PED data found for this sample"))
+        shiny::validate(need(!is.null(RV$data$ped), "No PED data found for this sample"),
+                        need(RV$data$n_all_samples > 1, "SINGLETON"))
         plot.pedigree(RV$data$ped, mar = c(5, 3, 5, 3))
     })
     
@@ -746,7 +751,7 @@ server <- function(input, output) {
     })
     
     output$Var_PopAF_plot <- renderPlot({
-        shiny::validate(need(RV$data != 0, "No data loaded"))
+        shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
         AF_data <- RV$data$variants_df %>% select(var_id, max_pop_af, cohort_af, var_type) %>% distinct()
         AF_data$PopAF_level <- cut(AF_data$max_pop_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
         AF_data$CohortAF_level <- cut(AF_data$cohort_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
@@ -848,10 +853,18 @@ server <- function(input, output) {
     
     output$PhyloP100 <- renderUI({
         sliderInput("PhyloP100_filter", "Min PhyloP100 score:",
-                    min = 0,
+                    min = min(RV$data$variants_df$PhyloP100, na.rm = T),
                     max = max(RV$data$variants_df$PhyloP100, na.rm = T),
                     value = 0,
                     step = 0.02)
+    })
+    
+    output$LoF_tolerance <- renderUI({
+        sliderInput("LoFtolerance_filter", "Max LoF tolerance score:",
+                    min = 0,
+                    max = max(RV$data$variants_df$LoF_tolerance, na.rm = T),
+                    value = 1,
+                    step = 0.02)        
     })
     
     output$REVEL <- renderUI({
