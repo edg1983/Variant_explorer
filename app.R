@@ -42,7 +42,7 @@ PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
 
 #Set data dir containing variants tables
-data_dir <- "encrypt_data"
+data_dir <- "encrypted_data"
 
 #################
 ### FUNCTIONS ###
