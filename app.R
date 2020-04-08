@@ -36,7 +36,7 @@ source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
 
-APP_VERSION <- "1.0.1"
+APP_VERSION <- "1.0.2"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
