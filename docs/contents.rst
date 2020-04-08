@@ -8,7 +8,8 @@ Welcome to Variant Explorer's documentation!
 
 .. toctree::
     :maxdepth: 2
-
+    :caption: Contents:
+    
     installation
     usage/overview
     usage/filters
