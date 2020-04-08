@@ -11,6 +11,7 @@ library(GenomicRanges)
 library(kinship2)
 library(dplyr)
 library(tidyr)
+library(data.table)
 pwd="HICF2_hg38_newdata"
 
 # load (gziped) data file
@@ -18,10 +19,10 @@ loadData <- function(dataF, append="", header=T, sep="\t", source=NA) {
   dataF = as.character(paste0(dataF, append))
   #message("Loading ", dataF)
   if ( endsWith(dataF, ".gz") ) {
-    dat_file = gzfile(dataF)
-    dat = read.table(dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
+    dat_file = paste0("zcat ", dataF)
+    dat = fread(cmd=dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
   } else {
-    dat = read.table(dataF, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
+    dat = fread(dataF, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
   }
   if ( ! is.na(source)) {
     dat$source = source
@@ -170,7 +171,10 @@ if (from_config==TRUE) {
     #Missing scores are set to zero
     genes_df <- loadData(paste0(newlist$gene_file))
     genes_df$Class <- "PASS"
-    genes_scores <- as.data.frame(genes_df %>% select(gene,gado_zscore,exomiser_gene_pheno_score,pLI_exac,pLI_gnomad,Class) %>% distinct() %>% arrange(desc(gado_zscore)))
+    genes_scores <- as.data.frame(genes_df %>% 
+      select(gene,gado_zscore,exomiser_gene_pheno_score,pLI_exac,pLI_gnomad,GDI_phred,EDS,RVIS,Class) %>% 
+        distinct() %>% 
+        arrange(desc(gado_zscore)))
     genes_df <- as.data.frame(genes_df %>% select(gene,inh_model,variants_n,variants,Class))
     
     genes_with_comphet <- as.data.frame(
@@ -181,8 +185,6 @@ if (from_config==TRUE) {
     )
     genes_df <- rbind(genes_df, genes_with_comphet)
     genes_df <- as.data.frame(genes_df %>% separate_rows(variants, sep=","))
-    genes_scores$pLI_gnomad[is.na(genes_scores$pLI_gnomad)] <- 0
-    genes_scores$pLI_exac[is.na(genes_scores$pLI_exac)] <- 0
     newlist$genes_df <- genes_df
     newlist$genes_scores <- genes_scores
     

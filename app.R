@@ -355,7 +355,10 @@ ui <- dashboardPage(
                     fluidRow(
                         box(title = "Gene filters", id = "gene_filters", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
-                        uiOutput("pLI") ),
+                        uiOutput("pLI"),
+                        uiOutput("GDI"),
+                        uiOutput("RVIS"),
+                        uiOutput("EDS")),
             
                         box(title = "Segregation filters", id = "segregation_filters", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE,
@@ -464,7 +467,8 @@ server <- function(input, output) {
         
         RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData"), pwd = input$pwd)
         if (inherits(RV$data, "list")) {
-            RV$data$variants_df <- RV$data$variants_df %>% replace_na(filter_definitions$fill_na)
+            RV$data$variants_df <- RV$data$variants_df %>% replace_na(filter_definitions$fill_na_vars)
+            RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(filter_definitions$fill_na_genes)
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
@@ -667,8 +671,12 @@ server <- function(input, output) {
             variants_df()$rec_id[variants_df()$Class == "PASS"], 
             comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
         
+        #Filters on gene scores are applied
         genes_above_score <- as.data.frame(RV$data$genes_scores %>% mutate(Class = ifelse(
-            pLI_gnomad >= input$pLI_filter, "PASS", "FILTER")))
+            pLI_gnomad >= input$pLI_filter | 
+            GDI_phred <= input$GDI_filter |
+            RVIS <= input$RVIS_filter |
+            EDS >= input$EDS , "PASS", "FILTER" )))
             
         as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
             variants %in% RV$filtered_vars_list & 
@@ -910,19 +918,37 @@ server <- function(input, output) {
     output$pLI <- renderUI({
         sliderInput("pLI_filter", "Min gnomad pLI:",
                     min = 0,
-                    max = max(RV$data$genes_scores$pLI_gnomad, na.rm = T),
+                    max = max(RV$data$genes_scores$pLI_gnomad[RV$data$genes_scores$pLI_gnomad != 99], na.rm = T),
                     value = 0,
                     step = 0.05)
     })
     
-    #output$GDI <- renderUI({
-    #    startvalue = 0
-    #    sliderInput("GDI_filter", "Max phred GDI:",
-    #                min = 0,
-    #                max = max(RV$data$genes_df$GDI_phred, na.rm = T),
-    #                value = max(RV$data$genes_df$GDI_phred, na.rm = T),
-    #                step = 0.1)
-    #})
+    output$GDI <- renderUI({
+        startvalue = 0
+        sliderInput("GDI_filter", "Max phred GDI:",
+                    min = 0,
+                    max = max(RV$data$genes_scores$GDI_phred, na.rm = T),
+                    value = max(RV$data$genes_scores$GDI_phred, na.rm = T),
+                    step = 0.05)
+    })
+    
+    output$RVIS <- renderUI({
+        startvalue = 0
+        sliderInput("RVIS_filter", "Max RVIS score:",
+                    min = min(RV$data$genes_scores$RVIS[RV$data$genes_scores$RVIS != -99], na.rm = T),
+                    max = max(RV$data$genes_scores$RVIS, na.rm = T),
+                    value = max(RV$data$genes_scores$RVIS, na.rm = T),
+                    step = 0.05)
+    })
+    
+    output$EDS <- renderUI({
+        startvalue = 0
+        sliderInput("EDS_filter", "Min EDS score:",
+                    min = 0,
+                    max = max(RV$data$genes_scores$EDS, na.rm = T),
+                    value = 0,
+                    step = 0.05)
+    })
     
     output$segregation_controls <- renderUI({
         segregationUI("segregation", choices_affected = RV$data$values_affected, choices_unaffected=RV$data$values_unaffected)

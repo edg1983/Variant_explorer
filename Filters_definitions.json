@@ -21,7 +21,7 @@
         "SegDup": "Segmental Duplication",
         "RefSeqReg": "RefSeq Regulatory DB"
     },
-    "fill_na" : {
+    "fill_na_vars" : {
       "max_pop_af": 0,
       "cohort_af": 0,
       "DANN_score": 99,
@@ -41,5 +41,11 @@
       "SpliceAI_SNP_SpliceAI_max": 99,
       "SpliceAI_INDEL_SpliceAI_max": 99,
       "MCAP_score": 99
+    },
+    "fill_na_genes" : {
+      "GDI_phred": -99,
+      "RVIS": -99,
+      "pLI_gnomad": 99,
+      "EDS": 99
     }
 }
