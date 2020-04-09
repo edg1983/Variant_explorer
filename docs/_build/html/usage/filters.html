@@ -1,113 +1,290 @@
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>Filters panel &#8212; Variant Explorer v1.0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Filters panel &mdash; Variant Explorer v1.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Filters explorer panel" href="filters_explorer.html" />
-    <link rel="prev" title="Overview panel" href="overview.html" />
+    <link rel="prev" title="Overview panel" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
           
 
-          <div class="body" role="main">
+          
+            <a href="../index.html" class="icon icon-home"> Variant Explorer
+          
+
+          
+          </a>
+
+          
             
-  <div class="section" id="filters-panel">
-<h1>Filters panel<a class="headerlink" href="#filters-panel" title="Permalink to this headline">¶</a></h1>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
 
-
-          </div>
           
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../contents.html">Variant Explorer</a></h1>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview panel</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Filters panel</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Filters panel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#understand-the-variants-annotations">Understand the variants annotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variants-filters">Variants filters</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="filters_explorer.html">Filters explorer panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filters_results.html">Filters results panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_details.html">Gene details panel</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../contents.html">Documentation overview</a><ul>
-      <li>Previous: <a href="overview.html" title="previous chapter">Overview panel</a></li>
-      <li>Next: <a href="filters_explorer.html" title="next chapter">Filters explorer panel</a></li>
-  </ul></li>
-</ul>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Variant Explorer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Filters panel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/usage/filters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="filters-panel">
+<h1>Filters panel<a class="headerlink" href="#filters-panel" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="understand-the-variants-annotations">
+<h2>Understand the variants annotations<a class="headerlink" href="#understand-the-variants-annotations" title="Permalink to this headline">¶</a></h2>
+<p>## Small variants
+Annotated for gene consequence using snpEff and then annotated with our collection of regulatory regions</p>
+<p>## Structural variants
+Annotated for gene consequence as
+- intronic_sv: overlap only introns
+- exonis_sv: overlap at least 1bp of a gene exon</p>
+<p>The final list of candidate variant records is then generated as follows:
+- Most severe consequence is selected for gene affecting variants, so each variant is reported with 1 gene consequence
+- Each variant can have multiple regulatory annotations if it overlap multiple regulatory regions</p>
+<p>So for example the same variant can appear as multiple records in the candidate vars table:
+<code class="docutils literal notranslate"><span class="pre">chr1</span>&#160;&#160;&#160; <span class="pre">10000</span>&#160;&#160;&#160;&#160; <span class="pre">G</span>&#160;&#160;&#160; <span class="pre">T</span>&#160;&#160;&#160; <span class="pre">5UTR</span></code>
+<code class="docutils literal notranslate"><span class="pre">chr1</span>&#160;&#160;&#160; <span class="pre">10000</span>&#160;&#160;&#160;&#160; <span class="pre">G</span>&#160;&#160;&#160; <span class="pre">T</span>&#160;&#160;&#160; <span class="pre">enhancer</span></code></p>
+<p>The filtering process is then applied on these single variants records to be able to finely tune the desired output</p>
+</div>
+<div class="section" id="variants-filters">
+<h2>Variants filters<a class="headerlink" href="#variants-filters" title="Permalink to this headline">¶</a></h2>
+<p>Variants filters are applied separately for specific variant group, so that each group of filters act only on the relevant variants.
+Variants group are defined as follows:</p>
+<ol class="arabic">
+<li><dl class="simple">
+<dt>splicing</dt><dd><p>Variants in splicing site or splicing region (10 bp from exon-intron junctions)</p>
+</dd>
+</dl>
+</li>
+<li><p>missense</p></li>
+<li><dl>
+<dt>regulatory regions</dt><dd><p>Any variant located in one of the annotated regulatory regions (enhancer, promoter, silencer, insulator)</p>
+<blockquote>
+<div><dl>
+<dt>pass_vars &lt;- as.data.frame(vars_in_regions %&gt;%</dt><dd><dl>
+<dt>filter(! (</dt><dd><p>d_score &lt; input$d_score_filter |
+consequence %nin% RV$accepted_consequence |
+max_pop_af &gt; input$MaxPopAF_filter |
+cohort_af &gt; input$CohortAF_filter |
+SegDup %nin% var_reg_anno$SegDup |
+LowComplexity %nin% var_reg_anno$LowComplexity |
+TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
+(reg_type == “splicing” &amp;</p>
+<blockquote>
+<div><dl class="simple">
+<dt>(SpliceAI_SNP_SpliceAI_max &lt; input$spliceAI_filter &amp;</dt><dd><p>SpliceAI_INDEL_SpliceAI_max &lt; input$spliceAI_filter) ) |</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>(consequence == “missense_variant” &amp;</dt><dd><dl class="simple">
+<dt>(CADD_PhredScore &lt; input$CADD_filter &amp;</dt><dd><p>REVEL_score &lt; input$REVEL_filter &amp;
+MCAP_score &lt; input$MCAP_filter &amp;
+DANN_score &lt; input$DANN_filter)) |</p>
+</dd>
+</dl>
+</dd>
+<dt>(consequence %in% reg_vars &amp;</dt><dd><dl class="simple">
+<dt>(ReMM_score &lt; input$ReMM_filter |</dt><dd><p>LinSight &lt; input$LinSight_filter |
+PhyloP100 &lt; input$PhyloP100_filter |
+LoF_tolerance &gt; input$LoFtolerance_filter) &amp;</p>
+</dd>
+</dl>
+<p>rec_id %nin% accepted_reg_recid &amp;
+reg_type %nin% RV$accepted_connected_gene &amp;
+TFBS %nin% NC_reg_anno$TFBS &amp;
+DNase %nin% NC_reg_anno$DNase &amp;
+UCNE %nin% NC_reg_anno$UCNE)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>)))</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="filters_explorer.html" class="btn btn-neutral float-right" title="Filters explorer panel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview panel" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+  
 
+  <hr/>
 
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Edoardo Giacopuzzi
 
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-
-
-
+</footer>
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2020, Edoardo Giacopuzzi.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../_sources/usage/filters.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
     
-  </body>
+   
+
+</body>
 </html>

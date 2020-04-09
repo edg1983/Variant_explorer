@@ -672,11 +672,11 @@ server <- function(input, output) {
             comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
         
         #Filters on gene scores are applied
-        genes_above_score <- as.data.frame(RV$data$genes_scores %>% mutate(Class = ifelse(
-            pLI_gnomad >= input$pLI_filter | 
-            GDI_phred <= input$GDI_filter |
-            RVIS <= input$RVIS_filter |
-            EDS >= input$EDS , "PASS", "FILTER" )))
+        genes_above_score <- as.data.frame(RV$data$genes_scores %>% filter(
+            pLI_gnomad >= input$pLI_filter & 
+            GDI_phred <= input$GDI_filter &
+            RVIS <= input$RVIS_filter &
+            EDS >= input$EDS_filter))
             
         as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
             variants %in% RV$filtered_vars_list & 
@@ -945,7 +945,7 @@ server <- function(input, output) {
         startvalue = 0
         sliderInput("EDS_filter", "Min EDS score:",
                     min = 0,
-                    max = max(RV$data$genes_scores$EDS, na.rm = T),
+                    max = max(RV$data$genes_scores$EDS[RV$data$genes_scores$EDS != 99], na.rm = T),
                     value = 0,
                     step = 0.05)
     })
@@ -973,7 +973,7 @@ server <- function(input, output) {
     })
     
     output$ROH_filters_UI <- renderUI({ 
-        validate(need(!is.null(RV$data$ROH_ranges), "No ROH regions loaded"))
+        shiny::validate(need(!is.null(RV$data$ROH_ranges), "No ROH regions loaded"))
     
         bedcontrolUI("ROH_filter", label = "Select only vars in ROH regions", 
             filter_config = c(
@@ -1027,10 +1027,12 @@ server <- function(input, output) {
     })
     
     output$GADO_distribution <- renderPlotly({
-        validate(need(input$genesTable_rows_selected, "Select a gene"))
+        shiny::validate(need(input$genesTable_rows_selected, "Select a gene"))
+        
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "gene"]
         Zscore <- genedetail_tab[input$genesTable_rows_selected, "gado_zscore"]
+        
         GADO_dist <- ggplot(gado_distribution[gado_distribution$Hgnc == gene_name,], aes(x=Zscore)) + 
             geom_histogram(bins = max(gado_distribution$Zscore[gado_distribution$Hgnc == gene_name])*10) + 
             geom_vline(xintercept = Zscore, color = "red") +
@@ -1081,7 +1083,7 @@ server <- function(input, output) {
     })
     
     output$PanelApp_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        validate(need(input$PanelApp_panels_table_rows_selected, "Select one panel"))
+        shiny::validate(need(input$PanelApp_panels_table_rows_selected, "Select one panel"))
         
         panelID <- PanelApp_panels_df()[input$PanelApp_panels_table_rows_selected, "id"]
 
@@ -1098,7 +1100,7 @@ server <- function(input, output) {
     })
     
     output$geneLists_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        validate(need(input$PanelApp_panels_table_rows_selected, "Select one gene list"))
+        shiny::validate(need(input$PanelApp_panels_table_rows_selected, "Select one gene list"))
         
         listID <- geneLists_df()[input$geneLists_table_rows_selected, "id"]
         
@@ -1119,17 +1121,17 @@ server <- function(input, output) {
     })
     
     output$Gene_symbol <- renderText({
-        validate(need(gene_name() != "", 'No gene selected'))
+        shiny::validate(need(gene_name() != "", 'No gene selected'))
         gene_name()
     })
     
     output$Gene_name <- renderText({
-        validate(need(gene_name() != "", 'No gene selected'))
+        shiny::validate(need(gene_name() != "", 'No gene selected'))
         genes_info[genes_info$symbol == gene_name(), "name"]
     })
     
     output$GTeX_link <- renderUI({
-        validate(need(gene_name() != "", 'No gene selected'))
+        shiny::validate(need(gene_name() != "", 'No gene selected'))
         ensg_id <- genes_info[genes_info$symbol == gene_name(), "ensembl_gene_id"]
         tags$a(href=paste0("https://gtexportal.org/home/gene/", gene_name()), paste0(gene_name(), "(", ensg_id, ")"), target="_blank")
     })
@@ -1139,7 +1141,7 @@ server <- function(input, output) {
     })
     
     output$geneInfo <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        validate(need(gene_name() != "", 'No gene selected'))
+        shiny::validate(need(gene_name() != "", 'No gene selected'))
         selected <- list()
         
         for (n in names(gene_anno)) {
@@ -1151,22 +1153,22 @@ server <- function(input, output) {
     
     output$gtex_plot <- renderPlot ({
         gene_exp <- GTeX_data[GTeX_data$Description == gene_name(),]
-        validate(need(nrow(gene_exp)>0, "Gene not found in GTeX"))
+        shiny::validate(need(nrow(gene_exp)>0, "Gene not found in GTeX"))
         gene_exp <- gather(gene_exp, key="tissue", value="median_TPM", 3:ncol(gene_exp))
         ggplot(gene_exp, aes(x=tissue, y=median_TPM)) + geom_bar(stat="identity") + format1
     })
     
     gene_comphet_vars_df <- reactive({
-        #validate(gene_name != "")
+        #shiny::validate(gene_name != "")
         
         comphet_details <- comphet_df() %>% filter(Class == "PASS", gene == gene_name()) %>% gather(key="variant",value = "varID", v1:v2) %>% select(-gene, -variant) %>% distinct()
-        #validate(need(nrow(comphet_details)>0, 'No compound het variants'))
+        #shiny::validate(need(nrow(comphet_details)>0, 'No compound het variants'))
         comphet_details <- merge(comphet_details,variants_df()[variants_df()$Class == "PASS",], by.x="varID",by.y="rec_id")
         as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))
     })
     
     gene_vars_df <- reactive ({
-        #validate(gene_name != "")
+        #shiny::validate(gene_name != "")
         #comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", V1:V2)
         
         #as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name))
@@ -1174,14 +1176,14 @@ server <- function(input, output) {
     })
     
     output$variantsTable <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
-        #validate(need(gene_name != "", 'No gene selected'))
+        #shiny::validate(need(gene_name != "", 'No gene selected'))
         
         as.data.frame(gene_vars_df())
     })
     
     output$comphetTable <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
-        #validate(need(gene_name != "", 'No gene selected'))
-        validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
+        #shiny::validate(need(gene_name != "", 'No gene selected'))
+        shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
 
         as.data.frame(gene_comphet_vars_df())
     })
@@ -1191,7 +1193,7 @@ server <- function(input, output) {
         start_pos <- unique(c(gene_comphet_vars_df()$start[input$comphetTable_rows_selected], gene_vars_df()$start[input$variantsTable_rows_selected]))
         end_pos <- unique(c(gene_comphet_vars_df()$end[input$comphetTable_rows_selected], gene_vars_df()$end[input$variantsTable_rows_selected]))
         
-        validate(
+        shiny::validate(
             need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"),
             need(length(chromosome) == 1, "Please select vars on the same chromosome"))
         
@@ -1227,7 +1229,7 @@ server <- function(input, output) {
     })
     
     output$exphunter_plot <- renderPlot({ 
-        validate(need(input$exphunter_loci != "", "No gene selected"))
+        shiny::validate(need(input$exphunter_loci != "", "No gene selected"))
         ggplot(RV$data$ExpHunter$PEDIGREE[RV$data$ExpHunter$PEDIGREE$LocusId == input$exphunter_loci,], aes(y=sampleID, x=Genotype, fill=Coverage)) + 
             geom_tile() + 
             facet_grid(group~VariantId, scales="free") +
