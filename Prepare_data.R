@@ -2,9 +2,7 @@
 # Symmetric sodium encryption and decryption of a datafile using cyphr.
 # https://github.com/ropensci/cyphr
 #
-# idea: 
-# 1) We generate a secure pwd and deliver safely to end users
-# 3) APP automatically checks if a file ends with ".cyphr.bin" and decrypts it directly when reading (see decrypt_datafile)
+
 library(cyphr)
 library(jsonlite)
 library(GenomicRanges)

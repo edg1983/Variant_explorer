@@ -36,7 +36,7 @@ source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
 
-APP_VERSION <- "1.0.2"
+APP_VERSION <- "1.0.3"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -244,7 +244,7 @@ RV <- reactiveValues(
 
 #and look for files in data_dir
 files <- list.files(data_dir, pattern = ".RData")
-samplesID <- gsub("\\.RData","",files)
+samplesID <- gsub("\\.RData[.enc]*","",files, perl = T)
 
 filter_definitions <- read_json("Filters_definitions.json")
 
@@ -254,7 +254,7 @@ filter_definitions <- read_json("Filters_definitions.json")
 
 ui <- dashboardPage(
     dashboardHeader(
-        title = paste0("Variant Explorer v", APP_VERSION),
+        title = paste0("VarExplorer v", APP_VERSION),
         dropdownMenuOutput("NotificationMenu")
     ),
 
@@ -465,7 +465,11 @@ server <- function(input, output) {
     observeEvent(input$decrypt_button, {
         #reset("custom_file")
         
-        RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData"), pwd = input$pwd)
+        if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
+            RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
+        } else if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData"))) {
+            RV$data <- readRDS(paste0(data_dir,"/",input$CaseCode,".RData"))
+        }
         if (inherits(RV$data, "list")) {
             RV$data$variants_df <- RV$data$variants_df %>% replace_na(filter_definitions$fill_na_vars)
             RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(filter_definitions$fill_na_genes)
