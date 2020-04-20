@@ -1116,18 +1116,17 @@ server <- function(input, output) {
     })
     
     callModule(downloadObj, id = "save_results",
-        output_prefix=input$CaseCode,
-        output_data = list(
-            "genes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)),
-            "customGenes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% filter(gene %in% RV$custom_genes) %>% select(-Class)),
-            "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list)),
-            "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list) %>% 
-                                gather(key="Variant",value = "varID", v1:v2) %>% 
-                                inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="ID")) %>%
-                                select(-Class.x,-Class.y))),
-        zip_archive = paste0(input$CaseCode, ".results.zip")
-    )
-
+    output_prefix=input$CaseCode,
+    output_data = list(
+        "genes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)),
+        "customGenes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% filter(gene %in% RV$custom_genes) %>% select(-Class)),
+        "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list)),
+        "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list) %>% 
+                            gather(key="Variant",value = "varID", v1:v2) %>% 
+                            inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="rec_id")) %>%
+                            select(-Class.x,-Class.y))),
+    zip_archive = paste0(input$CaseCode, ".results.zip") )
+        
     ################################
     ### PanelApp and genes lists tab
     ################################
