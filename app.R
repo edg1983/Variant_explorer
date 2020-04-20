@@ -12,10 +12,18 @@ list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tid
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
+#Packages from Bioconductor
 if(!("GenomicRanges" %in% installed.packages()[,"Package"])) {
     if (!requireNamespace("BiocManager", quietly = TRUE)) {install.packages("BiocManager")}
     BiocManager::install("GenomicRanges")
 }
+
+#Packages from github
+if(!("scattermore" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
+    devtools::install_github('exaexa/scattermore')
+}
+
 
 #options(repos = BiocManager::repositories())
 #getOption("repos")
@@ -31,12 +39,14 @@ library(shinydashboard)
 library(GenomicRanges)
 library(gridExtra)
 library(jsonlite)
+library(scattermore)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
+source("GQModule.R")
 
-APP_VERSION <- "1.0.3"
+APP_VERSION <- "1.0.4"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -172,15 +182,24 @@ gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors 
 ##Set axes options for plots
 genes_axes_options <- c(
     "GADO Zscore"= "gado_zscore", 
-    "Exomiser Pheno Rank"= "Exomiser_GenePhenoScore",
-    "gnomAD pLI"= "pLI_gnomad")
-variants_axes_options <- c("Maximum population AF"= "max_pop_af",
+    "Exomiser Pheno score"= "exomiser_gene_pheno_score",
+    "gnomAD pLI"= "pLI_gnomad",
+    "GDI phred"= "GDI_phred",
+    "RVIS intolerance"= "RVIS",
+    "EDS reg space score"= "EDS")
+variants_axes_options <- c(
+    "Maximum population AF"= "max_pop_af",
     "d score"= "d_score",
     "CADD phred"= "CADD_PhredScore", 
     "DANN score"= "DANN_score",
     "ReMM score" = "ReMM_score",
     "SpliceAI score" = "SpliceAI_SNP_SpliceAI_max",
-    "dbscSNV splice score" = "dbscSNV_ada")
+    "dbscSNV splice score" = "dbscSNV_ada",
+    "phyloP100 conservation" = "PhyloP100",
+    "REVEL score" = "REVEL_score",
+    "MCAP score" = "MCAP_score",
+    "LinSight score" = "LinSight"
+    )
 variants_bar_options <- c(
     "Region type" = "reg_type",
     "Variant consequence" = "consequence",
@@ -196,8 +215,11 @@ format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
 filter_cols_gene <- c("pLI_gnomAD","GDI_phred")
 filter_cols_vars <- c("d_score","SpliceAI_SpliceAI_max","max_pop_af","consequence","cohort_af")
 
-##consequence for regulatory vars
+##consequence groups for various variant categories
 reg_vars <- c("enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant") 
+
+##var_type groups for various variant categories
+sv_vars <- c("DEL","DUP","INV","DEL:ME")
 
 ##classification of reg regions sources
 reg_sources <- list(
@@ -367,7 +389,8 @@ ui <- dashboardPage(
                             column(6, textOutput("Total_unaffected")) ),
                         uiOutput("segregation_controls"),
                         "Number of affected / unaffected carrying the variant with the given genotype",
-                        "Homozygous and heterozygous conditions evaluated as AND, comphet as OR"
+                        "Homozygous and heterozygous conditions evaluated as AND, comphet as OR",
+                        uiOutput("GQfilter_controls")
                         ) 
                     ),
                     fluidRow(box(title = "ROH regions filter", id = "ROH_filters_box", status = "primary", solidHeader = TRUE,
@@ -385,9 +408,9 @@ ui <- dashboardPage(
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=TRUE),
+                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=FALSE),
                     br(),
-                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=TRUE)    
+                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=FALSE)    
             ),
             tabItem(tabName = "filter_results",
                     fluidRow(
@@ -463,7 +486,7 @@ server <- function(input, output) {
     ################
     
     observeEvent(input$decrypt_button, {
-        #reset("custom_file")
+        #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
         
         if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
             RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
@@ -477,12 +500,16 @@ server <- function(input, output) {
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
             RV$notifications[["decrypt"]] <- notificationItem(
-                text = paste0("Loaded encrypted data for ", input$CaseCode),
+                text = paste0("Loaded data for ", input$CaseCode),
                 icon = icon("check-circle"),
                 status = "success")
+            
+            RV$GQ_cols_all <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$all_samples, sep="_"))
+            RV$GQ_cols_affected <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$affected_samples, sep="_"))
+            RV$maxGQ <- max(RV$data$variants_df[,..GQ_cols_all], na.rm = T) 
         } else {
             RV$notifications[["decrypt"]] <- notificationItem(
-                text = "Error loading encrypted data! Missing file or wrong password!",
+                text = "Error loading data! Missing file or wrong password!",
                 icon = icon("exclamation-circle"),
                 status = "danger")
         }
@@ -580,22 +607,35 @@ server <- function(input, output) {
             
             #Get rec_id for reg variants in accepted db sources
             accepted_reg_recid <- RV$data$variants_df$rec_id[grep(paste(RV$accepted_reg_db, collapse="|"), RV$data$variants_df$db_source)]
-            
+           
             #Read which regions are selected from checkboxes and convert to 0/1 values
             NC_reg_anno <- makeBoolean(c("TFBS","DNase","UCNE"), input$NC_anno_regions, logic = "include")
             var_reg_anno <- makeBoolean(c("SegDup","LowComplexity","TopVariableGenes"), input$vars_anno_regions, logic = "exclude")
             
-            #if ROH regions are provided call the bed regions module with this
+            ##ROH FILTER and GQ FILTER
+            #These filters are high-level and applied before all others
+            #if ROH regions are provided call the bed regions module and get rec_id for variants in the ROH regions
             if (!is.null(RV$data$ROH_ranges)) {
-                message("call bed module")
-                vars_in_regions_ids <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges[[input$ROH_sample]], multiplier=1000)
-                vars_in_regions <- as.data.frame(RV$data$variants_df %>% filter(rec_id %in% vars_in_regions_ids))
+                #message("call bed module")
+                vars_pass_regions <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges[[input$ROH_sample]], multiplier=1000)
             } else {
-                vars_in_regions <- RV$data$variants_df
+                vars_pass_regions <- RV$data$variants_df$rec_id
             }
             
+            #Get rec_id for variants passing the GQ filter
+            vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
+                                       variants_df = RV$data$variants_df, 
+                                       GQ_cols = RV$GQ_cols_all, 
+                                       affected_cols = RV$GQ_cols_affected,
+                                       exclude_var_type = sv_vars)
+            
+            #Pre-filter variants_df and retain only vars passing ROH and GQ filters
+            vars_pass <- unique(intersect(vars_pass_regions, vars_pass_GQ))
+            prefilter_vars <- as.data.frame(RV$data$variants_df %>% filter(rec_id %in% vars_pass))
+            
+            ## FILTER VARS  
             #first select variants that pass the filters
-            pass_vars <- as.data.frame(vars_in_regions %>% 
+            pass_vars <- as.data.frame(prefilter_vars %>% 
                 filter(! (
                     d_score < input$d_score_filter | 
                     consequence %nin% RV$accepted_consequence |
@@ -694,13 +734,18 @@ server <- function(input, output) {
     })
     
     filters_summ_genes <- reactive ({
-        PASS_counts <- c(
-        #genes_df() %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
-        genes_scores() %>% filter(pLI_gnomad >= input$pLI_filter) %>% nrow() )
+        tot_genes <- nrow(genes_scores())
         
-        filters_summ_genes <- data.frame(Filter=c("pLI gnomAD"), 
+        PASS_counts <- c(
+            genes_scores() %>% filter(pLI_gnomad >= input$pLI_filter) %>% nrow(),
+            genes_scores() %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
+            genes_scores() %>% filter(RVIS <= input$RVIS_filter) %>% nrow(),
+            genes_scores() %>% filter(EDS >= input$EDS_filter) %>% nrow() )
+    
+        filters_summ_genes <- data.frame(
+            Filter=c("pLI gnomAD", "GDI phred", "RVIS", "EDS"), 
             PASS=PASS_counts, 
-            FILTERED=(nrow(RV$data$genes_df)-PASS_counts) )
+            FILTERED=(tot_genes-PASS_counts) )
         filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)   
     })
     
@@ -731,6 +776,7 @@ server <- function(input, output) {
     ClinVar_df <- reactive ({
         as.data.frame(ClinVar_genes %>% filter(gene %in% RV$filtered_genes_list))
     }) 
+
     
     ##################
     ### Overview Tab
@@ -904,7 +950,7 @@ server <- function(input, output) {
     })
     
     output$Max_pop_AF <- renderUI({
-        sliderInput("MaxPopAF_filter", "Max gnomAD AF:",
+        sliderInput("MaxPopAF_filter", "Max population AF:",
                     min = 0,
                     max = max(RV$data$variants_df$max_pop_af, na.rm = T),
                     value = max(RV$data$variants_df$max_pop_af, na.rm = T),
@@ -956,6 +1002,10 @@ server <- function(input, output) {
     
     output$segregation_controls <- renderUI({
         segregationUI("segregation", choices_affected = RV$data$values_affected, choices_unaffected=RV$data$values_unaffected)
+    })
+    
+    output$GQfilter_controls <- renderUI({
+        GQfilterUI("GQ_filter",maxGQ = RV$maxGQ, defaultGQ=10)    
     })
     
     output$var_consequence <- renderUI({
@@ -1011,9 +1061,9 @@ server <- function(input, output) {
     #    )
     #})
     
-    callModule(plotSelectedModule, "genes_scatter", plot_data = genes_scores(), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))
-    callModule(plotSelectedModule, "variants_scatter", plot_data = variants_df(), plotType = "scatter", variables = list("color"="Class"))
-    callModule(plotSelectedModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
+    callModule(plotModule, "genes_scatter", plot_data = genes_scores(), missingValues = c(99,-99), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))
+    callModule(plotModule, "variants_scatter", plot_data = variants_df(), missingValues = c(99,-99), plotType = "bigdata", variables = list("color"="Class", "size" = 1))
+    callModule(plotModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
     
     ########################
     ### Filter Results tab
