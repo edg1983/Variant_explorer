@@ -408,7 +408,7 @@ ui <- dashboardPage(
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), plotly=FALSE),
+                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), set_limits=c("x","y"), plotly=FALSE),
                     br(),
                     plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=FALSE)    
             ),
@@ -458,6 +458,14 @@ ui <- dashboardPage(
                     br(),
                     actionButton("openIGV", label="See selected vars in IGV"), textOutput("igv_region"),
                     br(),
+                    box(title = "PanelApp and ClinVar", id = "panelapp_clinvar_details", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        h3("PanelApp panels"),
+                        DT::dataTableOutput("panelapp_detail_tab"),
+                        h3("ClinVar associated diseases"),
+                        DT::dataTableOutput("clinvar_detail_tab"),
+                        h3("Interesting gene lists"),
+                        DT::dataTableOutput("genelists_detail_tab") ),
                     box(title = "Pathways and ontology", id = "path_go_details", status = "info", solidHeader = TRUE, width = 12,
                         collapsible = TRUE, collapsed = TRUE,
                         div(DT::dataTableOutput("geneInfo"),style="font-size: 75%") ),
@@ -501,6 +509,19 @@ server <- function(input, output) {
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
             RV$notifications[["decrypt"]] <- notificationItem(
                 text = paste0("Loaded data for ", input$CaseCode),
+                icon = icon("check-circle"),
+                status = "success")
+            RV$notifications[["pedigree"]] <- notificationItem(
+                text = paste0("Individuals: ", RV$data$
+                                  n_all_samples),
+                icon = icon("check-circle"),
+                status = "success")
+            RV$notifications[["variants"]] <- notificationItem(
+                text = paste0("variants loaded: ", length(unique(RV$data$variants_df$var_id))),
+                icon = icon("check-circle"),
+                status = "success")
+            RV$notifications[["genes"]] <- notificationItem(
+                text = paste0("distinct genes: ", length(unique(RV$data$genes_scores$gene))),
                 icon = icon("check-circle"),
                 status = "success")
             
@@ -1094,14 +1115,18 @@ server <- function(input, output) {
         ggplotly( GADO_dist )
      })
     
+    candidate_genes_df <- reactive({
+        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% select(-Class))
+    })
+    
     output$genesTable <- DT::renderDataTable(selection="single", {
-        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)) 
+        candidate_genes_df()
     })
     
     genesTable_proxy <- DT::dataTableProxy("genesTable")
     
     customGenesTable_df <- reactive({
-        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% filter(gene %in% RV$custom_genes) %>% select(-Class))
+        candidate_genes_df() %>% filter(gene %in% RV$custom_genes)
     })
     
     output$customGenesTable <- DT::renderDataTable(selection="single", {
@@ -1109,9 +1134,7 @@ server <- function(input, output) {
     })
     
     observeEvent(input$customGenesTable_rows_selected, {
-        mydf <- customGenesTable_df()
-        row_idx <- mydf[input$customGenesTable_rows_selected,"row_idx"]
-        RV$load_stats <- row_idx
+        row_idx <- customGenesTable_df()[input$customGenesTable_rows_selected,"row_idx"]
         genesTable_proxy %>% selectRows(row_idx) 
     })
     
@@ -1135,16 +1158,19 @@ server <- function(input, output) {
         PanelApp_panels_df()
     })
     
-    output$PanelApp_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        shiny::validate(need(input$PanelApp_panels_table_rows_selected, "Select one panel"))
-        
+    PanelApp_genes_df <- reactive ({
+        shiny::req(input$PanelApp_panels_table_rows_selected)
         panelID <- PanelApp_panels_df()[input$PanelApp_panels_table_rows_selected, "id"]
-
-        PanelApp_genes_df <- as.data.frame(PanelApp_genes %>% filter(panel_idx == panelID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "gene")))
-        PanelApp_genes_df <- PanelApp_genes_df[order(PanelApp_genes_df$gado_zscore, decreasing = TRUE),]        
+        genes_df <- as.data.frame(PanelApp_genes %>% filter(panel_idx == panelID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "gene")))
+        genes_df <- genes_df[order(genes_df$gado_zscore, decreasing = TRUE),]
     })
     
-    output$ClinVar_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+    output$PanelApp_genes_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+        shiny::validate(need(input$PanelApp_panels_table_rows_selected, "Select one panel"))
+        PanelApp_genes_df()       
+    })
+    
+    output$ClinVar_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
         ClinVar_df()
     })
     
@@ -1152,25 +1178,46 @@ server <- function(input, output) {
         geneLists_df()
     })
     
-    output$geneLists_genes_table <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        shiny::validate(need(input$PanelApp_panels_table_rows_selected, "Select one gene list"))
-        
+    geneList_genes_df <- reactive ({
+        shiny::req(input$geneLists_table_rows_selected)
         listID <- geneLists_df()[input$geneLists_table_rows_selected, "id"]
-        
-        geneList_genes_df <- as.data.frame(geneLists_genes %>% filter(genelist_idx == listID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "gene")))
-        geneList_genes_df <- geneList_genes_df[order(geneList_genes_df$gado_zscore, decreasing = TRUE),]        
+        genes_df <- as.data.frame(geneLists_genes %>% filter(genelist_idx == listID, entity_name %in% RV$filtered_genes_list) %>%  left_join(., genes_scores(), by = c("entity_name" = "gene")))
+        genes_df <- genes_df[order(genes_df$gado_zscore, decreasing = TRUE),]
+    })
+    
+    output$geneLists_genes_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+        shiny::validate(need(input$geneLists_table_rows_selected, "Select one gene list"))
+        geneList_genes_df()
+    })
+    
+    observeEvent(input$ClinVar_table_rows_selected, {
+        gene_name <- ClinVar_df()[input$ClinVar_table_rows_selected, "gene"]
+        row_idx <- candidate_genes_df()[candidate_genes_df()$gene == gene_name,"row_idx"]
+        genesTable_proxy %>% selectRows(row_idx) 
+    })
+    
+    observeEvent(input$PanelApp_genes_table_rows_selected, {
+        gene_name <- PanelApp_genes_df()[input$PanelApp_genes_table_rows_selected, "entity_name"]
+        row_idx <- candidate_genes_df()[candidate_genes_df()$gene == gene_name,"row_idx"]
+        genesTable_proxy %>% selectRows(row_idx) 
+    })
+    
+    observeEvent(input$geneLists_genes_table_rows_selected, {
+        gene_name <- geneList_genes_df()[input$geneLists_genes_table_rows_selected, "entity_name"]
+        row_idx <- candidate_genes_df()[candidate_genes_df()$gene == gene_name,"row_idx"]
+        genesTable_proxy %>% selectRows(row_idx) 
     })
     
     ####################
     ### Gene detail tab
     ####################
     
-    genedetail_tab <- reactive ({
-        as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
-    })
+    #genedetail_tab <- reactive ({
+    #    candidate_genes_df()
+    #})
     
     gene_name <- reactive ({
-        genedetail_tab()[input$genesTable_rows_selected, "gene"]
+        candidate_genes_df()[input$genesTable_rows_selected, "gene"]
     })
     
     output$Gene_symbol <- renderText({
@@ -1190,7 +1237,7 @@ server <- function(input, output) {
     })
     
     output$geneDetail <- DT::renderDataTable(selection="none", {
-        genedetail_tab()[input$genesTable_rows_selected,]
+        candidate_genes_df()[input$genesTable_rows_selected,]
     })
     
     output$geneInfo <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
@@ -1239,6 +1286,24 @@ server <- function(input, output) {
         shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
 
         as.data.frame(gene_comphet_vars_df())
+    })
+    
+    output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
+        panelID <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "panel_idx"]
+        conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
+        df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
+        df$gene <- gene_name()
+        df$confidence_level <- conf_level
+        df[,c("gene","confidence_level","id","name","disease_group","version","relevant_disorders")]
+    })
+    
+    output$clinvar_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+        ClinVar_df()[ClinVar_df()$gene == gene_name(),]
+    })
+    
+    output$genelists_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
+        listID <- geneLists_genes[geneLists_genes$entity_name == gene_name(), "genelist_idx"]
+        geneLists_df()[geneLists_df()$id == listID,]
     })
     
     observeEvent(input$openIGV, {
