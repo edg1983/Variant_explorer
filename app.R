@@ -527,7 +527,7 @@ server <- function(input, output) {
             
             RV$GQ_cols_all <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$all_samples, sep="_"))
             RV$GQ_cols_affected <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$affected_samples, sep="_"))
-            RV$maxGQ <- max(RV$data$variants_df[,..GQ_cols_all], na.rm = T) 
+            RV$maxGQ <- max(RV$data$variants_df[,..RV$GQ_cols_all], na.rm = T) 
         } else {
             RV$notifications[["decrypt"]] <- notificationItem(
                 text = "Error loading data! Missing file or wrong password!",
