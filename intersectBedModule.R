@@ -2,28 +2,30 @@
 ### INTERSECTBED MODULE ###
 ###########################
 
-#Use label to define checkbox label
-#You can set filter config to a named vector to generate a slider control
-#Named vector must contain
-#label = label for the slider
-#max = max value
-#min = min value
-#step = step of slider
-#value = starting value
-bedcontrolUI <- function(id, label, filter_config=FALSE) {
+#Arguments
+#label: define checkbox label
+#slider_config: named vector to generate a slider control
+  #Named vector must contain
+  #label = label for the slider
+  #max = max value
+  #min = min value
+  #step = step of slider
+  #value = starting value
+
+bedcontrolUI <- function(id, label, slider_config=FALSE) {
   ns <- NS(id)
   
   checkbox <- tagList(checkboxInput(ns("bed_filter"), label = label, value = FALSE))
   filter_control <- NULL
   
-  if (inherits(filter_config, "character")){
+  if (inherits(slider_config, "character")) {
     filter_control <- tagList(sliderInput(
                               ns("bed_limit"),
-                              label = filter_config[["label"]],
-                              min = as.numeric(filter_config[["min"]]),
-                              max = as.numeric(filter_config[["max"]]),
-                              step = as.numeric(filter_config[["step"]]),
-                              value = as.numeric(filter_config[["value"]])
+                              label = slider_config[["label"]],
+                              min = as.numeric(slider_config[["min"]]),
+                              max = as.numeric(slider_config[["max"]]),
+                              step = as.numeric(slider_config[["step"]]),
+                              value = as.numeric(slider_config[["value"]])
                       ))
   }
   
