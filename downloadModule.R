@@ -22,12 +22,12 @@
 # callModule(downloadObj, id="download", output_prefix="myprefix", output_data=list("file1.tsv" = data.frame1, "file2.tsv" = data.frame2), zip_archive="myarchive.zip")
 # ==> myarchive.zip [myprefix.file1.tsv, myprefix.file2.tsv]
 
-downloadObjUI <- function(id) {
+downloadObjUI <- function(id, label = "Download") {
   ns <- NS(id)
-  downloadButton(ns("download_results"), label = "Download Results")
+  downloadButton(ns("download_results"), label = label)
 }
 
-downloadObj <- function(input, output, session, output_prefix, output_data, sep="\t", zip_archive=NULL) {
+downloadObj <- function(input, output, session, output_prefix, output_data, sep="\t", zip_archive=NULL, col_names=TRUE) {
   output$download_results <- downloadHandler( 
     filename = function() { 
       if (is.null(zip_archive)) {
@@ -43,11 +43,11 @@ downloadObj <- function(input, output, session, output_prefix, output_data, sep=
           for (suffix in names(output_data)) {
            out_file <- paste0(file, ".", suffix)
             if (nrow(output_data[[suffix]]) > 0) {
-              write.table(output_data[[suffix]], file=out_file, sep=sep, row.names=F, quote=F)
+              write.table(output_data[[suffix]], file=out_file, sep=sep, row.names=F, quote=F, col.names = col_names)
             }
           }
-        } else if (inherits(output_data, "data.frame")) {
-          write.table(output_data, file=file, sep=sep, row.names=F, quote=F)
+        } else {
+          write.table(output_data, file=file, sep=sep, row.names=F, quote=F, col.names = col_names)
         }
       } else {
         tmp_prefix <- paste0(tempdir(), "/", output_prefix)

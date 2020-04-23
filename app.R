@@ -21,9 +21,12 @@ if(!("GenomicRanges" %in% installed.packages()[,"Package"])) {
 #Packages from github
 if(!("scattermore" %in% installed.packages()[,"Package"])) {
     if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
-    devtools::install_github('exaexa/scattermore')
+    devtools::install_github('exaexa/scattermore', upgrade = FALSE)
 }
-
+if(!("scattermore" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
+    devtools::install_github('daattali/shinycssloaders',upgrade = FALSE)
+}
 
 #options(repos = BiocManager::repositories())
 #getOption("repos")
@@ -40,6 +43,7 @@ library(GenomicRanges)
 library(gridExtra)
 library(jsonlite)
 library(scattermore)
+library(shinycssloaders)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
@@ -50,6 +54,10 @@ APP_VERSION <- "1.0.4"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
+Coverage_dir <- paste0(resource_dir, "/coverage")
+BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/"
+VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF/"
+SV_file <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
 
 #Set data dir containing variants tables
 data_dir <- "encrypted_data"
@@ -123,6 +131,10 @@ genome_size <- sum(as.numeric(chr_sizes$V2))
 ##Load gene names and IDs
 genes_info_file <- getResource("/hgnc_complete_set.txt")
 genes_info <- read.table(genes_info_file, header=T, sep="\t", stringsAsFactors = F)
+
+##Load genes coordinates
+genes_bed_file <- gzfile(getResource("gencode.v33.basic.genes.bed.gz"))
+genes_bed <- read.table(genes_bed_file, header=F, sep="\t",stringsAsFactors = F)
 
 ##Load pathways and GO groups (suppose .gmt file from MSigDB)
 gene_anno <- list()
@@ -255,10 +267,25 @@ RV <- reactiveValues(
     notifications = list(),
     data = 0,
     custom_genes = character(),
+    customBed_ranges = FALSE,
     filters_summ_genes = data.frame(),
     filters_summ_vars = data.frame(),
     selected_vars_region = "NONE",
-    accepted_reg_db = NULL)
+    accepted_reg_db = NULL,
+    cov_plot = NULL,
+    selected_gene = FALSE,
+    messages = list (jigv = messageItem(from="Variant Explorer",
+                                    message = "HOW TO USE JIGV SCRIPT
+                                    Copy the downloaded script to humbug and launch it.
+                                    bash downloaded_script.sh
+                                    Leaving the humbug session live, follow the instruction in the link to set up putty
+                                    Then you should be able to see IGV on your browser at localhost:5001
+                                    Configuration for putty
+                                    Source port: 5001
+                                    Destination: localhost:5001", 
+                                    href="https://www.skyverge.com/blog/how-to-set-up-an-ssh-tunnel-with-putty/")
+                      )
+    )
 
 ############################################
 ### Read variants data and filter config ###
@@ -277,6 +304,7 @@ filter_definitions <- read_json("Filters_definitions.json")
 ui <- dashboardPage(
     dashboardHeader(
         title = paste0("VarExplorer v", APP_VERSION),
+        dropdownMenuOutput("MessageMenu"),
         dropdownMenuOutput("NotificationMenu")
     ),
 
@@ -287,9 +315,11 @@ ui <- dashboardPage(
         textInput("pwd","Password:",placeholder = "Enter decryption password"),
         actionButton("decrypt_button",label = "Load data"),
         
-        h3("Custom gene list"),
+        #Custom gene list
         fileInput(inputId = "custom_file",label = "Custom gene list:", multiple=FALSE, accept="text/plain", placeholder = "gene list txt file"),
-
+        #Custom genomic regions
+        fileInput(inputId = "custom_bed",label = "Region BED:", multiple=FALSE, accept=".bed", placeholder = "region bed file"),
+        
         sidebarMenu(
             menuItem("Variants overview", tabName = "overview", icon = icon("th")),
             menuItem("Filters settings", tabName = "filters", icon = icon("th")),
@@ -297,7 +327,8 @@ ui <- dashboardPage(
             menuItem("Filter results", tabName = "filter_results", icon = icon("th")),
             menuItem("PanelApp and gene lists", tabName = "gene_lists", icon = icon("th")),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
-            menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th"))
+            menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th")),
+            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
         )
     ),
     dashboardBody(
@@ -305,20 +336,20 @@ ui <- dashboardPage(
             tabItem(tabName = "overview",
                     fluidRow(
                         box(title = "Pedigree", width=6, status = "primary", solidHeader = TRUE,
-                            plotOutput("ped")
+                            withSpinner(plotOutput("ped"))
                         ),
                         box(title = "Variant types", width=6, status = "primary", solidHeader = TRUE,
-                            plotOutput("Var_type_plot")
+                            withSpinner(plotOutput("Var_type_plot"))
                         )
                     ),
                     fluidRow(
                         box(title = "Variant consequences", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
-                            plotOutput("Var_consequence_plot")
+                            withSpinner(plotOutput("Var_consequence_plot"))
                         )
                     ),
                     fluidRow(
                         box(title = "Variant AF", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
-                            plotOutput("Var_PopAF_plot")
+                            withSpinner(plotOutput("Var_PopAF_plot"))
                         )
                     ),
                     fluidRow(
@@ -343,6 +374,7 @@ ui <- dashboardPage(
                                 uiOutput("Max_pop_AF"),
                                 uiOutput("Cohort_AF"),
                                 uiOutput("var_consequence"),
+                                uiOutput("custom_bed_check"),
                                 checkboxGroupInput("vars_anno_regions","Exclude from:", 
                                                    choices = c("Segmental duplications" = "SegDup", "Low complexity regions" = "LowComplexity", "Highly variable genes" = "TopVariableGenes"),
                                                    inline = FALSE) ),
@@ -401,28 +433,28 @@ ui <- dashboardPage(
             ),
             tabItem(tabName = "filter_explorer",
                     h3("Summary of filters effect"),
-                    fluidRow(column(6,plotlyOutput("summary_variants_filters", width = "100%")), column(6,plotlyOutput("summary_genes_filters", width = "100%"))),
+                    fluidRow(column(6,withSpinner(plotlyOutput("summary_variants_filters", width = "100%"))), column(6,withSpinner(plotlyOutput("summary_genes_filters", width = "100%")))),
                     
                     h3("Genes filter evaluation"),
-                    plotSelectedUI("genes_scatter", variables=list("x"=genes_axes_options,"y"=genes_axes_options), plotly=TRUE),
+                    withSpinner(plotSelectedUI("genes_scatter", variables=list("x"=genes_axes_options,"y"=genes_axes_options), plotly=TRUE)),
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), set_limits=c("x","y"), plotly=FALSE),
+                    withSpinner(plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), set_limits=c("x","y"), plotly=FALSE)),
                     br(),
-                    plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=FALSE)    
+                    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=FALSE))    
             ),
             tabItem(tabName = "filter_results",
                     fluidRow(
-                        column(8, plotlyOutput("GADO_rank")),
-                        column(4, plotlyOutput("GADO_distribution"))
+                        column(8, withSpinner(plotlyOutput("GADO_rank"))),
+                        column(4, withSpinner(plotlyOutput("GADO_distribution")))
                     ),
                     DT::dataTableOutput("genesTable"),
                     h3("Custom list genes"),
                     DT::dataTableOutput("customGenesTable"),
                     hr(),
                     fluidRow(column(8), 
-                             column(3, offset=1,downloadObjUI(id = "save_results")))    
+                             column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results")))    
             ),
             tabItem(tabName = "gene_lists",
                     box(title = "PanelApp panels", id = "PanelApp_panels", status = "info", solidHeader = TRUE, width = 12,
@@ -455,9 +487,12 @@ ui <- dashboardPage(
                     DT::dataTableOutput("variantsTable"),
                     h3("Filtered compound hets for the selected gene"),
                     DT::dataTableOutput("comphetTable"),
-                    br(),
-                    actionButton("openIGV", label="See selected vars in IGV"), textOutput("igv_region"),
-                    br(),
+                    fluidRow(br()),
+                    fluidRow(
+                        column(4, downloadObjUI("get_jigv_script", label = "Download JIGV script")),
+                        column(4, textOutput("igv_region"))
+                    ),
+                    fluidRow(hr()),
                     box(title = "PanelApp and ClinVar", id = "panelapp_clinvar_details", status = "info", solidHeader = TRUE, width = 12,
                         collapsible = TRUE, collapsed = TRUE,
                         h3("PanelApp panels"),
@@ -478,6 +513,14 @@ ui <- dashboardPage(
                     uiOutput("exphunter_selection"),
                     DT::dataTableOutput("exphunter_variants"),
                     plotOutput("exphunter_plot", width = "100%", height = "800px")
+            ),
+            tabItem(tabName = "coverage_explorer",
+                    fluidRow(
+                        column(3,selectInput("chr_coverage", "Chromosome: ", choices = paste("chr", c(1:22,"X","Y","M"), sep=""))),
+                        column(3,uiOutput("gene_cov_select")),
+                        column(3,textInput("cov_region_pad", label = "Flanking region (kb): ", value = "500")),
+                        column(3,actionButton("plot_coverage","Plot coverage")) ),
+                    withSpinner(plotlyOutput("coverage_plot"))
             )
         )
     )
@@ -487,7 +530,7 @@ ui <- dashboardPage(
 ### SERVER FUNCTIONS ###
 ########################
 
-server <- function(input, output) {
+server <- function(input, output, session) {
     
     ################
     ### Load Files 
@@ -496,6 +539,16 @@ server <- function(input, output) {
     observeEvent(input$decrypt_button, {
         #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
         
+        #Reset notifications, messages, custom bed and custom genes
+        RV$messages <- list()
+        RV$custom_genes <- character()
+        RV$customBed_ranges <- FALSE
+        RV$notifications <- list()
+        RV$cov_plot <- NULL
+        RV$selected_gene <- FALSE
+        
+        
+        #Load data from plain or encrypted object
         if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
             RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
         } else if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData"))) {
@@ -553,12 +606,27 @@ server <- function(input, output) {
                 status = "danger")
         })
     })
-    
-    #observeEvent(input$custom_bed, {
-    #    req(input$custom_bed)
-    #    RV$customBed_ranges <- GRanges(seqnames = ROH_regions$Chromosome, ranges = IRanges(ROH_regions$Start, end=ROH_regions$End), ID = paste0("ROH_", 1:nrow(ROH_regions)))
-    #    RV$load_status <- paste0(length(RV$customBed_ranges), " regions loaded")
-    #})
+
+    observeEvent(input$custom_bed, {
+        req(input$custom_bed)
+        message(input$custom_bed$datapath)
+        tryCatch({
+        bed_df <- read.table(input$custom_bed$datapath, sep="\t", header=F, stringsAsFactors = F)
+
+        #ID is set to ROH_nline for compatibility with the bed filtering module
+        RV$customBed_ranges <- GRanges(seqnames = bed_df$V1, ranges = IRanges(bed_df$V2, end=bed_df$V3), ID = paste("ROH",1:nrow(bed_df),sep="_"))
+        
+        RV$notifications[["custom_bed"]] <- notificationItem(
+            text = paste0(nrow(bed_df), " regions loaded from BED"),
+            icon = icon("check-circle"),
+            status = "success")
+        } , error=function(cond) {
+            RV$notifications[["custom_bed"]] <- notificationItem(
+                text = paste0("Failed loading custom BED file"),
+                icon = icon("exclamation-circle"),
+                status = "danger")
+        })
+    })
     
     output$Disease <- renderText({
         paste0(HPOs$Disease[HPOs$X.CaseID == input$CaseCode])
@@ -566,6 +634,10 @@ server <- function(input, output) {
     
     output$NotificationMenu <- renderMenu({
         dropdownMenu(type = "notifications", .list = RV$notifications)
+    })
+    
+    output$MessageMenu <- renderMenu({
+        dropdownMenu(type = "messages", .list = RV$messages)
     })
     
     #######################################
@@ -635,14 +707,21 @@ server <- function(input, output) {
             NC_reg_anno <- makeBoolean(c("TFBS","DNase","UCNE"), input$NC_anno_regions, logic = "include")
             var_reg_anno <- makeBoolean(c("SegDup","LowComplexity","TopVariableGenes"), input$vars_anno_regions, logic = "exclude")
             
-            ##ROH FILTER and GQ FILTER
+            ##ROH FILTER, BED FILTER and GQ FILTER
             #These filters are high-level and applied before all others
-            #if ROH regions are provided call the bed regions module and get rec_id for variants in the ROH regions
+            #call the bed regions module and get rec_id for variants in the ROH regions
             if (!is.null(RV$data$ROH_ranges)) {
                 #message("call bed module")
-                vars_pass_regions <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges[[input$ROH_sample]], multiplier=1000)
+                vars_pass_ROH <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges[[input$ROH_sample]], multiplier=1000)
             } else {
-                vars_pass_regions <- RV$data$variants_df$rec_id
+                vars_pass_ROH <- RV$data$variants_df$rec_id
+            }
+            
+            #call the bed regions module and get rec_id for variants in the custom BED regions
+            if (inherits(RV$customBed_ranges, "GRanges")) {
+                vars_pass_BED <- callModule(bedfilterModule,"bed_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$customBed_ranges)
+            } else {
+                vars_pass_BED <- RV$data$variants_df$rec_id
             }
             
             #Get rec_id for variants passing the GQ filter
@@ -653,7 +732,7 @@ server <- function(input, output) {
                                        exclude_var_type = sv_vars)
             
             #Pre-filter variants_df and retain only vars passing ROH and GQ filters
-            vars_pass <- unique(intersect(vars_pass_regions, vars_pass_GQ))
+            vars_pass <- unique(intersect(intersect(vars_pass_ROH, vars_pass_GQ), vars_pass_BED))
             prefilter_vars <- as.data.frame(RV$data$variants_df %>% filter(rec_id %in% vars_pass))
             
             ## FILTER VARS  
@@ -883,6 +962,11 @@ server <- function(input, output) {
                     step = 0.05)
     })
     
+    output$custom_bed_check <- renderUI({
+        shiny::validate(need(inherits(RV$customBed_ranges, "GRanges"), "No custom BED"))
+        bedcontrolUI("bed_filter", label = "Select only vars in custom regions")
+    })
+    
     output$spliceAI <- renderUI({
         sliderInput("spliceAI_filter", "Min spliceAI score:",
                     min = 0,
@@ -1054,7 +1138,7 @@ server <- function(input, output) {
         shiny::validate(need(!is.null(RV$data$ROH_ranges), "No ROH regions loaded"))
     
         bedcontrolUI("ROH_filter", label = "Select only vars in ROH regions", 
-            filter_config = c(
+            slider_config = c(
                 "label" = "ROH min dimension (kb)",
                 "min" = 0,
                 "max" = max(RV$data$ROH_ranges[[input$ROH_sample]]$value) / 1000,
@@ -1220,6 +1304,9 @@ server <- function(input, output) {
     #})
     
     gene_name <- reactive ({
+        symbol = candidate_genes_df()[input$genesTable_rows_selected, "gene"]
+        updateSelectInput(session = session, inputId = "chr_coverage",selected = genes_bed$V1[genes_bed$V4 == symbol])
+        RV$selected_gene <- symbol
         candidate_genes_df()[input$genesTable_rows_selected, "gene"]
     })
     
@@ -1309,32 +1396,36 @@ server <- function(input, output) {
         geneLists_df()[geneLists_df()$id == listID,]
     })
     
-    observeEvent(input$openIGV, {
+    
+    JIGV_script <- reactive ({
+        shiny::validate(need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"))
         chromosome <- unique(c(gene_comphet_vars_df()$chr[input$comphetTable_rows_selected], gene_vars_df()$chr[input$variantsTable_rows_selected]))
         start_pos <- unique(c(gene_comphet_vars_df()$start[input$comphetTable_rows_selected], gene_vars_df()$start[input$variantsTable_rows_selected]))
         end_pos <- unique(c(gene_comphet_vars_df()$end[input$comphetTable_rows_selected], gene_vars_df()$end[input$variantsTable_rows_selected]))
         
-        shiny::validate(
-            need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"),
-            need(length(chromosome) == 1, "Please select vars on the same chromosome"))
+        shiny::validate(need(length(chromosome) == 1, "Please select vars on the same chromosome"))
         
         start_pos <- min(start_pos)
         end_pos <- max(end_pos)
         region <- paste0(chromosome,":",start_pos,"-",end_pos)
+        out_file <- paste0(chromosome,"_",start_pos,"-",end_pos,".sh")
         RV$selected_vars_region <- region
         
-        igv_command <- paste0("./jigv --open-browser --region ", region, 
-                              " /well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/G179992K.bam#affected",
-                              " /well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/G179994V.bam#affected",
-                              " /well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/G179991G.bam#unaffected",
-                              " /well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/G179993Q.bam#unaffected",
-                              " /well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF/021Jea001.PASS.NORM.vcf.gz")
         
-        system2(igv_command, wait=FALSE)
+        jigv_command <- paste("jigv --region", region,
+                              paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
+                              paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
+                              paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
+                              SV_file, collapse=" ")
+        message(out_file)
+        message(jigv_command)
+        list(outfile=out_file, command=jigv_command)
     })
     
+    callModule(downloadObj, id="get_jigv_script", output_prefix= JIGV_script()$outfile, output_data=JIGV_script()$command, col_names=FALSE)
+
     output$igv_region <- renderText({
-        paste0("Visualized region: ", RV$selected_vars_region)
+        paste0("Generated script: ", JIGV_script()$outfile)
     })
     
     ########################
@@ -1356,6 +1447,48 @@ server <- function(input, output) {
             facet_grid(group~VariantId, scales="free") +
             format1
     })
+    
+    ########################
+    ### Explore coverage tab
+    ########################
+    
+    output$gene_cov_select <- renderUI({
+        genes_list <- unique(genes_bed$V4[genes_bed$V1 == input$chr_coverage])
+        if (RV$selected_gene != FALSE) {
+            selected_gene = RV$selected_gene
+        } else {
+            selected_gene = "NO_GENE"
+        }
+        selectInput("gene_coverage", "Gene: ", choices = c("NO_GENE",genes_list), selected = selected_gene)
+    })
+    
+    observeEvent(input$plot_coverage, {
+        filename <- paste0(Coverage_dir,"/indexcov-", input$chr_coverage, ".bed.gz")
+        shiny::validate(need(file_test("-f", filename), "No coverage data"))
+        
+        cov_file <- gzfile(filename)
+        cov_data <- read.table(cov_file, sep="\t", header=T, comment.char = "@", stringsAsFactors = F)
+        cov_df <- cov_data %>% select(all_of(c("X.chrom","start","end", RV$data$all_samples))) %>% gather(.,key="sample",value="norm_cov", 4:(3+length(RV$data$all_samples)))
+        cov_df$middle_point <- round(cov_df$start + ((cov_df$end - cov_df$start) / 2))
+        
+        if (input$gene_coverage != "NO_GENE") {
+            plot_start <- genes_bed$V2[genes_bed$V4 == input$gene_coverage] - as.numeric(input$cov_region_pad)*1000
+            plot_end <- genes_bed$V3[genes_bed$V4 == input$gene_coverage] + as.numeric(input$cov_region_pad)*1000
+            cov_df <- cov_df %>% filter(middle_point >= plot_start & middle_point <= plot_end)   
+        }
+        RV$cov_plot <- ggplot(cov_df, aes(x=middle_point/100000, y=norm_cov, color=sample)) + 
+            geom_line(size=0.5, alpha=0.5) + scale_y_continuous(limits=c(0,3), breaks=0:3) + 
+            theme(axis.text.x=element_text(size=8, angle=45, hjust=1)) + 
+            labs(x="position (x 100kb)", title=paste0("Chromosome: ", input$chr_coverage), subtitle = paste0("Gene: ", input$gene_coverage))
+        
+    })
+    
+    output$coverage_plot <- renderPlotly({
+        req(RV$cov_plot)
+        ggplotly(RV$cov_plot, tooltip = c("color","y"), dynamicTicks = T)
+    })
+    
+
     
 }
 
