@@ -264,27 +264,19 @@ segregation_cols <- c(
 
 ##Set reactive objects
 RV <- reactiveValues(
-    notifications = list(),
-    data = 0,
-    custom_genes = character(),
-    customBed_ranges = FALSE,
-    filters_summ_genes = data.frame(),
-    filters_summ_vars = data.frame(),
-    selected_vars_region = "NONE",
-    accepted_reg_db = NULL,
-    cov_plot = NULL,
-    selected_gene = FALSE,
-    messages = list (jigv = messageItem(from="Variant Explorer",
-                                    message = "HOW TO USE JIGV SCRIPT
-                                    Copy the downloaded script to humbug and launch it.
-                                    bash downloaded_script.sh
-                                    Leaving the humbug session live, follow the instruction in the link to set up putty
-                                    Then you should be able to see IGV on your browser at localhost:5001
-                                    Configuration for putty
-                                    Source port: 5001
-                                    Destination: localhost:5001", 
-                                    href="https://www.skyverge.com/blog/how-to-set-up-an-ssh-tunnel-with-putty/")
-                      )
+        notifications = list(),
+        data = 0,
+        custom_genes = character(),
+        customBed_ranges = FALSE,
+        filters_summ_genes = data.frame(),
+        filters_summ_vars = data.frame(),
+        selected_vars_region = "NONE",
+        accepted_reg_db = NULL,
+        cov_plot = NULL,
+        selected_gene = FALSE,
+        messages = list(jigv = messageItem(from="Variant Explorer",
+                                        message = "JIGV usage instructions", 
+                                        href="https://variant-explorer.readthedocs.io/en/latest/usage/JIGV.html") )
     )
 
 ############################################
@@ -540,7 +532,7 @@ server <- function(input, output, session) {
         #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
         
         #Reset notifications, messages, custom bed and custom genes
-        RV$messages <- list()
+        #RV$messages <- list()
         RV$custom_genes <- character()
         RV$customBed_ranges <- FALSE
         RV$notifications <- list()
