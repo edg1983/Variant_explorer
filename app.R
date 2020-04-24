@@ -365,6 +365,7 @@ ui <- dashboardPage(
                                 uiOutput("d_score"),
                                 uiOutput("Max_pop_AF"),
                                 uiOutput("Cohort_AF"),
+                                uiOutput("var_type_select"),
                                 uiOutput("var_consequence"),
                                 uiOutput("custom_bed_check"),
                                 checkboxGroupInput("vars_anno_regions","Exclude from:", 
@@ -643,6 +644,13 @@ server <- function(input, output, session) {
             RV$accepted_consequence <- input$consequence
         }
         
+        if ("ALL" %in% input$var_type) { 
+            RV$accepted_vartype <- sort(unique(RV$data$variants_df$var_type))    
+        } else {
+            RV$accepted_vartype <- input$var_type
+        }
+        
+        
         if ("ALL" %in% input$comphet_consequence_filter) { 
             RV$comphet_consequence <- sort(unique(RV$data$variants_df$consequence))    
         } else {
@@ -732,6 +740,7 @@ server <- function(input, output, session) {
             pass_vars <- as.data.frame(prefilter_vars %>% 
                 filter(! (
                     d_score < input$d_score_filter | 
+                    var_type %nin% RV$accepted_vartype |
                     consequence %nin% RV$accepted_consequence |
                     max_pop_af > input$MaxPopAF_filter |
                     cohort_af > input$CohortAF_filter |
@@ -742,20 +751,20 @@ server <- function(input, output, session) {
                          (SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter & 
                               SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) ) |
                     (consequence == "missense_variant" &
-                         (CADD_PhredScore < input$CADD_filter & 
-                              REVEL_score < input$REVEL_filter &
-                              MCAP_score < input$MCAP_filter &
+                         (CADD_PhredScore < input$CADD_filter | 
+                              REVEL_score < input$REVEL_filter |
+                              MCAP_score < input$MCAP_filter |
                               DANN_score < input$DANN_filter)) |
                     (consequence %in% reg_vars &
-                         (ReMM_score < input$ReMM_filter |
+                         ((ReMM_score < input$ReMM_filter |
                               LinSight < input$LinSight_filter |
                               PhyloP100 < input$PhyloP100_filter |
-                              LoF_tolerance > input$LoFtolerance_filter) &
-                         rec_id %nin% accepted_reg_recid &
-                         reg_type %nin% RV$accepted_connected_gene &
-                         TFBS %nin% NC_reg_anno$TFBS &
-                         DNase %nin% NC_reg_anno$DNase &
-                         UCNE %nin% NC_reg_anno$UCNE)
+                              LoF_tolerance > input$LoFtolerance_filter) |
+                         rec_id %nin% accepted_reg_recid |
+                         reg_type %nin% RV$accepted_connected_gene |
+                         TFBS %nin% NC_reg_anno$TFBS |
+                         DNase %nin% NC_reg_anno$DNase |
+                         UCNE %nin% NC_reg_anno$UCNE))
                 )))
             
             #COMPHET FILTERING
@@ -962,7 +971,7 @@ server <- function(input, output, session) {
     output$spliceAI <- renderUI({
         sliderInput("spliceAI_filter", "Min spliceAI score:",
                     min = 0,
-                    max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max, na.rm = T),
+                    max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != filter_definitions$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -970,7 +979,7 @@ server <- function(input, output, session) {
     output$CADD <- renderUI({
         sliderInput("CADD_filter", "Min CADD phred:",
                     min = 0,
-                    max = max(RV$data$variants_df$CADD_PhredScore, na.rm = T),
+                    max = max(RV$data$variants_df$CADD_PhredScore[RV$data$variants_df$CADD_PhredScore != filter_definitions$fill_na_vars$CADD_PhredScore], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -995,7 +1004,7 @@ server <- function(input, output, session) {
     output$LinSight <- renderUI({
         sliderInput("LinSight_filter", "Min LinSight score:",
                     min = 0,
-                    max = max(RV$data$variants_df$LinSight, na.rm = T),
+                    max = max(RV$data$variants_df$LinSight[RV$data$variants_df$LinSight != filter_definitions$fill_na_vars$LinSight], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -1003,14 +1012,14 @@ server <- function(input, output, session) {
     output$ReMM <- renderUI({
         sliderInput("ReMM_filter", "Min ReMM score:",
                     min = 0,
-                    max = max(RV$data$variants_df$ReMM_score, na.rm = T),
+                    max = max(RV$data$variants_df$ReMM_score[RV$data$variants_df$ReMM_score != filter_definitions$fill_na_vars$ReMM_score], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
     
     output$PhyloP100 <- renderUI({
         sliderInput("PhyloP100_filter", "Min PhyloP100 score:",
-                    min = min(RV$data$variants_df$PhyloP100, na.rm = T),
+                    min = min(RV$data$variants_df$PhyloP100[RV$data$variants_df$PhyloP100 != filter_definitions$fill_na_vars$PhyloP100], na.rm = T),
                     max = max(RV$data$variants_df$PhyloP100, na.rm = T),
                     value = 0,
                     step = 0.02)
@@ -1027,7 +1036,7 @@ server <- function(input, output, session) {
     output$REVEL <- renderUI({
         sliderInput("REVEL_filter", "Min REVEL score:",
                     min = 0,
-                    max = max(RV$data$variants_df$REVEL_score, na.rm = T),
+                    max = max(RV$data$variants_df$REVEL_score[RV$data$variants_df$REVEL_score != filter_definitions$fill_na_vars$REVEL_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
@@ -1035,7 +1044,7 @@ server <- function(input, output, session) {
     output$DANN <- renderUI({
         sliderInput("DANN_filter", "Min DANN score:",
                     min = 0,
-                    max = max(RV$data$variants_df$DANN_score, na.rm = T),
+                    max = max(RV$data$variants_df$DANN_score[RV$data$variants_df$DANN_score != filter_definitions$fill_na_vars$DANN_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
@@ -1043,7 +1052,7 @@ server <- function(input, output, session) {
     output$MCAP <- renderUI({
         sliderInput("MCAP_filter", "Min M-CAP score:",
                     min = 0,
-                    max = max(RV$data$variants_df$MCAP_score, na.rm = T),
+                    max = max(RV$data$variants_df$MCAP_score[RV$data$variants_df$MCAP_score != filter_definitions$fill_na_vars$MCAP_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
@@ -1109,10 +1118,21 @@ server <- function(input, output, session) {
     })
     
     output$var_consequence <- renderUI({
-        var_types <- sort(unique(RV$data$variants_df$consequence))
-        names(var_types) <- sort(unique(RV$data$variants_df$consequence))
+        if ("ALL" %nin% input$var_type) {
+            var_types <- sort(unique(RV$data$variants_df$consequence[RV$data$variants_df$var_type %in% input$var_type]))
+        } else {
+            var_types <- sort(unique(RV$data$variants_df$consequence))
+        }
+        names(var_types) <- var_types
         var_types <- c("ALL" = "ALL", var_types)
         selectInput("consequence", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
+    })
+    
+    output$var_type_select <- renderUI({
+        var_types <- sort(unique(RV$data$variants_df$var_type))
+        names(var_types) <- sort(unique(RV$data$variants_df$var_type))
+        var_types <- c("ALL" = "ALL", var_types)
+        selectInput("var_type", "Variant type:", choices = var_types, multiple=TRUE, selected="ALL")
     })
     
     output$comphet_consequence <- renderUI({
@@ -1372,6 +1392,8 @@ server <- function(input, output, session) {
     
     output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
         panelID <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "panel_idx"]
+        shiny::validate(need(length(panelID)>0, "No PanelApp panels for this gene"))
+        
         conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
         df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
         df$gene <- gene_name()
@@ -1445,7 +1467,7 @@ server <- function(input, output, session) {
     ########################
     
     output$gene_cov_select <- renderUI({
-        genes_list <- unique(genes_bed$V4[genes_bed$V1 == input$chr_coverage])
+        genes_list <- sort(unique(genes_bed$V4[genes_bed$V1 == input$chr_coverage]))
         if (RV$selected_gene != FALSE) {
             selected_gene = RV$selected_gene
         } else {
@@ -1464,9 +1486,10 @@ server <- function(input, output, session) {
         cov_df$middle_point <- round(cov_df$start + ((cov_df$end - cov_df$start) / 2))
         
         if (input$gene_coverage != "NO_GENE") {
+            plot_chr <- genes_bed$V1[genes_bed$V4 == input$gene_coverage]
             plot_start <- genes_bed$V2[genes_bed$V4 == input$gene_coverage] - as.numeric(input$cov_region_pad)*1000
             plot_end <- genes_bed$V3[genes_bed$V4 == input$gene_coverage] + as.numeric(input$cov_region_pad)*1000
-            cov_df <- cov_df %>% filter(middle_point >= plot_start & middle_point <= plot_end)   
+            cov_df <- cov_df %>% filter(X.chrom == plot_chr, middle_point >= plot_start & middle_point <= plot_end)   
         }
         RV$cov_plot <- ggplot(cov_df, aes(x=middle_point/100000, y=norm_cov, color=sample)) + 
             geom_line(size=0.5, alpha=0.5) + scale_y_continuous(limits=c(0,3), breaks=0:3) + 
