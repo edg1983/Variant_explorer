@@ -50,7 +50,7 @@ source("segregationModule.R")
 source("intersectBedModule.R")
 source("GQModule.R")
 
-APP_VERSION <- "1.0.5"
+APP_VERSION <- "1.0.6"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
