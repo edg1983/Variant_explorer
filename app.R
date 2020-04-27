@@ -450,11 +450,10 @@ ui <- dashboardPage(
                              column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results")))    
             ),
             tabItem(tabName = "filter_results_variants",
-                    fluidRow(box(title = "Single variants", id = "vars_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE,
-                                DT::dataTableOutput("vars_results_table") ),
-                            box(title = "Compound het variants", id = "comphet_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE,
-                                DT::dataTableOutput("comphet_results_table") )
-                            )
+                    box(title = "Single variants", id = "vars_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE, width = 12,
+                        DT::dataTableOutput("vars_results_table") ),
+                    box(title = "Compound het variants", id = "comphet_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE, width = 12,
+                        DT::dataTableOutput("comphet_results_table") )
             ),
             tabItem(tabName = "gene_lists",
                     box(title = "PanelApp panels", id = "PanelApp_panels", status = "info", solidHeader = TRUE, width = 12,
@@ -1293,7 +1292,7 @@ server <- function(input, output, session) {
                             })
     
     observeEvent(input$comphet_results_table_rows_selected, {
-        gene_name <- comphet_pass_df()[input$comphet_results_table_rows_selected, "gene.X"]
+        gene_name <- comphet_pass_df()[input$comphet_results_table_rows_selected, "gene.x"]
         row_idx <- candidate_genes_df()[candidate_genes_df()$gene == gene_name,"row_idx"]
         message(gene_name, "\t", row_idx)
         genesTable_proxy %>% selectRows(row_idx) 
