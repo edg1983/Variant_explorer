@@ -312,12 +312,14 @@ ui <- dashboardPage(
         #Custom genomic regions
         fileInput(inputId = "custom_bed",label = "Region BED:", multiple=FALSE, accept=".bed", placeholder = "region bed file"),
         
-        sidebarMenu(
+        sidebarMenu(id = "tabs",
             menuItem("Variants overview", tabName = "overview", icon = icon("th")),
             menuItem("Filters settings", tabName = "filters", icon = icon("th")),
             menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
-            menuItem("Filtered genes", tabName = "filter_results_genes", icon = icon("th")),
-            menuItem("Filtered variants", tabName = "filter_results_variants", icon = icon("th")),
+            menuItem("Results", icon = icon("th"),
+                menuSubItem("Filtered genes", tabName = "filter_results_genes"),
+                menuSubItem("Filtered variants", tabName = "filter_results_variants")
+            ),
             menuItem("PanelApp and gene lists", tabName = "gene_lists", icon = icon("th")),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
             menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th")),
@@ -690,6 +692,8 @@ server <- function(input, output, session) {
         } else {
             RV$accepted_connected_gene <- input$reg_connected_gene
         }
+        
+        updateTabItems(session, "tabs", "filter_results_genes")
     })    
 
     #######################################
