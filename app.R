@@ -50,7 +50,7 @@ source("segregationModule.R")
 source("intersectBedModule.R")
 source("GQModule.R")
 
-APP_VERSION <- "1.0.6"
+APP_VERSION <- "1.0.7"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -334,8 +334,8 @@ RV <- reactiveValues(
         cov_file = NULL,
         selected_gene = FALSE,
         messages = list(jigv = messageItem(from="Variant Explorer",
-                                        message = "JIGV usage instructions", 
-                                        href="https://variant-explorer.readthedocs.io/en/latest/usage/JIGV.html") )
+                                        message = "IGV session usage", 
+                                        href="https://variant-explorer.readthedocs.io/en/latest/usage/IGV_session.html") )
     )
 
 ############################################
