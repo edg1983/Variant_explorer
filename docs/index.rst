@@ -16,7 +16,7 @@ Welcome to Variant Explorer's documentation!
     usage/filters_explorer
     usage/filters_results
     usage/gene_details
-    usage/JIGV
+    usage/IGV_session
 
 
 Indices and tables

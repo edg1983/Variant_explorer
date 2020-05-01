@@ -37,7 +37,9 @@ downloadObj <- function(input, output, session, output_prefix, output_data, sep=
       }
     },
     content = function(file) {
-      
+      #shiny::validate(need(
+      #  (output_prefix != "" & !is.null(output_prefix)) & 
+      #    (inherits(output_data, "list") | inherits(output_data,"data.frame")), FALSE))
       if (is.null(zip_archive)) {
         if (inherits(output_data, "list") == TRUE) {
           for (suffix in names(output_data)) {

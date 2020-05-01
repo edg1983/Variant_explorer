@@ -55,9 +55,9 @@ resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
 Coverage_dir <- paste0(resource_dir, "/coverage")
-BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM/"
-VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF/"
-SV_file <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
+BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM"
+VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF"
+SV_VCF <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
 
 #Set data dir containing variants tables
 data_dir <- "encrypted_data"
@@ -65,6 +65,7 @@ data_dir <- "encrypted_data"
 #################
 ### FUNCTIONS ###
 #################
+`%nin%` = Negate(`%in%`)
 
 readGMT <- function(input_file) {
     out_list <- list()
@@ -114,7 +115,65 @@ makeBoolean <- function(myvalues,myvector, logic="include") {
     return(outlist)
 }
 
-`%nin%` = Negate(`%in%`)
+makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_file, BAM_path=BAM_dir, SV_file=SV_VCF) {
+header<- paste('<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+      paste0('<Session genome="hg38" hasGeneTrack="true" hasSequenceTrack="true" locus="', region, '">'),
+      '<Resources>', sep="\n")
+resources_affected <- paste('<Resource path="', BAM_path, '/', affected_samples, '.bam"/>', collapse="\n", sep="")
+resources_unaffected <- paste('<Resource path="', BAM_path, '/', unaffected_samples, '.bam"/>', collapse="\n", sep="")
+resource_vcf <- paste0('<Resource path="', VCF_file, '"/>')
+resource_sv <- paste0('<Resource path="', SV_VCF, '"/>')
+
+VCF_panel <- paste('<Panel name="VCF_panel">',
+    paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', VCF_file, '" name="Family VCF platypus" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
+    '</Panel>',
+    sep="\n")
+
+SV_panel <- paste('<Panel name="SV_panel">',
+                   paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', SV_file, '" name="SV VCF" visible="true"/>'),
+                   '</Panel>',
+                   sep="\n")
+
+samples_panels <- NULL
+for (sample in affected_samples) {
+    panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
+                paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - affected" visible="true"/>'),
+                '</Panel>',
+                sep="\n")
+    samples_panels <- c(samples_panels, panel)
+}
+for (sample in unaffected_samples) {
+    panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                   paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - unaffected" visible="true"/>'),
+                   '</Panel>',
+                   sep="\n")
+    samples_panels <- c(samples_panels, panel)
+}
+samples_panels <- paste(samples_panels, collapse="\n")
+
+close <- paste('<Panel height="61" name="FeaturePanel" width="1235">',
+    '<Track clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" visible="true"/>',
+    '<Track clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;426.0;255,255,255;0,0,178" fontSize="10" height="35" id="hg38_genes" name="Gene" visible="true"/>',
+    '</Panel>',
+    '</Session>', 
+    sep="\n")
+
+xml_text <- paste(header, 
+                  resources_affected,
+                  resources_unaffected,
+                  resource_vcf, 
+                  resource_sv, 
+                  '</Resources>', 
+                  VCF_panel, 
+                  SV_panel, 
+                  samples_panels,
+                  close,
+                  sep="\n")
+}
 
 #############################
 ### Load supporting files ###
@@ -490,7 +549,7 @@ ui <- dashboardPage(
                     DT::dataTableOutput("comphetTable"),
                     fluidRow(br()),
                     fluidRow(
-                        column(4, downloadObjUI("get_jigv_script", label = "Download JIGV script")),
+                        column(4, downloadObjUI("get_igv_session", label = "Download IGV session")),
                         column(4, textOutput("igv_region"))
                     ),
                     fluidRow(hr()),
@@ -1437,13 +1496,13 @@ server <- function(input, output, session) {
         as.data.frame(variants_df() %>% filter(Class == "PASS", gene == gene_name(), rec_id %nin% gene_comphet_vars_df()$varID)) 
     })
     
-    output$variantsTable <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+    output$variantsTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
         #shiny::validate(need(gene_name != "", 'No gene selected'))
         
         as.data.frame(gene_vars_df())
     })
     
-    output$comphetTable <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
+    output$comphetTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
         #shiny::validate(need(gene_name != "", 'No gene selected'))
         shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
 
@@ -1471,7 +1530,7 @@ server <- function(input, output, session) {
     })
     
     
-    JIGV_script <- reactive ({
+    IGV_session <- reactive ({
         shiny::validate(need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"))
         chromosome <- unique(c(gene_comphet_vars_df()$chr[input$comphetTable_rows_selected], gene_vars_df()$chr[input$variantsTable_rows_selected]))
         start_pos <- unique(c(gene_comphet_vars_df()$start[input$comphetTable_rows_selected], gene_vars_df()$start[input$variantsTable_rows_selected]))
@@ -1479,27 +1538,31 @@ server <- function(input, output, session) {
         
         shiny::validate(need(length(chromosome) == 1, "Please select vars on the same chromosome"))
         
-        start_pos <- min(start_pos)
-        end_pos <- max(end_pos)
+        start_pos <- min(start_pos) - 100
+        end_pos <- max(end_pos) + 100
         region <- paste0(chromosome,":",start_pos,"-",end_pos)
-        out_file <- paste0(chromosome,"_",start_pos,"-",end_pos,".sh")
+        out_file <- paste0(chromosome,"_",start_pos,"-",end_pos,".xml")
         RV$selected_vars_region <- region
         
+        igv_xml <- makeIGVxml(region, 
+                              RV$data$affected_samples, 
+                              RV$data$unaffected_samples,
+                              VCF_file = paste0(VCF_dir,"/",RV$data$pedigree, ".PASS.NORM.vcf.gz"))
         
-        jigv_command <- paste("jigv --region", region,
-                              paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
-                              paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
-                              paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
-                              SV_file, collapse=" ")
-        message(out_file)
-        message(jigv_command)
-        list(outfile=out_file, command=jigv_command)
+        message(igv_xml)
+        #jigv_command <- paste("jigv --region", region,
+        #                      paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
+        #                      paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
+        #                      paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
+        #                      SV_file, collapse=" ")
+
+        list(outfile=out_file, session_xml=igv_xml)
     })
     
-    callModule(downloadObj, id="get_jigv_script", output_prefix= JIGV_script()$outfile, output_data=JIGV_script()$command, col_names=FALSE)
+    callModule(downloadObj, id="get_igv_session", output_prefix= IGV_session()$outfile, output_data=IGV_session()$session_xml, col_names=FALSE)
 
     output$igv_region <- renderText({
-        paste0("Generated script: ", JIGV_script()$outfile)
+        paste0("Generated session: ", IGV_session()$outfile)
     })
     
     ########################
@@ -1572,9 +1635,6 @@ server <- function(input, output, session) {
         
         ggplotly(cov_plot, tooltip = c("color","y"), dynamicTicks = T)
     })
-    
-
-    
 }
 
 # Run the application 

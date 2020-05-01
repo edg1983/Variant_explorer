@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Filters explorer panel &mdash; Variant Explorer v1.0.1 documentation</title>
+  <title>IGV session file &mdash; Variant Explorer v1.0.1 documentation</title>
   
 
   
@@ -34,9 +34,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Filters results panel" href="filters_results.html" />
-    <link rel="prev" title="Filters panel" href="filters.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -81,11 +79,11 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filters.html">Filters panel</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Filters explorer panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filters_explorer.html">Filters explorer panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filters_results.html">Filters results panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_details.html">Gene details panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="JIGV.html">Use the JIGV script</a></li>
@@ -134,13 +132,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Filters explorer panel</li>
+      <li>IGV session file</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/usage/filters_explorer.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/usage/IGV_session.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -153,8 +151,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="filters-explorer-panel">
-<h1>Filters explorer panel<a class="headerlink" href="#filters-explorer-panel" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="igv-session-file">
+<h1>IGV session file<a class="headerlink" href="#igv-session-file" title="Permalink to this headline">¶</a></h1>
+<p>This section explains how to generate an IGV session file in the app and use it to inspect your variants
+This option is active from teh “Gene details” section to inspect one or more of the candidate variants</p>
+<div class="section" id="get-the-igv-session-file">
+<h2>Get the IGV session file<a class="headerlink" href="#get-the-igv-session-file" title="Permalink to this headline">¶</a></h2>
+<p>From the “gene details” tab in the app select the variant(s) that you want to inspect.
+You can select any number of variants from either comound hets table and/or single variants table,
+as long as they are on the same chromosome.
+When you select a variant you should see the region that will be configured in IGV in a text box
+on the right of the download button.</p>
+<ol class="arabic simple">
+<li><p>Selct variant(s) of interest</p></li>
+<li><p>Click on the “Download IGV session” button</p></li>
+<li><p>An XML file is automatically downloaded to your computer.</p></li>
+</ol>
+</div>
+<div class="section" id="prepare-for-visualization">
+<h2>Prepare for visualization<a class="headerlink" href="#prepare-for-visualization" title="Permalink to this headline">¶</a></h2>
+<p>To visualize the variant you need to run IGV from the server, either rescomp or humbug</p>
+<ol class="arabic simple">
+<li><p>Copy the XML file downloaded from the app to any location in the server</p></li>
+<li><p>Log in into the server using one of the following. Note that humbug require you are connected to VPN.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">-X</span> <span class="pre">-l</span> <span class="pre">username</span> <span class="pre">rescomp1.well.ox.ac.uk</span></code>
+<code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">-X</span> <span class="pre">-l</span> <span class="pre">username</span> <span class="pre">humbug.well.ox.ac.uk</span></code></p>
+<ol class="arabic simple" start="3">
+<li><p>Load IGV using</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">module</span> <span class="pre">load</span> <span class="pre">IGV/2.8.0-Java-11</span></code></p>
+<ol class="arabic simple" start="4">
+<li><p>Launch IGV from the server</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">igv.sh</span></code></p>
+<p>5. An IGV windows should open automatically on your computer.
+Use File &gt; Open Session and load the XML file you have previously copied</p>
+<p>The IGV screen would be set automatically to the proper location, diplaying the BAM files from the selected case
+labelled with affected / unaffected. Family VCF file and SV VCF will be loaded as well.</p>
+</div>
 </div>
 
 
@@ -162,15 +197,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="filters_results.html" class="btn btn-neutral float-right" title="Filters results panel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="filters.html" class="btn btn-neutral float-left" title="Filters panel" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
