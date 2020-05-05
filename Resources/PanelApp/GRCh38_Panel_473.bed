@@ -1,0 +1,49 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	114704469	114716894	NRAS	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	155897808	155911404	RIT1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	202331657	202341980	UBE2T	3		BIALLELIC, autosomal or pseudoautosomal
+2	28751640	28802940	PPP1CB	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	38981396	39124345	SOS1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	58159243	58241372	FANCL	3		BIALLELIC, autosomal or pseudoautosomal
+2	219550729	219571859	OBSL1	3		BIALLELIC, autosomal or pseudoautosomal
+3	10026414	10101930	FANCD2	3		BIALLELIC, autosomal or pseudoautosomal
+3	12583601	12664226	RAF1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	1793307	1808872	FGFR3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	68215720	68301821	PIK3R1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	35452361	35467103	FANCE	3		BIALLELIC, autosomal or pseudoautosomal
+6	43037617	43053945	CUL7	3		BIALLELIC, autosomal or pseudoautosomal
+7	140719327	140924764	BRAF	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	56160904	56211324	PLAG1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	89933336	90003228	NBN	3		BIALLELIC, autosomal or pseudoautosomal
+9	35073835	35080016	FANCG	3		BIALLELIC, autosomal or pseudoautosomal
+9	95099054	95426796	FANCC	3		BIALLELIC, autosomal or pseudoautosomal
+10	110919547	111013667	SHOC2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	532242	537287	HRAS	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	2129112	2141238	IGF2	3		MONOALLELIC, autosomal or pseudoautosomal, maternally imprinted (paternal allele expressed)
+11	2883213	2885881	CDKN1C	3		MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+11	22622519	22626787	FANCF	3		BIALLELIC, autosomal or pseudoautosomal
+11	119206276	119313926	CBL	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	25204789	25250936	KRAS	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	65824131	65966295	HMGA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	102395867	102480645	IGF1	3		BIALLELIC, autosomal or pseudoautosomal
+12	112418351	112509913	PTPN11	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	32315474	32400266	BRCA2	3		BIALLELIC, autosomal or pseudoautosomal
+14	50117120	50231558	SOS2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	66386817	66492312	MAP2K1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	88803443	88875354	ACAN	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+15	89243949	89317261	FANCI	3		BIALLELIC, autosomal or pseudoautosomal
+15	90717327	90816165	BLM	3		BIALLELIC, autosomal or pseudoautosomal
+15	98648971	98964530	IGF1R	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	3581181	3611598	SLX4	3		BIALLELIC, autosomal or pseudoautosomal
+16	13920157	13952345	ERCC4	3		BIALLELIC, autosomal or pseudoautosomal
+16	23603160	23641310	PALB2	3		BIALLELIC, autosomal or pseudoautosomal
+16	30698209	30741409	SRCAP	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	89267627	89490561	ANKRD11	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	89737549	89816657	FANCA	3		BIALLELIC, autosomal or pseudoautosomal
+17	18271428	18315007	TOP3A	3		BIALLELIC, autosomal or pseudoautosomal
+17	58982638	59106921	TRIM37	3		BIALLELIC, autosomal or pseudoautosomal
+17	61681266	61863521	BRIP1	3		BIALLELIC, autosomal or pseudoautosomal
+19	4090321	4124129	MAP2K2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	46410372	46413584	CCDC8	3		BIALLELIC, autosomal or pseudoautosomal
+22	20979462	20999038	LZTR1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+X	14843407	14873069	FANCB	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

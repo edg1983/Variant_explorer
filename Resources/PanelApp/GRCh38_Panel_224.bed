@@ -1,0 +1,9 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	219627327	219641980	SLC4A3	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38548057	38649673	SCN5A	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	81946444	82443798	CACNA2D1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	150944961	150978315	KCNH2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	18140677	18541869	CACNB2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	2444684	2849109	KCNQ1	3	unknown	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	1970786	2697950	CACNA1C	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	70168673	70180048	KCNJ2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

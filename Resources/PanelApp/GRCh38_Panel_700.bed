@@ -1,0 +1,33 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	2228695	2310119	SKI	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	11934205	11975538	PLOD1	3		BIALLELIC, autosomal or pseudoautosomal
+1	47416072	47418052	FOXE3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	218346235	218444619	TGFB2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	188974320	189012746	COL3A1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	189031896	189179879	COL5A2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	30606502	30694142	TGFBR2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	123610049	123884331	MYLK	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	122063195	122078360	LOX	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	128257909	128659185	FBN2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	30010587	30026684	FKBP14	3		BIALLELIC, autosomal or pseudoautosomal
+7	74027789	74069907	ELN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	99104038	99154192	TGFBR1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	130713946	130887675	ABL1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	134641774	134844843	COL5A1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	136494444	136545862	NOTCH1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	50991358	52298350	PRKG1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	88935074	88991339	ACTA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	65866441	65873592	EFEMP2	3		BIALLELIC, autosomal or pseudoautosomal
+12	8637346	8662888	MFAP5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	75958099	75982991	TGFB3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	91869412	91947987	FBLN5	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+15	48408306	48645849	FBN1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	66702228	66782848	SMAD6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	67063763	67195195	SMAD3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	15703172	15857033	MYH11	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	47808957	47931146	SMAD2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	51028394	51085045	SMAD4	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	46709487	46736347	SLC2A10	3		BIALLELIC, autosomal or pseudoautosomal
+21	43053191	43076943	CBS	3		BIALLELIC, autosomal or pseudoautosomal
+X	153494939	153509554	BGN	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	154348524	154374638	FLNA	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

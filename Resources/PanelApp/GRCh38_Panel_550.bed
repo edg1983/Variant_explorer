@@ -1,0 +1,57 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	9651732	9729114	PIK3CD	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	26401916	26456711	DRC1	3		BIALLELIC, autosomal or pseudoautosomal
+2	84516455	84819589	DNAH6	2		
+2	218672026	218702716	STK36	2		BIALLELIC, autosomal or pseudoautosomal
+3	50341110	50346852	ZMYND10	3		BIALLELIC, autosomal or pseudoautosomal
+3	52316319	52400491	DNAH1	2		BIALLELIC, autosomal or pseudoautosomal
+3	180602858	180871005	CCDC39	3		BIALLELIC, autosomal or pseudoautosomal
+4	16160505	16227410	TAPT1	2		
+4	102501329	102617302	NFKB1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	13690331	13944543	DNAH5	3		BIALLELIC, autosomal or pseudoautosomal
+5	55219614	55227315	MCIDAS	3		BIALLELIC, autosomal or pseudoautosomal
+5	55231152	55233680	CCNO	3		BIALLELIC, autosomal or pseudoautosomal
+5	68215720	68301821	PIK3R1	3	unknown	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+6	38715341	39030529	DNAH8	2		BIALLELIC, autosomal or pseudoautosomal
+6	43645046	43672599	RSPH9	3		BIALLELIC, autosomal or pseudoautosomal
+6	116616479	116632985	RSPH4A	3		BIALLELIC, autosomal or pseudoautosomal
+6	158972871	159000187	RSPH3	3		BIALLELIC, autosomal or pseudoautosomal
+7	726701	786475	DNAAF5	3		BIALLELIC, autosomal or pseudoautosomal
+7	21543215	21901839	DNAH11	3		BIALLELIC, autosomal or pseudoautosomal
+7	117465784	117715971	CFTR	3		BIALLELIC, autosomal or pseudoautosomal
+8	100157906	100259278	SPAG1	3		BIALLELIC, autosomal or pseudoautosomal
+8	132571953	132675617	LRRC6	3		BIALLELIC, autosomal or pseudoautosomal
+9	34457414	34520989	DNAI1	3		BIALLELIC, autosomal or pseudoautosomal
+10	27812164	27999048	ARMC4	3		BIALLELIC, autosomal or pseudoautosomal
+10	102394110	102402529	NFKB2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	132808392	132942823	CFAP46	2		
+11	537527	554916	LRRC56	3		BIALLELIC, autosomal or pseudoautosomal
+11	36510709	36593156	RAG1	3	unknown	BIALLELIC, autosomal or pseudoautosomal
+11	36575574	36598279	RAG2	3		BIALLELIC, autosomal or pseudoautosomal
+11	73950319	73970366	DNAJB13	3		BIALLELIC, autosomal or pseudoautosomal
+11	102047443	102084560	C11orf70	3		BIALLELIC, autosomal or pseudoautosomal
+12	6346843	6377730	SCNN1A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	48904110	48931840	CCDC65	3		BIALLELIC, autosomal or pseudoautosomal
+12	96489571	96875555	CFAP54	2		
+14	49625174	49635230	DNAAF2	3		BIALLELIC, autosomal or pseudoautosomal
+14	73644875	73703732	DNAL1	3		BIALLELIC, autosomal or pseudoautosomal
+15	55410525	55508234	DNAAF4	3		BIALLELIC, autosomal or pseudoautosomal
+16	23182715	23216883	SCNN1G	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	23278231	23381299	SCNN1B	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	70807378	71230722	HYDIN	3		BIALLELIC, autosomal or pseudoautosomal
+16	84145287	84178767	DNAAF1	3		BIALLELIC, autosomal or pseudoautosomal
+16	90019629	90044975	GAS8	3		BIALLELIC, autosomal or pseudoautosomal
+17	11598431	11969748	DNAH9	3		BIALLELIC, autosomal or pseudoautosomal
+17	35744511	35752878	GAS2L2	3		BIALLELIC, autosomal or pseudoautosomal
+17	41930635	41965651	TTC25	3		BIALLELIC, autosomal or pseudoautosomal
+17	44899142	44905390	CCDC103	3		BIALLELIC, autosomal or pseudoautosomal
+17	74274247	74314884	DNAI2	3		BIALLELIC, autosomal or pseudoautosomal
+17	80036632	80100613	CCDC40	3		BIALLELIC, autosomal or pseudoautosomal
+19	11420604	11435782	CCDC151	3		BIALLELIC, autosomal or pseudoautosomal
+19	48296457	48321894	CCDC114	3		BIALLELIC, autosomal or pseudoautosomal
+19	55158661	55166722	DNAAF3	3		BIALLELIC, autosomal or pseudoautosomal
+21	32592079	32612866	C21orf59	3		BIALLELIC, autosomal or pseudoautosomal
+21	42472486	42496354	RSPH1	3		BIALLELIC, autosomal or pseudoautosomal
+X	13734745	13769353	OFD1	2		
+X	38269163	38327564	RPGR	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	107206632	107244243	PIH1D3	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

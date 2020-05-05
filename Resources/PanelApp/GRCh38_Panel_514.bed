@@ -1,0 +1,12 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	47345158	47387601	EPCAM	3		BIALLELIC, autosomal or pseudoautosomal
+5	473310	524332	SLC9A3	3		BIALLELIC, autosomal or pseudoautosomal
+5	95463895	95555007	TTC37	3		BIALLELIC, autosomal or pseudoautosomal
+6	31959080	31969755	SKIV2L	3		BIALLELIC, autosomal or pseudoautosomal
+7	107765467	107803225	SLC26A3	3		BIALLELIC, autosomal or pseudoautosomal
+8	144314584	144326910	DGAT1	3		BIALLELIC, autosomal or pseudoautosomal
+11	59713456	59805882	STX3	3		BIALLELIC, autosomal or pseudoautosomal
+12	14612632	14696585	GUCY2C	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	49822813	50195093	MYO5B	3		BIALLELIC, autosomal or pseudoautosomal
+19	7636881	7647873	STXBP2	3		BIALLELIC, autosomal or pseudoautosomal
+19	38244035	38292614	SPINT2	3		BIALLELIC, autosomal or pseudoautosomal

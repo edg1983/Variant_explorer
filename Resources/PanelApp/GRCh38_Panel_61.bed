@@ -1,0 +1,19 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	73892314	73919865	ACTG2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	219418377	219426739	DES	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	38845769	38950561	SCN11A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	37812677	37839686	GDNF	2	Complete	Unknown
+7	93099513	93118023	SAMD9	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	73972437	73982783	TMEM70	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	102204502	102239118	RRM2B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	43077027	43130351	RET	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	87863113	87971930	PTEN	2	Complete	
+11	123069865	123195281	CLMP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	89305198	89334861	POLG	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	37970686	37987422	SOX10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	50525752	50530056	TYMP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	31097677	33339441	DMD	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	77504878	77786269	ATRX	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	149476990	149521096	IDS	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	153861514	153909223	L1CAM	2	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	154348524	154374638	FLNA	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

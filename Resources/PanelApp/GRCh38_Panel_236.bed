@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	24117160	24495282	THRB	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+4	73397114	73421412	ALB	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	89318506	89359662	SECISBP2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	80954989	81146302	TSHR	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	40058290	40093867	THRA	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	74421461	74533917	SLC16A2	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

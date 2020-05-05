@@ -1,0 +1,15 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	42925375	42959173	SLC2A1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	160115759	160143591	ATP1A2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	201039512	201112566	CACNA1S	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+5	36606355	36688334	SLC1A3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	143316126	143352083	CLCN1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	64746389	64760297	PYGM	3		BIALLELIC, autosomal or pseudoautosomal
+12	4909893	4918256	KCNA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	28878405	28904509	ATP2A1	3		BIALLELIC, autosomal or pseudoautosomal
+17	63938554	63972918	SCN4A	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	70168673	70180048	KCNJ2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	13206442	13633025	CACNA1A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	38433699	38587564	RYR1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+MT	8366	8572	MT-ATP8	3		MITOCHONDRIAL
+MT	8527	9207	MT-ATP6	3		MITOCHONDRIAL

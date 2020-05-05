@@ -1,0 +1,25 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	5862811	5992473	NPHP4	3		BIALLELIC, autosomal or pseudoautosomal
+1	155185824	155192916	MUC1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	204154819	204190324	REN	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+2	110122311	110205066	NPHP1	3		BIALLELIC, autosomal or pseudoautosomal
+2	165857475	165953843	TTC21B	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	64515654	64688000	ADAMTS9	2		BIALLELIC, autosomal or pseudoautosomal
+3	128051641	128071683	SEC61A1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	132680609	132722442	NPHP3	3		BIALLELIC, autosomal or pseudoautosomal
+3	186567403	186585800	DNAJB11	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	39182404	39285810	WDR19	3		BIALLELIC, autosomal or pseudoautosomal
+6	24171756	24358052	DCDC2	2		BIALLELIC, autosomal or pseudoautosomal
+8	93754844	93819234	TMEM67	3		BIALLELIC, autosomal or pseudoautosomal
+9	98731329	98796965	ANKS6	3		BIALLELIC, autosomal or pseudoautosomal
+9	100099256	100301000	INVS	3		BIALLELIC, autosomal or pseudoautosomal
+11	117314557	117413268	CEP164	3		BIALLELIC, autosomal or pseudoautosomal
+12	94306449	94459988	CEP83	3		BIALLELIC, autosomal or pseudoautosomal
+15	41774434	41827855	MAPKBP1	3		BIALLELIC, autosomal or pseudoautosomal
+15	45361124	45402327	GATM	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	4314761	4339597	GLIS2	2		BIALLELIC, autosomal or pseudoautosomal
+16	20333052	20356301	UMOD	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	49487524	49857919	ZNF423	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	37686432	37745247	HNF1B	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	40857077	40932815	XPNPEP3	2		BIALLELIC, autosomal or pseudoautosomal
+MT	577	647	MT-TF	3	Complete	MITOCHONDRIAL

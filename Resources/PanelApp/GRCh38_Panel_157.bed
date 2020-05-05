@@ -1,0 +1,9 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	231363751	231425044	EGLN1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	46293667	46386703	EPAS1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	10141008	10152220	VHL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	134646808	134679813	BPGM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	5225464	5229395	HBB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	172847	173710	HBA2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	176680	177522	HBA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	11377205	11384342	EPOR	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

@@ -1,0 +1,51 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	39026318	39034636	NDUFS5	2		Unknown
+1	161197104	161214395	NDUFS2	3		BIALLELIC, autosomal or pseudoautosomal
+2	37231631	37253403	NDUFAF7	2		Unknown
+2	201071433	201085750	NDUFB3	3		BIALLELIC, autosomal or pseudoautosomal
+2	206114817	206159603	NDUFS1	3		BIALLELIC, autosomal or pseudoautosomal
+2	239892450	240025402	NDUFA10	3		BIALLELIC, autosomal or pseudoautosomal
+3	49020459	49023495	NDUFAF3	3		BIALLELIC, autosomal or pseudoautosomal
+3	119498532	119525090	TIMMDC1	2		BIALLELIC, autosomal or pseudoautosomal
+3	120596309	120602500	NDUFB4	2		BIALLELIC, autosomal or pseudoautosomal
+3	128879596	128916067	ACAD9	3		BIALLELIC, autosomal or pseudoautosomal
+3	179604690	179627647	NDUFB5	2		Unknown
+4	139266880	139302551	NDUFC1	2		Unknown
+5	1801400	1816605	NDUFS6	3		BIALLELIC, autosomal or pseudoautosomal
+5	53560633	53683340	NDUFS4	3		BIALLELIC, autosomal or pseudoautosomal
+5	60945129	61153037	NDUFAF2	3		BIALLELIC, autosomal or pseudoautosomal
+5	140638740	140647785	NDUFA2	3		BIALLELIC, autosomal or pseudoautosomal
+6	96889313	96897881	NDUFAF4	3		BIALLELIC, autosomal or pseudoautosomal
+7	123536997	123558255	NDUFA5	2		Unknown
+7	140690777	140722790	NDUFB2	2		Unknown
+8	94895767	95116455	NDUFAF6	3		BIALLELIC, autosomal or pseudoautosomal
+8	124539103	124568510	NDUFB9	2		BIALLELIC, autosomal or pseudoautosomal
+9	32552999	32573184	NDUFB6	2		Unknown
+9	122144058	122159819	NDUFA8	2		Unknown
+10	100523740	100530000	NDUFB8	3		BIALLELIC, autosomal or pseudoautosomal
+11	47565336	47584562	NDUFS3	3		BIALLELIC, autosomal or pseudoautosomal
+11	67606852	67612535	NDUFV1	3		BIALLELIC, autosomal or pseudoautosomal
+11	68030617	68036644	NDUFS8	3		BIALLELIC, autosomal or pseudoautosomal
+11	78068304	78080219	NDUFC2	2		Unknown
+11	85628573	85636539	TMEM126B	3		BIALLELIC, autosomal or pseudoautosomal
+11	126269055	126278131	FOXRED1	3		BIALLELIC, autosomal or pseudoautosomal
+12	4649095	4694317	NDUFA9	3		BIALLELIC, autosomal or pseudoautosomal
+12	94897055	95003770	NDUFA12	2		BIALLELIC, autosomal or pseudoautosomal
+14	31489956	31861224	NUBPL	3		BIALLELIC, autosomal or pseudoautosomal
+14	92116122	92121917	NDUFB1	2		Unknown
+15	41387349	41402519	NDUFAF1	3		BIALLELIC, autosomal or pseudoautosomal
+16	1959508	1961975	NDUFB10	2		BIALLELIC, autosomal or pseudoautosomal
+16	23581002	23596356	NDUFAB1	2		Unknown
+17	81239239	81241281	NDUFAF8	3		BIALLELIC, autosomal or pseudoautosomal
+18	9102630	9134345	NDUFV2	3		BIALLELIC, autosomal or pseudoautosomal
+19	1383527	1395589	NDUFS7	3		BIALLELIC, autosomal or pseudoautosomal
+19	5891276	5904006	NDUFA11	3		BIALLELIC, autosomal or pseudoautosomal
+19	8308768	8321396	NDUFA7	2		Unknown
+19	14566078	14572062	NDUFB7	2		Unknown
+19	19515736	19529054	NDUFA13	2		BIALLELIC, autosomal or pseudoautosomal
+19	54102728	54109257	NDUFA3	2		Unknown
+20	13784950	13821582	NDUFAF5	3		BIALLELIC, autosomal or pseudoautosomal
+21	42879644	42913304	NDUFV3	2		Unknown
+22	42085525	42090955	NDUFA6	3		BIALLELIC, autosomal or pseudoautosomal
+X	47142216	47145504	NDUFB11	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	119871487	119876662	NDUFA1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

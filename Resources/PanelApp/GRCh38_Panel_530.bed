@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+MT	3307	4262	MT-ND1	3		MITOCHONDRIAL
+MT	10760	12137	MT-ND4	3		MITOCHONDRIAL
+MT	14149	14673	MT-ND6	3		MITOCHONDRIAL

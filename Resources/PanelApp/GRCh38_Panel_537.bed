@@ -1,0 +1,41 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	52684451	52698366	COA7	3		BIALLELIC, autosomal or pseudoautosomal
+1	234373456	234384049	COA6	3		BIALLELIC, autosomal or pseudoautosomal
+1	244835322	244845057	COX20	3		BIALLELIC, autosomal or pseudoautosomal
+2	43886508	43996005	LRPPRC	3		BIALLELIC, autosomal or pseudoautosomal
+2	97646040	97648383	COX5B	2		Unknown
+2	98599310	98608515	COA5	2		BIALLELIC, autosomal or pseudoautosomal
+2	206765357	206792509	FASTKD2	3		BIALLELIC, autosomal or pseudoautosomal
+3	119654513	119677454	COX17	2		Unknown
+4	73052362	73069755	COX18	2		Unknown
+5	86617904	86620962	COX7C	2		Unknown
+7	898778	975599	COX19	2		Unknown
+7	10931951	10940256	NDUFA4	3		BIALLELIC, autosomal or pseudoautosomal
+7	43608456	43729717	COA1	2		Unknown
+8	99873200	99894062	COX6C	2		Unknown
+9	133351755	133356676	SURF1	3		BIALLELIC, autosomal or pseudoautosomal
+10	99711844	99732100	COX15	3		BIALLELIC, autosomal or pseudoautosomal
+11	63974607	63976543	COX8A	2		BIALLELIC, autosomal or pseudoautosomal
+11	73872667	73876988	COA4	2		Unknown
+12	50111979	50120457	COX14	3		BIALLELIC, autosomal or pseudoautosomal
+12	120438090	120440742	COX6A1	3		BIALLELIC, autosomal or pseudoautosomal
+14	22766522	22773041	OXA1L	2		BIALLELIC, autosomal or pseudoautosomal
+14	70325081	70359731	COX16	2		Unknown
+14	103562962	103607523	APOPT1	3		BIALLELIC, autosomal or pseudoautosomal
+15	74919791	74938168	COX5A	2		BIALLELIC, autosomal or pseudoautosomal
+16	31427731	31428428	COX6A2	2		Unknown
+16	85798633	85807044	COX4I1	2		BIALLELIC, autosomal or pseudoautosomal
+17	10672474	10698375	SCO1	3		BIALLELIC, autosomal or pseudoautosomal
+17	14069496	14208677	COX10	3		BIALLELIC, autosomal or pseudoautosomal
+17	42795147	42798704	COA3	2		BIALLELIC, autosomal or pseudoautosomal
+17	54951902	54968785	COX11	2		Unknown
+17	63600872	63608365	TACO1	3		BIALLELIC, autosomal or pseudoautosomal
+19	7629737	7631956	PET100	3		BIALLELIC, autosomal or pseudoautosomal
+19	32875925	32971991	CEP89	2		BIALLELIC, autosomal or pseudoautosomal
+19	35648223	35658861	COX6B1	3		BIALLELIC, autosomal or pseudoautosomal
+19	36150922	36152869	COX7A1	2		Unknown
+19	55349306	55354814	COX6B2	2		Unknown
+20	18137873	18143169	PET117	2		BIALLELIC, autosomal or pseudoautosomal
+20	31637888	31645006	COX4I2	2		BIALLELIC, autosomal or pseudoautosomal
+22	50523568	50525606	SCO2	3		BIALLELIC, autosomal or pseudoautosomal
+X	77899438	77907373	COX7B	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

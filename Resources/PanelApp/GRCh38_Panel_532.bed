@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	27309492	27325680	MPV17	3		BIALLELIC, autosomal or pseudoautosomal
+2	73926826	73958961	DGUOK	3		BIALLELIC, autosomal or pseudoautosomal
+2	218658764	218663443	BCS1L	3		BIALLELIC, autosomal or pseudoautosomal
+10	58385022	58399221	TFAM	2		BIALLELIC, autosomal or pseudoautosomal
+10	100987367	100994401	TWNK	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+15	89305198	89334861	POLG	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+22	46330875	46357340	TRMU	3		BIALLELIC, autosomal or pseudoautosomal

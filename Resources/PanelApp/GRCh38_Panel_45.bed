@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+4	41744082	41748970	PHOX2B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	105369077	105474081	PPA2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	151822513	151924842	GLRA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	21764955	21775581	KCNJ8	2	Complete	Unknown

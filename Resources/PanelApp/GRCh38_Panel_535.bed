@@ -1,0 +1,9 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	17018722	17054170	SDHB	2		BIALLELIC, autosomal or pseudoautosomal
+1	161314257	161375340	SDHC	2		Unknown
+5	218241	256700	SDHA	3		BIALLELIC, autosomal or pseudoautosomal
+6	70566917	70589569	SDHAF4	2		Unknown
+7	97116590	97181763	SDHAF3	2		Unknown
+11	61430042	61447529	SDHAF2	2		Unknown
+11	112086773	112120013	SDHD	3		BIALLELIC, autosomal or pseudoautosomal
+19	35995199	35996315	SDHAF1	3		BIALLELIC, autosomal or pseudoautosomal

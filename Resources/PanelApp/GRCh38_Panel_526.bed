@@ -1,0 +1,14 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	16985958	17011928	ATP13A2	3		BIALLELIC, autosomal or pseudoautosomal
+1	40071461	40097727	PPT1	3		BIALLELIC, autosomal or pseudoautosomal
+4	127917732	127966034	MFSD8	3		BIALLELIC, autosomal or pseudoautosomal
+7	66628767	66649067	KCTD7	3		BIALLELIC, autosomal or pseudoautosomal
+8	1755778	1801711	CLN8	3		BIALLELIC, autosomal or pseudoautosomal
+11	1752752	1764573	CTSD	3		BIALLELIC, autosomal or pseudoautosomal
+11	6612763	6619461	TPP1	3		BIALLELIC, autosomal or pseudoautosomal
+11	66563463	66568841	CTSF	3		BIALLELIC, autosomal or pseudoautosomal
+13	76990660	77019143	CLN5	3		BIALLELIC, autosomal or pseudoautosomal
+15	68206992	68257211	CLN6	3		BIALLELIC, autosomal or pseudoautosomal
+16	28474111	28495575	CLN3	3		BIALLELIC, autosomal or pseudoautosomal
+17	44345086	44353102	GRN	2		BIALLELIC, autosomal or pseudoautosomal
+20	63895182	63936031	DNAJC5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

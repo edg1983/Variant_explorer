@@ -1,0 +1,18 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	15940564	15947007	MYCN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	42767089	42792593	HAAO	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	142877498	143055832	KYNU	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	44303544	44389706	FGF10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	27193503	27200106	HOXA13	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	60678778	60868028	CHD7	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	143816344	143829859	PUF60	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	6570083	6607476	CHD4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	114353931	114408442	TBX5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	114670254	114684164	TBX3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	91347820	91354579	MIR17HG	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	3651639	3717597	TRAP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	51135975	51151367	SALL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	44849943	44899662	EFTUD2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	51782331	51802520	SALL4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+X	14843407	14873069	FANCB	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	137566142	137577691	ZIC3	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

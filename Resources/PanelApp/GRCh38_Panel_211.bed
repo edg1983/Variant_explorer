@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	40300487	40317816	COL9A2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	19992111	20012694	MATN3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	149960737	149993455	SLC26A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	18782773	18791314	COMP	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	62816244	62841159	COL9A3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

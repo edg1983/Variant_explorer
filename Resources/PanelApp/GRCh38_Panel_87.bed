@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+4	150264531	151015727	LRBA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42313324	42388568	STAT3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+21	44285838	44298648	AIRE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	49250436	49264826	FOXP3	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

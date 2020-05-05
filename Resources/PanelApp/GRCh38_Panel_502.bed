@@ -1,5 +1,6 @@
 #chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
 1	161222292	161223631	APOA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	247416156	247449108	NLRP3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
 4	154583126	154590766	FGA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
 9	121207794	121332843	GSN	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
 11	116829706	116833072	APOC3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

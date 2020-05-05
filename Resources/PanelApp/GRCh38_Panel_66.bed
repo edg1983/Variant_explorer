@@ -1,0 +1,48 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	53196429	53214197	CPT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	63593276	63660245	PGM1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	75724347	75787575	ACADM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	99850084	99924023	AGL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	201039512	201112566	CACNA1S	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	11677595	11827409	LPIN1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	26190635	26244726	HADHA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	26243170	26290468	HADHB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	71453722	71686768	DYSF	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	8733800	8841808	CAV3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	81489699	81762161	GBE1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	128879596	128916067	ACAD9	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	148991341	149027668	GYG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	158672125	158709623	ETFDH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	132369752	132395614	SLC22A5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	138946720	139293557	SIL1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	44062727	44065587	PGAM2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	151556111	151877125	PRKAG2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	102204502	102239118	RRM2B	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+9	105558130	105641118	FKTN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	18394388	18408425	LDHA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	22193176	22283357	ANO5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	64746389	64760297	PYGM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	48105139	48146404	PFKM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	57782589	57808071	TSFM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	108562582	108569384	ISCU	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	47936491	48001354	SUCLA2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	76215355	76311472	ETFA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	89305198	89334861	POLG	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	30053090	30070457	ALDOA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	47461123	47701523	PHKB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	66508003	66552544	TK2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	4948092	4957131	ENO3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	7217125	7225273	ACADVL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	64477785	64497036	POLG2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	75516060	75524739	TSEN54	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	80101556	80119879	GAA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	38433699	38587564	RYR1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	46746046	46776988	FKRP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	48968125	48993310	GYS1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	51345169	51366418	ETFB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	407498	430966	RBCK1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	50525752	50530056	TYMP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	31097677	33339441	DMD	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	72578814	72714319	PHKA1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	78065188	78129296	PGK1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	120427827	120469365	LAMP2	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

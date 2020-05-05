@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	202376936	202567751	BMPR2	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	100802565	100827521	EPHB4	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	127815012	127854756	ENG	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	47322490	47326270	GDF2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	51906908	51923361	ACVRL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	51028394	51085045	SMAD4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

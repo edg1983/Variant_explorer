@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	218162845	218166995	CXCR1	2		
+3	46370854	46376206	CCR5	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+4	186069152	186088069	TLR3	3		Unknown
+19	48695971	48705950	FUT2	3		BIALLELIC, autosomal or pseudoautosomal
+19	54816468	54830778	KIR3DL1	3		Unknown

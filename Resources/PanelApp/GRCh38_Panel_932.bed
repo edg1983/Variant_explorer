@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	10141008	10152220	VHL	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	112707498	112846239	APC	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	64803510	64811294	MEN1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	11089362	11133816	LDLR	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

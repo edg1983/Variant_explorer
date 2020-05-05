@@ -1,0 +1,27 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	63593276	63660245	PGM1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	99850084	99924023	AGL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	112911847	112957013	SLC16A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	71109684	71130239	MCEE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	15601341	15645822	BTD	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	81489699	81762161	GBE1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	136250306	136337896	PCCB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	170996348	171026750	SLC2A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	41730065	41870519	OXCT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	49430360	49463191	MUT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	94603133	94640249	FBP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	101420578	101435823	ALDOB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	18394388	18408425	LDHA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	66848233	66958376	PC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	108121516	108147776	ACAT1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	119024114	119030906	SLC37A4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	21536189	21604847	GYS2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	100089015	100530437	PCCA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	50857891	50944736	PYGL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	40405795	40435947	IVD	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	30053090	30070457	ALDOA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	30748270	30761176	PHKG2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	47461123	47701523	PHKB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42900797	42913369	G6PC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	36750888	36990236	HLCS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	18892300	18984598	PHKA2	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

@@ -1,0 +1,11 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	235661041	235883640	LYST	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	33944616	33984730	SLC45A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	12685439	12710290	TYRP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	75431453	76560167	LRMDA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	89177452	89295759	TYR	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+15	27754875	28099358	OCA2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	48120972	48142672	SLC24A5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	13206442	13633025	CACNA1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+X	9725346	9786297	GPR143	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	132076993	132128020	FRMD7	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

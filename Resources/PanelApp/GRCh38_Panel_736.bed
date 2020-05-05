@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	243488233	243851079	AKT3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	179148114	179240093	PIK3CA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	87863113	87971930	PTEN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	4273772	4305350	CCND2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	104769349	104795751	AKT1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	18153118	18170540	PIK3R2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	122183683	122291629	CASR	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	3094410	3124004	GNA11	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	46838136	46850992	AP2S1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

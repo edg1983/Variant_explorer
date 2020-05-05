@@ -1,0 +1,25 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	169463909	169486003	SLC19A2	3		BIALLELIC, autosomal or pseudoautosomal
+1	228165815	228182257	IBA57	3		BIALLELIC, autosomal or pseudoautosomal
+2	69395750	69437628	NFU1	3		BIALLELIC, autosomal or pseudoautosomal
+2	74135398	74147994	BOLA3	3		BIALLELIC, autosomal or pseudoautosomal
+2	99154955	99163157	LIPT1	3		BIALLELIC, autosomal or pseudoautosomal
+2	190189735	190344193	HIBCH	3		BIALLELIC, autosomal or pseudoautosomal
+2	227685210	227718012	SLC19A3	3		BIALLELIC, autosomal or pseudoautosomal
+3	58427630	58433857	PDHB	3		BIALLELIC, autosomal or pseudoautosomal
+3	66133610	66388116	SLC25A26	3		BIALLELIC, autosomal or pseudoautosomal
+4	39458587	39485109	LIAS	3		BIALLELIC, autosomal or pseudoautosomal
+6	98868538	98948006	FBXL4	3		BIALLELIC, autosomal or pseudoautosomal
+7	107890970	107931730	DLD	3		BIALLELIC, autosomal or pseudoautosomal
+7	144451941	144836395	TPK1	3		BIALLELIC, autosomal or pseudoautosomal
+8	93857807	93926066	PDP1	3		BIALLELIC, autosomal or pseudoautosomal
+9	86264546	86283102	ISCA1	3		BIALLELIC, autosomal or pseudoautosomal
+10	133362480	133373689	ECHS1	3		BIALLELIC, autosomal or pseudoautosomal
+11	34915829	35020591	PDHX	3		BIALLELIC, autosomal or pseudoautosomal
+11	74491712	74493733	LIPT2	3		BIALLELIC, autosomal or pseudoautosomal
+11	112024814	112064390	DLAT	3		BIALLELIC, autosomal or pseudoautosomal
+14	74493720	74497106	ISCA2	3		BIALLELIC, autosomal or pseudoautosomal
+14	95533503	95544724	GLRX5	3		BIALLELIC, autosomal or pseudoautosomal
+17	75272981	75289510	SLC25A19	3		BIALLELIC, autosomal or pseudoautosomal
+19	5691834	5720572	LONP1	3		BIALLELIC, autosomal or pseudoautosomal
+X	19343893	19361705	PDHA1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

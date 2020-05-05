@@ -1,0 +1,13 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+4	87650307	87664361	DMP1	3		BIALLELIC, autosomal or pseudoautosomal
+5	177379235	177398848	SLC34A1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	131808016	131895155	ENPP1	3		BIALLELIC, autosomal or pseudoautosomal
+7	192969	260745	FAM20C	3		BIALLELIC, autosomal or pseudoautosomal
+7	99756960	99784265	CYP3A4	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	137230757	137236554	SLC34A3	3		BIALLELIC, autosomal or pseudoautosomal
+11	14877440	14892252	CYP2R1	3		BIALLELIC, autosomal or pseudoautosomal
+12	4368227	4379728	FGF23	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	47841537	47943048	VDR	3		BIALLELIC, autosomal or pseudoautosomal
+12	57762334	57768986	CYP27B1	3		BIALLELIC, autosomal or pseudoautosomal
+X	22032441	22251310	PHEX	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	49922615	50099235	CLCN5	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females

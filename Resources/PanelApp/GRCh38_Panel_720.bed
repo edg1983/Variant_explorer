@@ -1,0 +1,28 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	5862811	5992473	NPHP4	3		BIALLELIC, autosomal or pseudoautosomal
+1	179550539	179575952	NPHS2	3		BIALLELIC, autosomal or pseudoautosomal
+2	44275458	44321494	SLC3A1	2		BIALLELIC, autosomal or pseudoautosomal
+2	227002711	227164113	COL4A4	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	227164565	227314792	COL4A3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	132680609	132722442	NPHP3	3		BIALLELIC, autosomal or pseudoautosomal
+4	88007668	88077777	PKD2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	51615300	52087625	PKHD1	3		BIALLELIC, autosomal or pseudoautosomal
+8	71197433	71362232	EYA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	123356170	123380324	CRB2	2		BIALLELIC, autosomal or pseudoautosomal
+10	100735603	100829941	PAX2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	5225464	5229395	HBB	3		BIALLELIC, autosomal or pseudoautosomal
+11	71428193	71452868	DHCR7	3		BIALLELIC, autosomal or pseudoautosomal
+11	101451564	101872562	TRPC6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	112418351	112509913	PTPN11	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	120978543	121002512	HNF1A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	104689606	104722535	INF2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	2088710	2135898	PKD1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	3725054	3880726	CREBBP	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	20333052	20356301	UMOD	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	56865207	56915850	SLC12A3	3		BIALLELIC, autosomal or pseudoautosomal
+17	31094927	31382116	NF1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	35825964	35869287	NPHS1	2		BIALLELIC, autosomal or pseudoautosomal
+20	3082556	3084724	AVP	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	49922615	50099235	CLCN5	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	101397803	101407925	GLA	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	108439844	108697545	COL4A5	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

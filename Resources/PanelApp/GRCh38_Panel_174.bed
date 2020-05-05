@@ -1,0 +1,17 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	40258107	40294184	ZMPSTE24	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	156082573	156140089	LMNA	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	73385758	73610793	ALMS1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	12287368	12434356	PPARG	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	196214222	196287957	PCYT1A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	68215720	68301821	PIK3R1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	31033801	31173769	WRN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	136673143	136687423	AGPAT2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	62690275	62709845	BSCL2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	89664365	89679427	PLIN1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	90717327	90816165	BLM	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42402452	42423517	CAVIN1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	7112255	7294034	INSR	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	42401507	42427426	LIPE	3		BIALLELIC, autosomal or pseudoautosomal
+19	50384204	50418018	POLD1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+21	46324122	46445769	PCNT	3	Complete	BIALLELIC, autosomal or pseudoautosomal

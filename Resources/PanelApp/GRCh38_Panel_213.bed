@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+6	29656981	29672372	MOG	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	82239023	82273731	CSNK1D	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	10133345	10231286	DNMT1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

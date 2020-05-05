@@ -1,0 +1,36 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	40258107	40294184	ZMPSTE24	3		BIALLELIC, autosomal or pseudoautosomal
+1	156082573	156140089	LMNA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	204403387	204411791	PPP1R15B	3		BIALLELIC, autosomal or pseudoautosomal
+2	171434217	171485052	DCAF17	3		BIALLELIC, autosomal or pseudoautosomal
+2	181673088	181680876	NEUROD1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	12287368	12434356	PPARG	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	57227737	57273468	APPL1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	114314501	115147271	ZBTB20	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	6269849	6303265	WFS1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+4	99546709	99564032	TRMT10A	3		BIALLELIC, autosomal or pseudoautosomal
+4	102868978	102889242	CISD2	3		BIALLELIC, autosomal or pseudoautosomal
+5	68215720	68301821	PIK3R1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	29672392	29681110	ZFP57	3		BIALLELIC, autosomal or pseudoautosomal
+6	116877212	116932163	RFX6	3		BIALLELIC, autosomal or pseudoautosomal
+7	44144271	44198170	GCK	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+8	11676959	11760002	GATA4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	133061978	133071861	CEL	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	70882280	70888784	PCBD1	3		BIALLELIC, autosomal or pseudoautosomal
+10	71319258	71363385	SLC29A3	3		BIALLELIC, autosomal or pseudoautosomal
+11	2159779	2161341	INS	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	17385859	17389331	KCNJ11	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	17392885	17476845	ABCC8	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	31784779	31818062	PAX6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	120978543	121002512	HNF1A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	27920020	27926231	PDX1	3		BIALLELIC, autosomal or pseudoautosomal
+13	95677139	95794989	DNAJC3	3		BIALLELIC, autosomal or pseudoautosomal
+15	89664365	89679427	PLIN1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	37686432	37745247	HNF1B	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	22169443	22202528	GATA6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	7112255	7294034	INSR	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	39825350	39834201	DYRK1B	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	40230317	40285536	AKT2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	50384204	50418018	POLD1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	44355700	44434596	HNF4A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+MT	3230	3304	MT-TL1	3		MITOCHONDRIAL

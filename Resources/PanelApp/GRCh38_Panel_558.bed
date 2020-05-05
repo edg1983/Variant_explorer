@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	47402969	47562311	MSH2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	47695530	47810101	MSH6	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	36993332	37050918	MLH1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	5973239	6009125	PMS2	2		BIALLELIC, autosomal or pseudoautosomal
+12	65169571	65248327	LEMD3	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	50742050	50801935	CYLD	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	17212212	17237188	FLCN	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

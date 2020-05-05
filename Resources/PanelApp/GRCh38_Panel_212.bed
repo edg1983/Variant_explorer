@@ -1,0 +1,28 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	119911553	120069626	NOTCH2	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	225936598	225941489	LEFTY2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	130592168	130599575	CFC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	9933822	9945413	CRELD1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	38453851	38493142	ACVR2B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	76435100	76783253	SHROOM3	2	Complete	Unknown
+5	173232109	173235357	NKX2-5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	149218641	149411613	TAB2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	35202430	35254147	TBX20	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	74027789	74069907	ELN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	11676959	11760002	GATA4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	130713946	130887675	ABL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	136494444	136545862	NOTCH1	2	unknown	MONOALLELIC, autosomal or pseudoautosomal, maternally imprinted (paternal allele expressed)
+10	70432315	70447951	NODAL	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	125766453	125775821	MMP21	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	114353931	114408442	TBX5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	23381990	23408277	MYH6	3	Incomplete	BIALLELIC, autosomal or pseudoautosomal
+15	34788096	34796139	ACTC1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	96325938	96340263	NR2F2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	2155698	2178129	TRAF7	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+18	22169443	22202528	GATA6	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	50227193	50266522	CFAP53	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	18868545	18896096	GDF1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	10637684	10674107	JAG1	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	62463497	62475970	GATA5	2	Complete	
+X	137566142	137577691	ZIC3	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	154348524	154374638	FLNA	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

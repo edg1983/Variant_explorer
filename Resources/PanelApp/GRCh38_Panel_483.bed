@@ -1,0 +1,30 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	168281040	168314426	TBX19	3		BIALLELIC, autosomal or pseudoautosomal
+1	180230286	180278982	LHX4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	85133410	85310388	TCF7L1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	120735623	120992653	GLI2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	57197843	57226521	HESX1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	87259404	87276587	POU1F1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	172445133	172448456	GHSR	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	181711924	181714436	SOX2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	67739328	67754360	GNRHR	3		BIALLELIC, autosomal or pseudoautosomal
+4	110617423	110642123	PITX2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	42423777	42721878	GHR	3		BIALLELIC, autosomal or pseudoautosomal
+5	177992235	177996242	PROP1	3		BIALLELIC, autosomal or pseudoautosomal
+7	30938669	30993254	GHRHR	3		BIALLELIC, autosomal or pseudoautosomal
+7	41960950	42237870	GLI3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	155799986	155812273	SHH	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	38411138	38468834	FGFR1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	60678778	60868028	CHD7	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	136196250	136205109	LHX3	3		BIALLELIC, autosomal or pseudoautosomal
+10	101770130	101780369	FGF8	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	2444684	2849109	KCNQ1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	125955796	126063335	CDON	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	56799905	56810479	OTX2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	63917200	63918838	GH1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	7534004	7561764	PNPLA6	3		BIALLELIC, autosomal or pseudoautosomal
+20	5302040	5314369	PROKR2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	22581005	22585455	FOXA2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	101349447	101390796	BTK	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	131273506	131578899	IGSF1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	140502985	140505116	SOX3	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

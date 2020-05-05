@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	235367360	235448968	TBCE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	122183683	122291629	CASR	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	10873223	10881941	GCM2	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+10	8053604	8075198	GATA3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	13492055	13496181	PTH	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	3094410	3124004	GNA11	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+21	44285838	44298648	AIRE	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal

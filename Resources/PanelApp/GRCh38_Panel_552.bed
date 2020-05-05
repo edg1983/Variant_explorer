@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	165747591	165794682	GALNT3	3		BIALLELIC, autosomal or pseudoautosomal
+7	93099513	93118023	SAMD9	2		BIALLELIC, autosomal or pseudoautosomal
+12	4368227	4379728	FGF23	3		BIALLELIC, autosomal or pseudoautosomal

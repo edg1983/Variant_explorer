@@ -1,0 +1,48 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	3812081	3857214	CEP104	3		BIALLELIC, autosomal or pseudoautosomal
+1	200623896	200669969	DDX59	3		BIALLELIC, autosomal or pseudoautosomal
+1	214603195	214664588	CENPF	3		BIALLELIC, autosomal or pseudoautosomal
+2	110122311	110205066	NPHP1	3		BIALLELIC, autosomal or pseudoautosomal
+2	201620184	201643570	TMEM237	3		BIALLELIC, autosomal or pseudoautosomal
+2	231198546	231374837	ARMC9	3		BIALLELIC, autosomal or pseudoautosomal
+3	93980139	94055668	ARL13B	3		BIALLELIC, autosomal or pseudoautosomal
+3	132680609	132722442	NPHP3	3		BIALLELIC, autosomal or pseudoautosomal
+4	5542772	5709548	EVC2	3		BIALLELIC, autosomal or pseudoautosomal
+4	5711197	5814305	EVC	3		BIALLELIC, autosomal or pseudoautosomal
+4	15469865	15601557	CC2D2A	3		BIALLELIC, autosomal or pseudoautosomal
+4	128864921	129093607	SCLT1	3		BIALLELIC, autosomal or pseudoautosomal
+5	37106228	37249428	C5orf42	3		BIALLELIC, autosomal or pseudoautosomal
+5	61332273	61546170	ZSWIM6	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	134873803	134901525	TXNDC15	3		BIALLELIC, autosomal or pseudoautosomal
+6	53001279	53061802	ICK	3		BIALLELIC, autosomal or pseudoautosomal
+6	135283532	135497776	AHI1	3		BIALLELIC, autosomal or pseudoautosomal
+7	41960950	42237870	GLI3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	130393771	130442433	CEP41	3		BIALLELIC, autosomal or pseudoautosomal
+8	67062426	67196263	CSPP1	3		BIALLELIC, autosomal or pseudoautosomal
+8	93754844	93819234	TMEM67	3		BIALLELIC, autosomal or pseudoautosomal
+8	99013266	99877580	VPS13B	3		BIALLELIC, autosomal or pseudoautosomal
+9	123356170	123380324	CRB2	3		BIALLELIC, autosomal or pseudoautosomal
+9	136428619	136439823	INPP5E	3		BIALLELIC, autosomal or pseudoautosomal
+10	73168166	73244504	FAM149B1	2		BIALLELIC, autosomal or pseudoautosomal
+10	95663396	95694143	TCTN3	3		BIALLELIC, autosomal or pseudoautosomal
+10	102503987	102633535	SUFU	2		BIALLELIC, autosomal or pseudoautosomal
+11	61362001	61369509	TMEM138	3		BIALLELIC, autosomal or pseudoautosomal
+11	61391687	61398863	TMEM216	3		BIALLELIC, autosomal or pseudoautosomal
+11	71428193	71452868	DHCR7	3		BIALLELIC, autosomal or pseudoautosomal
+11	74012714	74171210	C2CD3	3		BIALLELIC, autosomal or pseudoautosomal
+11	125883614	125900648	HYLS1	3		BIALLELIC, autosomal or pseudoautosomal
+12	88049014	88142216	CEP290	3		BIALLELIC, autosomal or pseudoautosomal
+12	89419718	89526024	POC1B	2		BIALLELIC, autosomal or pseudoautosomal
+12	110614027	110649430	TCTN1	3		BIALLELIC, autosomal or pseudoautosomal
+12	123671113	123708403	TCTN2	3		BIALLELIC, autosomal or pseudoautosomal
+14	58427385	58551289	KIAA0586	3		BIALLELIC, autosomal or pseudoautosomal
+15	89608789	89655451	KIF7	3		BIALLELIC, autosomal or pseudoautosomal
+16	8788823	8849331	PMM2	3		BIALLELIC, autosomal or pseudoautosomal
+16	49487524	49857919	ZNF423	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	53597683	53703938	RPGRIP1L	3		BIALLELIC, autosomal or pseudoautosomal
+16	75536744	75556286	TMEM231	3		BIALLELIC, autosomal or pseudoautosomal
+17	6578148	6640927	KIAA0753	3		BIALLELIC, autosomal or pseudoautosomal
+17	8173237	8176399	TMEM107	3		BIALLELIC, autosomal or pseudoautosomal
+17	58205437	58219605	MKS1	3		BIALLELIC, autosomal or pseudoautosomal
+19	41354421	41364173	B9D2	3		BIALLELIC, autosomal or pseudoautosomal
+X	13734745	13769353	OFD1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

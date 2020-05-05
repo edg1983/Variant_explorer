@@ -1,0 +1,14 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	45329163	45340470	MUTYH	3		BIALLELIC, autosomal or pseudoautosomal
+1	55039548	55064852	PCSK9	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	21001429	21044073	APOB	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	47402969	47562311	MSH2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	47695530	47810101	MSH6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	10141008	10152220	VHL	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	36993332	37050918	MLH1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	112707498	112846239	APC	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	43077027	43130351	RET	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	64803510	64811294	MEN1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+13	32315474	32400266	BRCA2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	43044295	43170245	BRCA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	11089362	11133816	LDLR	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

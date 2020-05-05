@@ -1,0 +1,25 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	155234452	155244699	GBA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	85657314	85668741	SFTPB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	122183683	122291629	CASR	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	169764520	169765060	TERC	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	25655301	25678748	SLC34A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	1253147	1295069	TERT	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	78000525	78294755	AP3B1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	18055992	18084998	ASAH1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	22156913	22164479	SFTPC	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	79555852	79560402	SFTPA2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	98416198	98446947	HPS1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	6390431	6394998	SMPD1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	59107185	59127410	FAM111B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	22773222	22829820	SLC7A7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	24239643	24242674	TINF2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	36516392	36521149	NKX2-1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	2275881	2340746	ABCA3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	14435701	14632728	PARN	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	50055968	50090481	ITGA3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	63657810	63696253	RTEL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	26443423	26483837	HPS4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	36913628	36940449	CSF2RB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	1268800	1310381	CSF2RA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	154762742	154777689	DKC1	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

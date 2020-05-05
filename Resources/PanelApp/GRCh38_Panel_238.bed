@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	201359008	201377762	TNNT2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	47331397	47352702	MYBPC3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	23412738	23435718	MYH7	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	34788096	34796139	ACTC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+15	63042632	63071915	TPM1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	154411518	154421726	TAZ	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

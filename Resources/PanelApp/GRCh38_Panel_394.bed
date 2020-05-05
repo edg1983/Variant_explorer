@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	168695459	168729264	DPT	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	70295975	70302090	FAM136A	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	30874514	30895065	COCH	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	23836001	24220611	PRKCB	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	34493290	34891844	DTNA	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

@@ -1,0 +1,29 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	63593276	63660245	PGM1	3		BIALLELIC, autosomal or pseudoautosomal
+1	99850084	99924023	AGL	3		BIALLELIC, autosomal or pseudoautosomal
+3	81489699	81762161	GBE1	3		BIALLELIC, autosomal or pseudoautosomal
+3	148991341	149027668	GYG1	3		BIALLELIC, autosomal or pseudoautosomal
+3	170996348	171026750	SLC2A2	3		BIALLELIC, autosomal or pseudoautosomal
+6	18120440	18122687	NHLRC1	3		BIALLELIC, autosomal or pseudoautosomal
+6	145382535	145736023	EPM2A	3		BIALLELIC, autosomal or pseudoautosomal
+7	44062727	44065587	PGAM2	3		BIALLELIC, autosomal or pseudoautosomal
+7	151556111	151877125	PRKAG2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	94603133	94640249	FBP1	3		BIALLELIC, autosomal or pseudoautosomal
+9	101420578	101435823	ALDOB	3		BIALLELIC, autosomal or pseudoautosomal
+11	18394388	18408425	LDHA	3		BIALLELIC, autosomal or pseudoautosomal
+11	64746389	64760297	PYGM	3		BIALLELIC, autosomal or pseudoautosomal
+11	119024114	119030906	SLC37A4	3		BIALLELIC, autosomal or pseudoautosomal
+12	21536189	21604847	GYS2	3		BIALLELIC, autosomal or pseudoautosomal
+12	48105139	48146404	PFKM	3		BIALLELIC, autosomal or pseudoautosomal
+14	50857891	50944736	PYGL	3		BIALLELIC, autosomal or pseudoautosomal
+16	30053090	30070457	ALDOA	3		BIALLELIC, autosomal or pseudoautosomal
+16	30748270	30761176	PHKG2	3		BIALLELIC, autosomal or pseudoautosomal
+16	47461123	47701523	PHKB	3		BIALLELIC, autosomal or pseudoautosomal
+17	4948092	4957131	ENO3	3		BIALLELIC, autosomal or pseudoautosomal
+17	42900797	42913369	G6PC	3		BIALLELIC, autosomal or pseudoautosomal
+17	80101556	80119879	GAA	3		BIALLELIC, autosomal or pseudoautosomal
+19	48968125	48993310	GYS1	3		BIALLELIC, autosomal or pseudoautosomal
+X	18892300	18984598	PHKA2	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	72578814	72714319	PHKA1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	78065188	78129296	PGK1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	120427827	120469365	LAMP2	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

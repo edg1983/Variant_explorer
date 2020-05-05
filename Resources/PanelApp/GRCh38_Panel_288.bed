@@ -1,0 +1,23 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	115285918	115338236	NGF	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	156815640	156881850	NTRK1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	27309492	27325680	MPV17	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	166195185	166375993	SCN9A	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	240713764	240820308	KIF1A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	38696802	38794010	SCN10A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38845769	38950561	SCN11A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	128726122	128814796	RAB7A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	16473038	16617058	RETREG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	72019917	72075617	TRPA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	92031999	92115384	SPTLC1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	108867517	108934116	ELP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	130664594	130682981	PRDM12	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	63624087	63671921	ATL3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	752593	911452	WNK1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	50532509	50633068	ATL1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	77505997	77616773	SPTLC2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	42536172	42544449	NAGLU	2	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	77280569	77500596	SEPT9	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+18	31591726	31599021	TTR	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	4686236	4701590	PRNP	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+X	101397803	101407925	GLA	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

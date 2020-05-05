@@ -3,8 +3,10 @@
 1	196651878	196747504	CFH	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
 1	196774795	196795406	CFHR3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
 1	196819757	196832189	CFHR1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	196977556	197009674	CFHR5	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
 1	207752057	207795513	CD46	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
 4	109740694	109802179	CFI	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
 6	31945650	31952084	CFB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	133414358	133459402	ADAMTS13	2		BIALLELIC, autosomal or pseudoautosomal
 17	56834099	56869567	DGKE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
 19	6677704	6730562	C3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

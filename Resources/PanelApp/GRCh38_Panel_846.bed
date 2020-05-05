@@ -1,0 +1,175 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	2403964	2413797	PEX10	2		BIALLELIC, autosomal or pseudoautosomal
+1	6466092	6520061	PLEKHG5	3		BIALLELIC, autosomal or pseudoautosomal
+1	11980181	12013514	MFN2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	32775237	32818153	YARS	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	45500053	45513382	MMACHC	2		BIALLELIC, autosomal or pseudoautosomal
+1	52684451	52698366	COA7	2		BIALLELIC, autosomal or pseudoautosomal
+1	110519837	110631474	KCNA2	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	115285918	115338236	NGF	3		BIALLELIC, autosomal or pseudoautosomal
+1	116372668	116410261	ATP1A1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	156082573	156140089	LMNA	3		BIALLELIC, autosomal or pseudoautosomal
+1	156815640	156881850	NTRK1	3		BIALLELIC, autosomal or pseudoautosomal
+1	161166410	161178013	PPOX	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	161304735	161309972	MPZ	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	173824503	173858546	DARS2	2		BIALLELIC, autosomal or pseudoautosomal
+1	212858255	212899363	FLVCR1	2		BIALLELIC, autosomal or pseudoautosomal
+1	220094102	220148041	IARS2	2		BIALLELIC, autosomal or pseudoautosomal
+1	224175756	224193441	DEGS1	2		BIALLELIC, autosomal or pseudoautosomal
+1	228149852	228159826	GJC2	2		BIALLELIC, autosomal or pseudoautosomal
+1	235661041	235883640	LYST	2		BIALLELIC, autosomal or pseudoautosomal
+2	26190635	26244726	HADHA	2		BIALLELIC, autosomal or pseudoautosomal
+2	26243170	26290468	HADHB	2		BIALLELIC, autosomal or pseudoautosomal
+2	27309492	27325680	MPV17	3		BIALLELIC, autosomal or pseudoautosomal
+2	32063611	32157637	SPAST	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	73926826	73958961	DGUOK	2		BIALLELIC, autosomal or pseudoautosomal
+2	74361154	74392087	DCTN1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	86213993	86338083	REEP1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	107986523	108013994	SLC5A7	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	166195185	166375993	SCN9A	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	218781749	218815293	CYP27A1	3		BIALLELIC, autosomal or pseudoautosomal
+2	219279267	219286900	DNAJB2	3		BIALLELIC, autosomal or pseudoautosomal
+2	240713764	240820308	KIF1A	3		BIALLELIC, autosomal or pseudoautosomal
+2	240868479	240880502	AGXT	2		BIALLELIC, autosomal or pseudoautosomal
+3	38696802	38794010	SCN10A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	38845769	38950561	SCN11A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	98521132	98593723	CPOX	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	100709331	100748966	TFG	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	128726122	128814796	RAB7A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	155024124	155183729	MME	3		BIALLELIC, autosomal or pseudoautosomal
+3	179396089	179451590	GNB4	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	193593144	193697823	OPA1	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	76158733	76234536	SCARB2	2		BIALLELIC, autosomal or pseudoautosomal
+4	99563761	99623999	MTTP	2		BIALLELIC, autosomal or pseudoautosomal
+4	153152342	153339320	TRIM2	3		BIALLELIC, autosomal or pseudoautosomal
+4	158672125	158709623	ETFDH	2		BIALLELIC, autosomal or pseudoautosomal
+5	16473038	16617058	RETREG1	3		BIALLELIC, autosomal or pseudoautosomal
+5	60873831	60945073	ERCC8	2		BIALLELIC, autosomal or pseudoautosomal
+5	70925030	70953942	SMN1	3		BIALLELIC, autosomal or pseudoautosomal
+5	110738136	110765161	SLC25A46	2		BIALLELIC, autosomal or pseudoautosomal
+5	131159027	131171735	HINT1	3		BIALLELIC, autosomal or pseudoautosomal
+5	140673173	140692024	HARS	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	148383935	148442836	FBXO38	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	148923639	149063163	SH3TC2	3		BIALLELIC, autosomal or pseudoautosomal
+6	56457987	56954628	DST	3		BIALLELIC, autosomal or pseudoautosomal
+6	80106647	80346270	BCKDHB	2		BIALLELIC, autosomal or pseudoautosomal
+6	109691312	109825428	FIG4	3		BIALLELIC, autosomal or pseudoautosomal
+6	136822564	136913937	PEX7	2		BIALLELIC, autosomal or pseudoautosomal
+7	22889371	23014130	FAM126A	2		BIALLELIC, autosomal or pseudoautosomal
+7	30594681	30634033	GARS	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	76302544	76304295	HSPB1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	101154397	101161596	AP1S1	2		BIALLELIC, autosomal or pseudoautosomal
+8	1823976	1958641	ARHGEF10	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	24950955	24957110	NEFL	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+8	63048553	63086053	TTPA	2		BIALLELIC, autosomal or pseudoautosomal
+8	72019917	72075617	TRPA1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	74321130	74488872	GDAP1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+8	81440326	81447523	PMP2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	133237171	133302022	NDRG1	3		BIALLELIC, autosomal or pseudoautosomal
+8	144354135	144361272	SLC52A2	3		BIALLELIC, autosomal or pseudoautosomal
+9	32972606	33025168	APTX	2		BIALLELIC, autosomal or pseudoautosomal
+9	34634722	34637809	SIGMAR1	3		BIALLELIC, autosomal or pseudoautosomal
+9	35056064	35073249	VCP	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	35736866	35749228	GBA2	2		BIALLELIC, autosomal or pseudoautosomal
+9	69035259	69100178	FXN	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	77177353	77421541	VPS13A	2		BIALLELIC, autosomal or pseudoautosomal
+9	85546539	85742029	AGTPBP1	2		BIALLELIC, autosomal or pseudoautosomal
+9	92031999	92115384	SPTLC1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	92711363	92764812	BICD2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	97674909	97697357	XPA	2		BIALLELIC, autosomal or pseudoautosomal
+9	104781002	104928237	ABCA1	3		BIALLELIC, autosomal or pseudoautosomal
+9	108867517	108934116	ELP1	3		BIALLELIC, autosomal or pseudoautosomal
+9	127451486	127503501	LRSAM1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+9	130664594	130682981	PRDM12	3		BIALLELIC, autosomal or pseudoautosomal
+9	132261356	132354985	SETX	3		BIALLELIC, autosomal or pseudoautosomal
+9	133351755	133356676	SURF1	2		BIALLELIC, autosomal or pseudoautosomal
+10	13277796	13302412	PHYH	2		BIALLELIC, autosomal or pseudoautosomal
+10	49455368	49539538	ERCC6	2		BIALLELIC, autosomal or pseudoautosomal
+10	62811996	62919900	EGR2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	69269984	69401882	HK1	3		BIALLELIC, autosomal or pseudoautosomal
+10	77969251	78029545	POLR3A	2		BIALLELIC, autosomal or pseudoautosomal
+10	87863113	87971930	PTEN	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	100987367	100994401	TWNK	2		BIALLELIC, autosomal or pseudoautosomal
+10	119651370	119677819	BAG3	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	9778667	10294207	SBF2	3		BIALLELIC, autosomal or pseudoautosomal
+11	33698261	33736445	CD59	2		BIALLELIC, autosomal or pseudoautosomal
+11	62690275	62709845	BSCL2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	63624087	63671921	ATL3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	65525077	65538704	SCYL1	2		BIALLELIC, autosomal or pseudoautosomal
+11	68903842	68940602	IGHMBP2	3		BIALLELIC, autosomal or pseudoautosomal
+11	95832882	95925315	MTMR2	3		BIALLELIC, autosomal or pseudoautosomal
+11	108222484	108369102	ATM	2		BIALLELIC, autosomal or pseudoautosomal
+11	116835751	116837950	APOA1	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	119084866	119093549	HMBS	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	752593	911452	WNK1	3		BIALLELIC, autosomal or pseudoautosomal
+12	32399529	32646050	FGD4	3		BIALLELIC, autosomal or pseudoautosomal
+12	57549998	57586632	KIF5A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	57623410	57633355	B4GALNT1	2		BIALLELIC, autosomal or pseudoautosomal
+12	109783085	109833401	TRPV4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	112418351	112509913	PTPN11	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	119178642	119221131	HSPB8	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	120438090	120440742	COX6A1	3		BIALLELIC, autosomal or pseudoautosomal
+12	123232916	123257959	C12orf65	2		BIALLELIC, autosomal or pseudoautosomal
+13	23328826	23411513	SACS	2		BIALLELIC, autosomal or pseudoautosomal
+13	47936491	48001354	SUCLA2	2		BIALLELIC, autosomal or pseudoautosomal
+13	95677139	95794989	DNAJC3	2		BIALLELIC, autosomal or pseudoautosomal
+14	50532509	50633068	ATL1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	67727374	67816590	ZFYVE26	2		BIALLELIC, autosomal or pseudoautosomal
+14	77505997	77616773	SPTLC2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	87837820	87993665	GALC	2		BIALLELIC, autosomal or pseudoautosomal
+14	91869412	91947987	FBLN5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	96797304	96931722	VRK1	3		BIALLELIC, autosomal or pseudoautosomal
+14	100333788	100376805	WARS	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	101964528	102050792	DYNC1H1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+14	104689606	104722535	INF2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	34229996	34338060	SLC12A6	2		BIALLELIC, autosomal or pseudoautosomal
+15	44562696	44663678	SPG11	3		BIALLELIC, autosomal or pseudoautosomal
+15	80152490	80186946	FAH	2		BIALLELIC, autosomal or pseudoautosomal
+15	89305198	89334861	POLG	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	8788823	8849331	PMM2	2		BIALLELIC, autosomal or pseudoautosomal
+16	11547722	11636381	LITAF	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	70252295	70289543	AARS	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	81314952	81390884	GAN	2		BIALLELIC, autosomal or pseudoautosomal
+16	89490917	89557768	SPG7	2		BIALLELIC, autosomal or pseudoautosomal
+16	89921392	89938761	TUBB3	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	15229777	15265326	PMP22	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	42682613	42699814	CNTNAP1	2		BIALLELIC, autosomal or pseudoautosomal
+17	59674636	59707626	PTRH2	2		BIALLELIC, autosomal or pseudoautosomal
+17	75272981	75289510	SLC25A19	2		BIALLELIC, autosomal or pseudoautosomal
+17	77280569	77500596	SEPT9	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31591726	31599021	TTR	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	79679801	79756623	CTDP1	2		BIALLELIC, autosomal or pseudoautosomal
+19	7534004	7561764	PNPLA6	2		BIALLELIC, autosomal or pseudoautosomal
+19	10133345	10231286	DNMT1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	10718079	10833488	DNM2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	40393768	40413366	PRX	3		BIALLELIC, autosomal or pseudoautosomal
+19	43543040	43580473	XRCC1	2		BIALLELIC, autosomal or pseudoautosomal
+19	45527427	45602212	OPA3	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+19	49859882	49878351	PNKP	2		BIALLELIC, autosomal or pseudoautosomal
+19	50188186	50310545	MYH14	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	53879190	53907652	PRKCG	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	760080	776015	SLC52A3	3		BIALLELIC, autosomal or pseudoautosomal
+20	1978757	1994285	PDYN	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	25294743	25390983	ABHD12	2		BIALLELIC, autosomal or pseudoautosomal
+21	46235126	46286297	MCM3AP	3		BIALLELIC, autosomal or pseudoautosomal
+22	23765834	23768443	CHCHD10	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	29480230	29491390	NEFH	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+22	30925130	30968298	MORC2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+22	37970686	37987422	SOX10	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+22	42058354	42070842	NAGA	2		BIALLELIC, autosomal or pseudoautosomal
+22	50445000	50475024	SBF1	3		BIALLELIC, autosomal or pseudoautosomal
+22	50525752	50530056	TYMP	2		BIALLELIC, autosomal or pseudoautosomal
+22	50622754	50628173	ARSA	2		BIALLELIC, autosomal or pseudoautosomal
+X	19343893	19361705	PDHA1	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	24465221	24539837	PDK3	2		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	37685759	37732130	XK	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	71215194	71225516	GJB1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	77910656	78050395	ATP7A	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	101219769	101264497	DRP2	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	101397803	101407925	GLA	2		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	103773718	103792619	PLP1	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	107628424	107651026	PRPS1	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	130129362	130165887	AIFM1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+MT	648	1601	MT-RNR1	2		MITOCHONDRIAL
+MT	3230	3304	MT-TL1	2		MITOCHONDRIAL
+MT	8527	9207	MT-ATP6	3		MITOCHONDRIAL

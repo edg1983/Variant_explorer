@@ -1,0 +1,16 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	15940564	15947007	MYCN	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	150166795	150184558	CDX1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	41960950	42237870	GLI3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	156994051	157010651	MNX1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	144511288	144517845	RECQL4	3		BIALLELIC, autosomal or pseudoautosomal
+13	27962137	27971139	CDX2	2		BIALLELIC, autosomal or pseudoautosomal
+16	51135975	51151367	SALL1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	86510527	86515418	FOXF1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	50188186	50310545	MYH14	2		BIALLELIC, autosomal or pseudoautosomal
+X	10445310	10833654	MID1	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	14843407	14873069	FANCB	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	41514934	41923463	CASK	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	71118556	71142454	MED12	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	137566142	137577691	ZIC3	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	153587919	153600045	FAM58A	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

@@ -1,0 +1,16 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	127257290	127294176	ERCC3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	14145147	14178783	XPC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	60873831	60945073	ERCC8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	43576150	43615660	POLH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	158168352	158199344	GTF2H5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	40126023	40134659	MPLKIP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	30578318	30658251	GTF2E2	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	97674909	97697357	XPA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	49455368	49539538	ERCC6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	47214465	47239240	DDB2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	94415578	94493908	MRE11	2		BIALLELIC, autosomal or pseudoautosomal
+13	102844844	102876001	ERCC5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	13920157	13952345	ERCC4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	45349837	45370918	ERCC2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	45407333	45478828	ERCC1	3	Complete	BIALLELIC, autosomal or pseudoautosomal

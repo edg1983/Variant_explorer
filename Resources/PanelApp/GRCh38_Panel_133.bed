@@ -1,0 +1,4 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	52401013	52410350	BAP1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	21967753	21995301	CDKN2A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	57747727	57756013	CDK4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

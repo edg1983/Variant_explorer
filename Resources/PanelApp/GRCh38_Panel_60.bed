@@ -1,0 +1,24 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	161222292	161223631	APOA2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	247416156	247449108	NLRP3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	113058638	113065382	IL36RN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	113107214	113134016	IL1RN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	154583126	154590766	FGA	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	14664664	14699711	OTULIN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	38845858	38945596	OSMR	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	32840717	32844703	PSMB8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	137867188	137883312	TNFAIP3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	121207794	121332843	GSN	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	116829706	116833072	APOC3	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	116835751	116837950	APOA1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	6328757	6342114	TNFRSF1A	3	Incomplete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	69348341	69354234	LYZ	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	109573255	109598117	MVK	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	76993359	77037332	PSTPIP1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	3242028	3256627	MEFV	3	Incomplete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+16	50693603	50734041	NOD2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	2916994	3013315	LPIN2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	31591726	31599021	TTR	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	851014	856247	ELANE	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	44945982	44949565	APOC2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	53793603	53824394	NLRP12	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

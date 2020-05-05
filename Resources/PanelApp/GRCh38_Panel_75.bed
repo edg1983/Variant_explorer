@@ -1,0 +1,18 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	155234452	155244699	GBA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	32996608	33097230	GLB1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	986997	1004506	IDUA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	78777209	78986087	ARSB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	31857659	31862906	NEU1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	65960684	65982314	GUSB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	43140455	43202855	HGSNAT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	71816298	71851375	PSAP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	64713445	64759447	GNS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	101745497	101830938	GNPTAB	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	1351923	1364113	GNPTG	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	88813734	88856970	GALNS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42536172	42544449	NAGLU	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	80206716	80220923	SGSH	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	7522626	7534009	MCOLN1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	101397803	101407925	GLA	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	149476990	149521096	IDS	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

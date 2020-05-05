@@ -1,0 +1,23 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	146017468	146036746	HFE2	3		BIALLELIC, autosomal or pseudoautosomal
+1	155234452	155244699	GBA	3		BIALLELIC, autosomal or pseudoautosomal
+2	119223831	119265652	STEAP3	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	171522247	171558133	CYBRD1	3		BIALLELIC, autosomal or pseudoautosomal
+2	189560579	189583758	SLC40A1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	39383348	39397351	SLC25A38	3		BIALLELIC, autosomal or pseudoautosomal
+3	133745956	133779006	TF	3		BIALLELIC, autosomal or pseudoautosomal
+3	149162410	149222055	CP	3		BIALLELIC, autosomal or pseudoautosomal
+6	7726797	7881422	BMP6	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	26087281	26098343	HFE	3		BIALLELIC, autosomal or pseudoautosomal
+7	100620416	100642779	TFR2	3		BIALLELIC, autosomal or pseudoautosomal
+11	61959718	61967660	FTH1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	50979401	51028566	SLC11A2	3		BIALLELIC, autosomal or pseudoautosomal
+13	51930436	52012125	ATP7B	3		BIALLELIC, autosomal or pseudoautosomal
+14	95533503	95544724	GLRX5	3		BIALLELIC, autosomal or pseudoautosomal
+18	57548283	57586772	FECH	2		BIALLELIC, autosomal or pseudoautosomal
+19	35280716	35285143	HAMP	3		BIALLELIC, autosomal or pseudoautosomal
+19	48965301	48966878	FTL	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+22	37065436	37109563	TMPRSS6	3		BIALLELIC, autosomal or pseudoautosomal
+X	55009055	55031064	ALAS2	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	66162549	66268867	HEPH	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	75053172	75156732	ABCB7	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

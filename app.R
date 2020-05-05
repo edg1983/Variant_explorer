@@ -8,7 +8,7 @@
 # TODO Set up configurable filters
 
 #Install needed packages if missing
-list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite")
+list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -44,17 +44,19 @@ library(gridExtra)
 library(jsonlite)
 library(scattermore)
 library(shinycssloaders)
+library(ontologyIndex)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
 source("GQModule.R")
 
-APP_VERSION <- "1.0.7"
+APP_VERSION <- "1.0.8"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
 Coverage_dir <- paste0(resource_dir, "/coverage")
+HPO_dir <- paste0(resource_dir, "/HPO")
 BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM"
 VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF"
 SV_VCF <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
@@ -183,19 +185,23 @@ xml_text <- paste(header,
 #load("Peds_and_HPOs.RData")
 
 ##Load hg38 chrom sizes
+message("Load chromosome size")
 chr_sizes_file <- getResource("hg38_chromSizes.txt")
 chr_sizes <- read.table(chr_sizes_file,header=F, sep="\t", stringsAsFactors = F)
 genome_size <- sum(as.numeric(chr_sizes$V2))
 
 ##Load gene names and IDs
+message("Load gene IDs")
 genes_info_file <- getResource("/hgnc_complete_set.txt")
 genes_info <- read.table(genes_info_file, header=T, sep="\t", stringsAsFactors = F)
 
 ##Load genes coordinates
+message("Load genes coordinates")
 genes_bed_file <- gzfile(getResource("gencode.v33.basic.genes.bed.gz"))
 genes_bed <- read.table(genes_bed_file, header=F, sep="\t",stringsAsFactors = F)
 
 ##Load pathways and GO groups (suppose .gmt file from MSigDB)
+message("Load GO and pathways annotations")
 gene_anno <- list()
 gene_anno[["pathways"]] <- readGMT(getResource("c2.cp.v7.0.symbols.gmt"))
 gene_anno[["GO_BP"]] <- readGMT(getResource("c5.bp.v7.0.symbols.gmt"))
@@ -203,48 +209,74 @@ gene_anno[["GO_MF"]] <- readGMT(getResource("c5.mf.v7.0.symbols.gmt"))
 gene_anno[["GO_CC"]] <- readGMT(getResource("c5.cc.v7.0.symbols.gmt"))
 
 ## Load GTeX median expression
+message("Load GTeX data")
 GTeX_file <- gzfile(getResource("GTEx_v8_median_TPM.gct.gz"))
 GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
 
 ## Load PanelApp index table
 #PanelApp index table contains an id column with panel id number
 #Each panel file is then names GRCh38_Panel_[id].bed
+message("Load PanelApp panels")
 PanelApp_file <- getResource("PanelApp_index.tsv")
 PanelApp_data <- read.table(PanelApp_file, sep="\t", header = T, stringsAsFactors = F)
 
 PanelApp_genes <- data.frame(entity_name=character(), confidence_level=character(), panel_idx=character(), stringsAsFactors = F)
 
+n <- 0
 for (id in PanelApp_data$id) {
     filename <- paste0(PanelApp_dir,"/GRCh38_Panel_", id, ".bed")
-    mydf <- read.table(filename, sep="\t", header=T, stringsAsFactors = F, comment.char = "@")
-    mydf$panel_idx <- id
-    mydf <- mydf[,c("entity_name","confidence_level","panel_idx")]
-    PanelApp_genes <- rbind(PanelApp_genes, mydf)
+    if (file_test("-f", filename)) {
+      mydf <- read.table(filename, sep="\t", header=T, stringsAsFactors = F, comment.char = "@")
+      if (nrow(mydf) > 0) {
+        n <- n + 1
+        mydf$panel_idx <- id
+        mydf <- mydf[,c("entity_name","confidence_level","panel_idx")]
+        PanelApp_genes <- rbind(PanelApp_genes, mydf)
+      }
+    }
 }
+message(n, " panels loaded")
 
 ## Load additional genes list
+message("Load gene lists")
 #Expect a GeneLists_index.tsv file in the genelist folder
 #This file must contain an id column and this ids mus match lists file name
 #Example: list1.tsv, id=list1
 geneLists_file <- getResource("GeneLists_index.tsv")
 geneLists_data <- read.table(geneLists_file, sep="\t", header = T, stringsAsFactors = F)
+geneLists_data <- geneLists_data[order(geneLists_data$id),]
 
 geneLists_genes <- data.frame(entity_name=character(), genelist_idx=character(), stringsAsFactors = F)
 
+n <- 0
 for (id in geneLists_data$id) {
+    n <- n + 1
     filename <- paste0(GeneLists_dir,"/", id, ".tsv")
     mydf <- data.frame(entity_name=scan(filename, what="", sep="\n"), genelist_idx = id, stringsAsFactors = F)
     geneLists_genes <- rbind(geneLists_genes, mydf)
 }
+message(n, " gene lists loaded")
 
 ## Load ClinVar pathogenic genes
 # Tab-separated file with gene symbol and list of diseases
+message("Load ClinVar data")
 ClinVar_file <- getResource("clinvar_path_likelypath_20190704.tsv")
 ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors = F)
 
 ##Load GADO distribution
+message("Load HICF2 GADO distribution")
 GADO_file <- gzfile(getResource("GADO_distribution.tsv.gz"))
 gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors = F)
+
+##Load HPO data
+HPO_obo <- get_OBO(paste0(HPO_dir, "/hp.obo"))
+HPO_obo <- as.data.frame(HPO_obo$name)
+HPO_obo$HPO_id <- rownames(HPO_obo)
+colnames(HPO_obo)[1] <- "HPO_name"
+HPO_genes <- read.table(paste0(HPO_dir, "/genes_to_phenotype.txt"), sep="\t", header=F, stringsAsFactors = F) %>% select(V2,V3,V4)
+colnames(HPO_genes) <- c("gene","HPO_id","HPO_name")
+HICF2_HPO <- read.table(getResource("HICF2_HPO_terms.tsv"), sep="\t", header=T, stringsAsFactors = F)
+HICF2_HPO <- HICF2_HPO %>% separate_rows(HPO, sep=",")
 
 #######################
 ### Set environment ###
@@ -325,7 +357,7 @@ segregation_cols <- c(
 RV <- reactiveValues(
         notifications = list(),
         data = 0,
-        custom_genes = character(),
+        custom_genes = data.frame(gene=character(), source=character(), stringsAsFactors = F),
         customBed_ranges = FALSE,
         filters_summ_genes = data.frame(),
         filters_summ_vars = data.frame(),
@@ -366,13 +398,12 @@ ui <- dashboardPage(
         textInput("pwd","Password:",placeholder = "Enter decryption password"),
         actionButton("decrypt_button",label = "Load data"),
         
-        #Custom gene list
-        fileInput(inputId = "custom_file",label = "Custom gene list:", multiple=FALSE, accept="text/plain", placeholder = "gene list txt file"),
         #Custom genomic regions
         fileInput(inputId = "custom_bed",label = "Region BED:", multiple=FALSE, accept=".bed", placeholder = "region bed file"),
         
         sidebarMenu(id = "tabs",
             menuItem("Variants overview", tabName = "overview", icon = icon("th")),
+            menuItem("Create custom genes list", tabName = "custom_genes_list_builder", icon = icon("th")),
             menuItem("Filters settings", tabName = "filters", icon = icon("th")),
             menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
             menuItem("Results", icon = icon("th"),
@@ -397,6 +428,14 @@ ui <- dashboardPage(
                         )
                     ),
                     fluidRow(
+                      box(title = "Phenotype information", width = 12, status = "primary", solidHeader = T, collapsible = T,
+                          fluidRow(
+                            column(4, h4("Disease:"), verbatimTextOutput("Disease")),
+                            column(8, tableOutput("case_HPO_terms"))
+                          )
+                      )
+                    ),
+                    fluidRow(
                         box(title = "Variant consequences", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
                             withSpinner(plotOutput("Var_consequence_plot"))
                         )
@@ -414,6 +453,66 @@ ui <- dashboardPage(
                         )
                     )
                     
+            ),
+            tabItem(tabName = "custom_genes_list_builder",
+              DT::dataTableOutput("custom_genes_table"),
+              fluidRow(column(12, align="center",
+                actionButton("custom_genes_reset", "Reset list"),
+                actionButton("custom_genes_remove", "Remove selected")
+              )),
+              hr(),
+              box(title = "Manual input", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                fluidRow(
+                  column(6, 
+                         textAreaInput("custom_genes_txt", "Gene list:", placeholder = "Official gene symbols one per line", rows = 10, resize = "vertical"),
+                         verbatimTextOutput("custom_genes_list_length"),
+                         actionButton("custom_genes_load_txt", "Load list") 
+                         ),
+                  column(6, 
+                         fileInput(inputId = "custom_genes_file",label = "Gene list file:", multiple=FALSE, accept="text/plain", placeholder = "gene list txt file"),
+                         verbatimTextOutput("custom_genes_file_txt")
+                        )
+                )
+              ),
+              box(title = "Load from PanelApp", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                fluidRow(
+                  column(3, selectInput("panelapp_confidence", "Min confidence level:", choices = c("green" = 3, "amber" = 2), selected = "green",multiple = FALSE)),
+                  column(3, actionButton("panelapp_genes_load", "Load panelapp genes")),
+                  column(3, actionButton("panelapp_reset", "Reset selection")),
+                  column(3, verbatimTextOutput("panelapp_n_genes"))
+                ),
+                hr(),
+                DT::dataTableOutput("panelapp_selection_table")
+              ),
+              box(title = "Load from ClinVar", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                  fluidRow(
+                    column(3, actionButton("clinvar_genes_load", "Load clinvar genes")),
+                    column(3, actionButton("clinvar_select_all", "Select all")),
+                    column(3, actionButton("clinvar_reset", "Reset selection")),
+                    column(3, verbatimTextOutput("clinvar_n_genes"))
+                  ),
+                  hr(),
+                  DT::dataTableOutput("clinvar_selection_table")
+              ),
+              box(title = "Load from gene lists", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                  fluidRow(
+                    column(4, actionButton("genelists_genes_load", "Load gene list genes")),
+                    column(4, actionButton("genelists_reset", "Reset selection")),
+                    column(4, verbatimTextOutput("genelists_n_genes"))
+                  ),
+                  hr(),
+                  DT::dataTableOutput("genelists_selection_table")
+              ),
+              box(title = "Load from HPO terms", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                  fluidRow(
+                    column(3, actionButton("hpo_genes_load", "Load HPO genes")),
+                    column(3, actionButton("hpo_select_all", "Select all")),
+                    column(3, actionButton("hpo_reset", "Reset selection")),
+                    column(3, verbatimTextOutput("hpo_n_genes"))
+                  ),
+                  hr(),
+                  DT::dataTableOutput("hpo_selection_table")
+              )
             ),
             tabItem(tabName = "filters",
                     column(12, align="center", actionButton(inputId = "Apply_filters", label = "Apply filters")),
@@ -441,7 +540,9 @@ ui <- dashboardPage(
                                 uiOutput("REVEL") ),
                             column(4,
                                 h4("Splice filters"),   
-                                uiOutput("spliceAI")) ),
+                                uiOutput("spliceAI"),
+                                h4("Intron filters"),
+                                uiOutput("spliceAI_intron")) ),
                         fluidRow(
                             column(4, 
                                 h4("Regulatory filters"),
@@ -508,9 +609,11 @@ ui <- dashboardPage(
                     DT::dataTableOutput("customGenesTable"),
                     hr(),
                     fluidRow(column(8), 
-                             column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results")))    
+                             column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results")))
             ),
             tabItem(tabName = "filter_results_variants",
+                    selectInput("vars_results_genes", "Show variants for:", choices = c("ALL GENES", "CUSTOM GENE LIST"), selected = "ALL GENES", multiple = FALSE),
+                    br(),
                     box(title = "Single variants", id = "vars_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE, width = 12,
                         DT::dataTableOutput("vars_results_table") ),
                     box(title = "Compound het variants", id = "comphet_results_box", status = "primary", solidHeader = TRUE, collapsible = TRUE, width = 12,
@@ -561,6 +664,9 @@ ui <- dashboardPage(
                         DT::dataTableOutput("clinvar_detail_tab"),
                         h3("Interesting gene lists"),
                         DT::dataTableOutput("genelists_detail_tab") ),
+                    box(title = "Associated HPO terms", id = "HPO_terms_details", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        DT::dataTableOutput("hpo_detail_tab")),
                     box(title = "Pathways and ontology", id = "path_go_details", status = "info", solidHeader = TRUE, width = 12,
                         collapsible = TRUE, collapsed = TRUE,
                         div(DT::dataTableOutput("geneInfo"),style="font-size: 75%") ),
@@ -605,12 +711,13 @@ server <- function(input, output, session) {
         
         #Reset notifications, messages, custom bed and custom genes
         #RV$messages <- list()
-        RV$custom_genes <- character()
+        RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
         RV$customBed_ranges <- FALSE
         RV$notifications <- list()
         RV$cov_file <- NULL
         RV$selected_gene <- FALSE
-        
+        RV$custom_genes_n_loaded <- "NO"
+        RV$custom_genes_txt_length <- 0
         
         #Load data from plain or encrypted object
         if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
@@ -654,22 +761,6 @@ server <- function(input, output, session) {
                 status = "danger")
         }
     })
-    
-    observeEvent(input$custom_file, {
-        req(input$custom_file)
-        tryCatch({
-            RV$custom_genes <- scan(input$custom_file$datapath,what="",sep="\n")
-            RV$notifications[["custom_file"]] <- notificationItem(
-                text = paste0(length(RV$custom_genes), " genes loaded"),
-                icon = icon("check-circle"),
-                status = "success")
-        }, error=function(cond) {
-            RV$notifications[["custom_file"]] <- notificationItem(
-                text = paste0("Failed loading custom genes list"),
-                icon = icon("exclamation-circle"),
-                status = "danger")
-        })
-    })
 
     observeEvent(input$custom_bed, {
         req(input$custom_bed)
@@ -690,10 +781,6 @@ server <- function(input, output, session) {
                 icon = icon("exclamation-circle"),
                 status = "danger")
         })
-    })
-    
-    output$Disease <- renderText({
-        paste0(HPOs$Disease[HPOs$X.CaseID == input$CaseCode])
     })
     
     output$NotificationMenu <- renderMenu({
@@ -820,9 +907,14 @@ server <- function(input, output, session) {
                     SegDup %nin% var_reg_anno$SegDup |
                     LowComplexity %nin% var_reg_anno$LowComplexity |
                     TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
-                    (reg_type == "splicing" & 
-                         (SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter & 
-                              SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) ) |
+                    (reg_type == "splicing" & var_type == "INDEL" &
+                        SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) |
+                    (reg_type == "splicing" & var_type == "SNV" & 
+                        SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter) |
+                    (consequence == "intron_variant" & var_type == "INDEL" &
+                        SpliceAI_INDEL_SpliceAI_max < input$spliceAI_intron_filter) |
+                    (consequence == "intron_variant" & var_type == "SNV" &
+                        SpliceAI_SNP_SpliceAI_max < input$spliceAI_intron_filter) |
                     (consequence == "missense_variant" &
                          (CADD_PhredScore < input$CADD_filter | 
                               REVEL_score < input$REVEL_filter |
@@ -979,6 +1071,17 @@ server <- function(input, output, session) {
         ggplot(var_data, aes(x=consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
     })
     
+    output$Disease <- renderText({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == input$CaseCode])
+    })
+
+    output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == input$CaseCode])
+      HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
+    })
+
     output$Var_type_plot <- renderPlot({
         shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
         ggplot(RV$data$variants_df, aes(x=var_type)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
@@ -1008,7 +1111,6 @@ server <- function(input, output, session) {
             format1
     })
     
-    
     output$ROH_plot_select <- renderUI ({
         selectInput("ROH_plot_sample", label = "Select sample:", choices = RV$data$all_samples, multiple = FALSE, selected = RV$data$affected_samples[1])
     })
@@ -1022,6 +1124,189 @@ server <- function(input, output, session) {
             geom_hline(yintercept = 0.1, linetype="dashed") + 
             labs(x="chromosome", y="fraction of chromosome within ROH", fill="ROH size", title=paste0("ROH distribution by chromosome for ", input$ROH_plot_sample)) + 
             format1
+    })
+    
+    #####################
+    ### Custom genes tab
+    #####################
+    
+    ### MANUAL INPUT ###
+    observeEvent(input$custom_genes_reset, {
+      RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
+    })
+    
+    observeEvent(input$custom_genes_remove, {
+      shiny::validate(need(input$custom_genes_table_rows_selected, "Select a gene"))
+      RV$custom_genes <- RV$custom_genes[-input$custom_genes_table_rows_selected,]
+    })
+    
+    output$custom_genes_table <- DT::renderDataTable(selection="multiple", {
+      RV$custom_genes
+    })
+    
+    observeEvent(input$custom_genes_txt, {
+      genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
+      RV$custom_genes_txt_length <- length(genes) 
+    })
+    
+    output$custom_genes_list_length <- renderText({
+      paste0(RV$custom_genes_txt_length, " genes in the list")
+    })
+    
+    observeEvent(input$custom_genes_load_txt, {
+      genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
+      mydf <- data.frame(gene=genes, source=rep("manual_input", length(genes)))
+      RV$custom_genes <- rbind(RV$custom_genes, mydf) %>% distinct()
+    })
+    
+    observeEvent(input$custom_genes_file, {
+      req(input$custom_genes_file)
+      tryCatch({
+        genes <- scan(input$custom_genes_file$datapath,what="",sep="\n")
+        RV$custom_genes_n_loaded <- length(genes)
+        values <- paste(c(input$custom_genes_txt,
+                          paste(genes, collapse="\n") ), collapse="\n")
+        updateTextAreaInput(session, "custom_genes_txt", value = values) 
+      }, error=function(cond) {
+        RV$notifications[["custom_file"]] <- notificationItem(
+          text = paste0("Failed loading custom genes list"),
+          icon = icon("exclamation-circle"),
+          status = "danger")
+      })
+      
+    })
+    
+    output$custom_genes_file_txt <- renderText({
+      paste0(RV$custom_genes_n_loaded, " genes loaded from file")
+    })
+    
+    ### PANELAPP SELECTION ###
+    output$panelapp_selection_table <- DT::renderDataTable(selection="multiple", {
+      PanelApp_data
+    })
+    
+    panelapp_selected_genes <- reactive ({
+      shiny::req(input$panelapp_selection_table_rows_selected)
+      panelID <- PanelApp_data[input$panelapp_selection_table_rows_selected, "id"]
+      genes_df <- PanelApp_genes %>% 
+        filter(panel_idx %in% panelID, confidence_level >= input$panelapp_confidence) %>%  
+        left_join(., PanelApp_data[,c("id","name")], by = c("panel_idx" = "id")) %>%
+        select(entity_name, name)
+      colnames(genes_df) <- c("gene","source")
+      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
+    })
+    
+    output$panelapp_n_genes <- renderText({
+      paste0(nrow(panelapp_selected_genes()), " genes to be imported")
+    })
+    
+    panelapp_selection_proxy <- DT::dataTableProxy("panelapp_selection_table")
+    
+    observeEvent(input$panelapp_reset, {
+      panelapp_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$panelapp_genes_load, {
+      shiny::req(nrow(panelapp_selected_genes()) > 0)
+      RV$custom_genes <- rbind(RV$custom_genes, panelapp_selected_genes()) %>% distinct()
+      panelapp_selection_proxy %>% selectRows(NULL)
+    })
+    
+    ### CLINVAR SELECTION ###
+    output$clinvar_selection_table <-  DT::renderDataTable(selection="multiple", {
+      ClinVar_genes 
+    })
+      
+    clinvar_selection_proxy <- DT::dataTableProxy("clinvar_selection_table")
+    
+    output$clinvar_n_genes <- renderText({
+      paste0(nrow(clinvar_selected_genes()), " genes to be imported")
+    })
+    
+    observeEvent(input$clinvar_reset, {
+      clinvar_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$clinvar_genes_load, {
+      shiny::req(nrow(clinvar_selected_genes()) > 0)
+      RV$custom_genes <- rbind(RV$custom_genes, clinvar_selected_genes()) %>% distinct()
+      clinvar_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$clinvar_select_all, {
+      clinvar_selection_proxy %>% selectRows(input$clinvar_selection_table_rows_all)
+    })
+    
+    clinvar_selected_genes <- reactive ({
+      shiny::req(input$clinvar_selection_table_rows_selected)
+      genes <- ClinVar_genes[input$clinvar_selection_table_rows_selected, "gene"]
+      genes_df <- data.frame(gene=genes, source=rep("ClinVar", length(genes)))
+      genes_df <- genes_df[order(genes_df$gene),]
+    })
+    
+    ### GENE LISTS SELECTION ###
+    output$genelists_selection_table <- DT::renderDataTable(selection="multiple", {
+      geneLists_data
+    })
+    
+    genelists_selection_proxy <- DT::dataTableProxy("genelists_selection_table")
+    
+    genelists_selected_genes <- reactive ({
+      shiny::req(input$genelists_selection_table_rows_selected)
+      panelID <- geneLists_data[input$genelists_selection_table_rows_selected, "id"]
+      genes_df <- geneLists_genes %>% 
+        filter(genelist_idx %in% panelID) %>%  
+        left_join(., geneLists_data[,c("id","list_name")], by = c("genelist_idx" = "id")) %>%
+        select(entity_name, list_name)
+      colnames(genes_df) <- c("gene","source")
+      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
+    })
+    
+    output$genelists_n_genes <- renderText({
+      paste0(nrow(genelists_selected_genes()), " genes to be imported")
+    })
+    
+    observeEvent(input$genelists_reset, {
+      genelists_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$genelists_genes_load, {
+      shiny::req(nrow(genelists_selected_genes()) > 0)
+      RV$custom_genes <- rbind(RV$custom_genes, genelists_selected_genes()) %>% distinct()
+      genelists_selection_proxy %>% selectRows(NULL)
+    })
+    
+    ### HPO GENES SELECTION ###
+    output$hpo_selection_table <-  DT::renderDataTable(selection="multiple", {
+      HPO_genes 
+    })
+    
+    hpo_selection_proxy <- DT::dataTableProxy("hpo_selection_table")
+    
+    output$hpo_n_genes <- renderText({
+      paste0(nrow(hpo_selected_genes()), " genes to be imported")
+    })
+    
+    observeEvent(input$hpo_reset, {
+      hpo_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$hpo_genes_load, {
+      shiny::req(nrow(hpo_selected_genes()) > 0)
+      RV$custom_genes <- rbind(RV$custom_genes, hpo_selected_genes()) %>% distinct()
+      hpo_selection_proxy %>% selectRows(NULL)
+    })
+    
+    observeEvent(input$hpo_select_all, {
+      hpo_selection_proxy %>% selectRows(input$hpo_selection_table_rows_all)
+    })
+    
+    hpo_selected_genes <- reactive ({
+      shiny::req(input$hpo_selection_table_rows_selected)
+      genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
+      hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"]
+      genes_df <- data.frame(gene=genes, source=hpo_ids)
+      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
     })
     
     #################
@@ -1047,6 +1332,14 @@ server <- function(input, output, session) {
                     max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != filter_definitions$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
                     value = 0,
                     step = 0.02)
+    })
+    
+    output$spliceAI_intron <- renderUI({
+      sliderInput("spliceAI_intron_filter", "Min spliceAI score:",
+                  min = 0,
+                  max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != filter_definitions$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
+                  value = 0,
+                  step = 0.02)
     })
     
     output$CADD <- renderUI({
@@ -1298,7 +1591,7 @@ server <- function(input, output, session) {
     genesTable_proxy <- DT::dataTableProxy("genesTable")
     
     customGenesTable_df <- reactive({
-        candidate_genes_df() %>% filter(gene %in% RV$custom_genes)
+        candidate_genes_df() %>% filter(gene %in% RV$custom_genes$gene)
     })
     
     output$customGenesTable <- DT::renderDataTable(selection="single", {
@@ -1327,7 +1620,11 @@ server <- function(input, output, session) {
     ########################
     
     variants_pass_df <- reactive ({
+      if (input$vars_results_genes == "ALL GENES") {
         variants_df() %>% filter(Class == "PASS")
+      } else {
+        variants_df() %>% filter(Class == "PASS", gene %in% RV$custom_genes$gene)
+      }
     })
     
     comphet_pass_df <- reactive ({
@@ -1529,6 +1826,10 @@ server <- function(input, output, session) {
         geneLists_df()[geneLists_df()$id == listID,]
     })
     
+    output$hpo_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+      HPO_ids <- unique(HPO_genes$HPO_id[HPO_genes$gene == gene_name()])
+      HPO_table <- HPO_obo %>% filter(HPO_id %in% HPO_ids) %>% distinct()
+    })
     
     IGV_session <- reactive ({
         shiny::validate(need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"))

@@ -1,0 +1,21 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	94529225	94541800	F3	2		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+1	169514166	169586588	F5	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+1	173903804	173917378	SERPINC1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	127418427	127429246	PROC	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	187464230	187565760	TFPI	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	93873033	93974066	PROS1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	186660216	186678240	HRG	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	154562956	154571086	FGB	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+4	154583126	154590766	FGA	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+4	154604134	154612967	FGG	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+6	160702238	160753315	PLG	3		BIALLELIC, autosomal or pseudoautosomal
+7	101127089	101139266	SERPINE1	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+8	42175233	42207724	PLAT	2		BIALLELIC, autosomal or pseudoautosomal
+9	133414358	133459402	ADAMTS13	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	46719180	46739506	F2	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+13	113158654	113172383	PROZ	2		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+20	23045633	23049741	THBD	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	35172073	35216240	PROCR	2		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+22	20773879	20787720	SERPIND1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	15319451	15335580	PIGA	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

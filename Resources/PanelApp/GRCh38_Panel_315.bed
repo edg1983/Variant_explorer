@@ -1,0 +1,22 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	154582062	154627999	ADAR	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	180632004	180890251	XPR1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	162267079	162318703	IFIH1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	48465811	48467645	TREX1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+4	107931369	107953457	CYP2U1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	69492292	69558104	OCLN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	150113837	150155872	PDGFRB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	41158506	41163186	TREM2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	42416475	42541926	SLC20A2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	34366670	34376853	KIAA1161	3	unknown	BIALLELIC, autosomal or pseudoautosomal
+11	65714896	65720947	RNASEH2C	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	134068925	134152001	JAM3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	50909678	50973745	RNASEH2B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+13	110148963	110307149	COL4A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	8224821	8248044	CTC1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	11574660	11579008	ACP5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	12802063	12813638	RNASEH2A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	36890229	36951843	SAMHD1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	18149899	18177397	USP18	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	39223359	39244751	PDGFB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	15825806	15854931	AP1S2	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)

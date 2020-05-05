@@ -1,0 +1,33 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	225401502	225428925	LBR	3		BIALLELIC, autosomal or pseudoautosomal
+2	19910260	19990131	WDR35	3		BIALLELIC, autosomal or pseudoautosomal
+2	27444371	27489789	IFT172	3		BIALLELIC, autosomal or pseudoautosomal
+2	43774039	43810010	DYNC2LI1	3		BIALLELIC, autosomal or pseudoautosomal
+2	165857475	165953843	TTC21B	3		BIALLELIC, autosomal or pseudoautosomal
+3	129440036	129520507	IFT122	3		BIALLELIC, autosomal or pseudoautosomal
+3	160256986	160399880	IFT80	3		BIALLELIC, autosomal or pseudoautosomal
+3	196291219	196318299	TCTEX1D2	3		BIALLELIC, autosomal or pseudoautosomal
+4	5542772	5709548	EVC2	3		BIALLELIC, autosomal or pseudoautosomal
+4	5711197	5814305	EVC	3		BIALLELIC, autosomal or pseudoautosomal
+4	39182404	39285810	WDR19	3		BIALLELIC, autosomal or pseudoautosomal
+4	169392857	169612629	NEK1	3		BIALLELIC, autosomal or pseudoautosomal
+5	61332273	61546170	ZSWIM6	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	123344885	123423592	CEP120	3		BIALLELIC, autosomal or pseudoautosomal
+6	53001279	53061802	ICK	3		BIALLELIC, autosomal or pseudoautosomal
+7	41960950	42237870	GLI3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	66987677	66995601	SBDS	3		BIALLELIC, autosomal or pseudoautosomal
+7	158856578	158956747	WDR60	3		BIALLELIC, autosomal or pseudoautosomal
+9	128633661	128656787	WDR34	3		BIALLELIC, autosomal or pseudoautosomal
+10	73168166	73244504	FAM149B1	2		BIALLELIC, autosomal or pseudoautosomal
+10	102503987	102633535	SUFU	2		BIALLELIC, autosomal or pseudoautosomal
+11	17077730	17207983	PIK3C2A	3		BIALLELIC, autosomal or pseudoautosomal
+11	71428193	71452868	DHCR7	3		BIALLELIC, autosomal or pseudoautosomal
+11	74012714	74171210	C2CD3	3		BIALLELIC, autosomal or pseudoautosomal
+11	103109431	103479863	DYNC2H1	3		BIALLELIC, autosomal or pseudoautosomal
+12	110124335	110218797	IFT81	3		BIALLELIC, autosomal or pseudoautosomal
+14	75902136	76084585	IFT43	3		BIALLELIC, autosomal or pseudoautosomal
+16	1510427	1612110	IFT140	3		BIALLELIC, autosomal or pseudoautosomal
+16	8788823	8849331	PMM2	3		BIALLELIC, autosomal or pseudoautosomal
+17	6578148	6640927	KIAA0753	3		BIALLELIC, autosomal or pseudoautosomal
+20	43590931	43647296	IFT52	3		BIALLELIC, autosomal or pseudoautosomal
+21	44328944	44339402	C21orf2	3		BIALLELIC, autosomal or pseudoautosomal

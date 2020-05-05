@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	15438439	15449242	CTRC	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	147824568	147831786	SPINK1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	117465784	117715971	CFTR	3		BIALLELIC, autosomal or pseudoautosomal
+7	130380339	130388114	CPA1	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	142749468	142753076	PRSS1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	52897187	52949954	KRT8	2		BIALLELIC, autosomal or pseudoautosomal

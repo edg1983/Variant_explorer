@@ -1,0 +1,10 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	47402969	47562311	MSH2	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	112707498	112846239	APC	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+8	31033801	31173769	WRN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	97853254	97856715	FOXE1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	87863113	87971930	PTEN	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	95086228	95158010	DICER1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	68511780	68551319	PRKAR1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	17871973	17895174	SLC5A5	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	18507493	18561415	SEC23B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+8	56160904	56211324	PLAG1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+11	2129112	2141238	IGF2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, paternally imprinted (maternal allele expressed)
+12	65824131	65966295	HMGA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	102395867	102480645	IGF1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	98648971	98964530	IGF1R	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal

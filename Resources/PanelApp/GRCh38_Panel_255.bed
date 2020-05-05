@@ -1,0 +1,27 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	47402969	47562311	MSH2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	47695530	47810101	MSH6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	58159243	58241372	FANCL	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	10026414	10101930	FANCD2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	12583601	12664226	RAF1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	36993332	37050918	MLH1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	35452361	35467103	FANCE	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	5973239	6009125	PMS2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	140719327	140924764	BRAF	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	35073835	35080016	FANCG	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	95099054	95426796	FANCC	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	22622519	22626787	FANCF	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	88492793	88580851	KITLG	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	112418351	112509913	PTPN11	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	32315474	32400266	BRCA2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	38252326	38357249	SPRED1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	89243949	89317261	FANCI	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	3581181	3611598	SLX4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	23603160	23641310	PALB2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	89737549	89816657	FANCA	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	31094927	31382116	NF1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	58692573	58735611	RAD51C	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	61681266	61863521	BRIP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	58839718	58911192	GNAS	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+X	14843407	14873069	FANCB	3	Complete	X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	24693919	24996986	POLA1	2		X-LINKED: hemizygous mutation in males, biallelic mutations in females

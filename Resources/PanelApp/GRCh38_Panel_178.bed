@@ -1,0 +1,35 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	26401916	26456711	DRC1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	45823316	45916042	LZTFL1	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	50341110	50346852	ZMYND10	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+3	180602858	180871005	CCDC39	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	13690331	13944543	DNAH5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	55219614	55227315	MCIDAS	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+5	55231152	55233680	CCNO	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	43645046	43672599	RSPH9	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	116616479	116632985	RSPH4A	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	158972871	159000187	RSPH3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	726701	786475	DNAAF5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	21543215	21901839	DNAH11	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	100157906	100259278	SPAG1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+8	132571953	132675617	LRRC6	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+9	34457414	34520989	DNAI1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+10	27812164	27999048	ARMC4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	48904110	48931840	CCDC65	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	49625174	49635230	DNAAF2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+14	73644875	73703732	DNAL1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+15	55410525	55508234	DNAAF4	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	70807378	71230722	HYDIN	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	84145287	84178767	DNAAF1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	90019629	90044975	GAS8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	35744511	35752878	GAS2L2	3		BIALLELIC, autosomal or pseudoautosomal
+17	44899142	44905390	CCDC103	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	74274247	74314884	DNAI2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	80036632	80100613	CCDC40	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	11420604	11435782	CCDC151	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	48296457	48321894	CCDC114	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	55158661	55166722	DNAAF3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	32592079	32612866	C21orf59	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+21	42472486	42496354	RSPH1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+X	38269163	38327564	RPGR	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females
+X	107206632	107244243	PIH1D3	3	Complete	X-LINKED: hemizygous mutation in males, biallelic mutations in females

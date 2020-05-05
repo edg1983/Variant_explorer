@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+5	148025683	148137289	SPINK5	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	83161150	83193936	PGM3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+7	2906141	3043945	CARD11	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+9	214854	465259	DOCK8	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	42313324	42388568	STAT3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

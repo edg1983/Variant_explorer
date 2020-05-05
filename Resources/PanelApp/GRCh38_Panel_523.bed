@@ -1,0 +1,7 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	17018722	17054170	SDHB	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	161314257	161375340	SDHC	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	54229097	54298247	PDGFRA	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	54657918	54740715	KIT	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	218241	256700	SDHA	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	112086773	112120013	SDHD	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

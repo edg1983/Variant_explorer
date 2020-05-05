@@ -1,0 +1,6 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	9651732	9729114	PIK3CD	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	117465784	117715971	CFTR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	6346843	6377730	SCNN1A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	23182715	23216883	SCNN1G	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	23278231	23381299	SCNN1B	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal

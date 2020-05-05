@@ -1,0 +1,16 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	74235401	74544428	TNNI3K	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	86424086	86456558	CLCA2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+1	156082573	156140089	LMNA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+2	219418377	219426739	DES	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+3	38548057	38649673	SCN5A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	173232109	173235357	NKX2-5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	151556111	151877125	PRKAG2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	114353931	114408442	TBX5	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	73319859	73369264	HCN4	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31591726	31599021	TTR	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	35030466	35040449	SCN1B	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	49157741	49211836	TRPM4	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+X	101397803	101407925	GLA	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	120427827	120469365	LAMP2	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	154379197	154381523	EMD	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females

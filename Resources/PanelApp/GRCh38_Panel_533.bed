@@ -1,0 +1,24 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	11980181	12013514	MFN2	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	3544793	3558616	RNASEH1	3		BIALLELIC, autosomal or pseudoautosomal
+2	27309492	27325680	MPV17	3		BIALLELIC, autosomal or pseudoautosomal
+2	73926826	73958961	DGUOK	3		BIALLELIC, autosomal or pseudoautosomal
+2	84423523	84460045	SUCLG1	3		BIALLELIC, autosomal or pseudoautosomal
+3	193593144	193697823	OPA1	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+4	185143241	185150382	SLC25A4	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	98868538	98948006	FBXL4	3		BIALLELIC, autosomal or pseudoautosomal
+8	102204502	102239118	RRM2B	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+10	58385022	58399221	TFAM	2		BIALLELIC, autosomal or pseudoautosomal
+10	68414064	68472121	DNA2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	100987367	100994401	TWNK	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+13	47936491	48001354	SUCLA2	3		BIALLELIC, autosomal or pseudoautosomal
+15	89305198	89334861	POLG	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+16	8674565	8784575	ABAT	3		BIALLELIC, autosomal or pseudoautosomal
+16	66508003	66552544	TK2	3		BIALLELIC, autosomal or pseudoautosomal
+16	89490917	89557768	SPG7	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+17	18271428	18315007	TOP3A	3		BIALLELIC, autosomal or pseudoautosomal
+17	64477785	64497036	POLG2	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+18	12328944	12377314	AFG3L2	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+19	10718079	10833488	DNM2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	17968913	17991122	MGME1	3		BIALLELIC, autosomal or pseudoautosomal
+22	50525752	50530056	TYMP	3		BIALLELIC, autosomal or pseudoautosomal

@@ -1,0 +1,16 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	46303631	46316776	UQCRH	2		BIALLELIC, autosomal or pseudoautosomal
+2	218658764	218663443	BCS1L	3		BIALLELIC, autosomal or pseudoautosomal
+3	48599002	48610976	UQCRC1	2		Unknown
+5	131170810	131205426	LYRM7	3		BIALLELIC, autosomal or pseudoautosomal
+5	132866560	132868031	UQCRQ	2		BIALLELIC, autosomal or pseudoautosomal
+6	33694293	33711727	UQCC2	3		BIALLELIC, autosomal or pseudoautosomal
+8	96225920	96235634	UQCRB	3		BIALLELIC, autosomal or pseudoautosomal
+8	144095027	144097525	CYC1	3		BIALLELIC, autosomal or pseudoautosomal
+11	62670273	62673687	UQCC3	2		BIALLELIC, autosomal or pseudoautosomal
+16	21952660	21983660	UQCRC2	2		BIALLELIC, autosomal or pseudoautosomal
+17	15999380	16045015	TTC19	3		BIALLELIC, autosomal or pseudoautosomal
+19	1597172	1605490	UQCR11	2		Unknown
+19	29205321	29213541	UQCRFS1	2		Unknown
+20	35302566	35412141	UQCC1	2		Unknown
+22	29767369	29770413	UQCR10	2		Unknown

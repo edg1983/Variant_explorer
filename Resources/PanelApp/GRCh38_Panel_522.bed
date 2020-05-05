@@ -1,0 +1,9 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	52401013	52410350	BAP1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	1253147	1295069	TERT	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+7	124822386	124929983	POT1	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+9	21967753	21995301	CDKN2A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	57747727	57756013	CDK4	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+13	32315474	32400266	BRCA2	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	67657512	67660815	ACD	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	75647786	75761872	TERF2IP	2		

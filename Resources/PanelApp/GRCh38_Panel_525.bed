@@ -1,0 +1,15 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+3	128479427	128493185	GATA2	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+3	169764520	169765060	TERC	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+4	56466915	56503680	SRP72	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	1253147	1295069	TERT	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+5	177511577	177517469	DDX41	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+7	93099513	93118023	SAMD9	2	unknown	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+10	26991914	27100498	ANKRD26	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	11649854	11895402	ETV6	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	67657512	67660815	ACD	2	unknown	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+17	7661779	7687550	TP53	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+19	33299934	33302564	CEBPA	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+20	63657810	63696253	RTEL1	2	unknown	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+21	34787801	36004667	RUNX1	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	28687743	28742422	CHEK2	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

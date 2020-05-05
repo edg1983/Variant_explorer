@@ -1,0 +1,8 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+8	19901717	19967258	LPL	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+8	143213193	143217170	GPIHBP1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+11	116789367	116792420	APOA5	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+12	50103819	50111319	GPD1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+16	853634	981318	LMF1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+19	4153601	4173054	CREB3L3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	44945982	44949565	APOC2	3	Complete	BIALLELIC, autosomal or pseudoautosomal

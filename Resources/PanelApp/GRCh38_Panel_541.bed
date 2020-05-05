@@ -1,0 +1,26 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	42925375	42959173	SLC2A1	3		BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+1	160115759	160143591	ATP1A2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	151832768	152099475	CACNB4	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	165984641	166149214	SCN1A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+2	218270392	218346793	PNKD	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+3	123282296	123449758	ADCY5	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+4	157076057	157172090	GLRB	3		BIALLELIC, autosomal or pseudoautosomal
+5	36606355	36688334	SLC1A3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	151822513	151924842	GLRA1	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	29656981	29672372	MOG	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+6	165327287	165986603	PDE10A	3		BIALLELIC, autosomal or pseudoautosomal
+10	76869601	77638369	KCNMA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+10	87751512	87841343	ATAD1	3		BIALLELIC, autosomal or pseudoautosomal
+10	117197489	117210299	KCNK18	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+11	20599400	20659285	SLC6A5	3		BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+11	72576141	72674591	PDE2A	2		BIALLELIC, autosomal or pseudoautosomal
+12	4909893	4918256	KCNA1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+12	51590266	51812864	SCN8A	2		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+16	29811382	29815892	PRRT2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	8159149	8163546	VAMP2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	82239023	82273731	CSNK1D	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	10133345	10231286	DNMT1	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	13206442	13633025	CACNA1A	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+19	41966582	41997497	ATP1A3	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+20	63400210	63472677	KCNQ2	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown

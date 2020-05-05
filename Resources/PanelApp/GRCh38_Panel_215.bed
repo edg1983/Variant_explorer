@@ -1,0 +1,36 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	34759741	34763724	GJB4	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+1	34781189	34786369	GJB3	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+1	37611350	37634923	RSPO1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+4	94207611	94291292	SMARCAD1	2	Complete	MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+5	96525267	96779595	CAST	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+6	7541575	7586717	DSP	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+6	121435692	121449727	GJA1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+6	131808016	131895155	ENPP1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+8	142740944	142742411	SLURP1	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+11	88293592	88337787	CTSC	3	unknown	BIALLELIC, autosomal or pseudoautosomal
+12	49961870	49965681	AQP5	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	52446651	52452126	KRT6B	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	52468516	52473785	KRT6C	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	52487174	52493257	KRT6A	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+12	52674736	52680407	KRT1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	20187470	20192898	GJB2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+13	20221971	20232395	GJB6	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+15	67201033	67255195	AAGAB	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	71565660	71577130	TAT	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	3510502	3557995	TRPV3	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	8072636	8087703	ALOX12B	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	8095900	8119047	ALOXE3	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	40818117	40822595	KRT10	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	41565841	41572058	KRT9	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	41582279	41586921	KRT14	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	41609778	41615899	KRT16	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	41619437	41624842	KRT17	3	Complete	BOTH monoallelic and biallelic (but BIALLELIC mutations cause a more SEVERE disease form), autosomal or pseudoautosomal
+17	41754604	41786931	JUP	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+17	76470891	76501790	RHBDF2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+17	80169992	80209331	CARD14	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+18	31058840	31102415	DSC2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	31318089	31357029	DSG1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+18	63327726	63367510	KDSR	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+18	63752935	63805376	SERPINB7	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+22	20858983	20891218	SNAP29	3	Complete	BIALLELIC, autosomal or pseudoautosomal

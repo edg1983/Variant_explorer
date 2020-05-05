@@ -1,0 +1,5 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+2	177623252	178072755	PDE11A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+5	77210449	77429807	PDE8B	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+16	31458080	31467166	ARMC5	3		MONOALLELIC, autosomal or pseudoautosomal, imprinted status unknown
+17	68511780	68551319	PRKAR1A	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted

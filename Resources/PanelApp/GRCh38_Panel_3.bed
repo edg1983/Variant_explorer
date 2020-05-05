@@ -1,0 +1,11 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	40300487	40317816	COL9A2	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+1	102876467	103108496	COL11A1	3	Complete	BOTH monoallelic and biallelic, autosomal or pseudoautosomal
+2	74532414	74555690	LOXL3	2	Complete	BIALLELIC, autosomal or pseudoautosomal
+2	169127109	169362685	LRP2	2		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	33162681	33192499	COL11A2	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+6	70215061	70303083	COL9A1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+12	47972965	48004486	COL2A1	3	Complete	MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+14	53949736	53958761	BMP4	2		BIALLELIC, autosomal or pseudoautosomal
+20	23362182	23373063	GZF1	3	Complete	BIALLELIC, autosomal or pseudoautosomal
+20	62816244	62841159	COL9A3	3	Complete	BIALLELIC, autosomal or pseudoautosomal

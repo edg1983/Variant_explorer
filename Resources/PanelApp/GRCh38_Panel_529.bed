@@ -1,0 +1,52 @@
+#chrom	start	stop	entity_name	confidence_level	penetrance	mode_of_inheritance
+1	23845077	23868294	FUCA1	3		BIALLELIC, autosomal or pseudoautosomal
+1	40071461	40097727	PPT1	3		BIALLELIC, autosomal or pseudoautosomal
+1	150796208	150808323	CTSK	3		BIALLELIC, autosomal or pseudoautosomal
+1	155234452	155244699	GBA	3		BIALLELIC, autosomal or pseudoautosomal
+3	3700814	4467281	SUMF1	3		BIALLELIC, autosomal or pseudoautosomal
+3	32996608	33097230	GLB1	3		BIALLELIC, autosomal or pseudoautosomal
+3	50299889	50312381	HYAL1	3		BIALLELIC, autosomal or pseudoautosomal
+4	986997	1004506	IDUA	3		BIALLELIC, autosomal or pseudoautosomal
+4	102631488	102760994	MANBA	3		BIALLELIC, autosomal or pseudoautosomal
+4	127917732	127966034	MFSD8	3		BIALLELIC, autosomal or pseudoautosomal
+4	177430770	177442503	AGA	3		BIALLELIC, autosomal or pseudoautosomal
+5	74640023	74722647	HEXB	3		BIALLELIC, autosomal or pseudoautosomal
+5	78777209	78986087	ARSB	3		BIALLELIC, autosomal or pseudoautosomal
+5	151212150	151270440	GM2A	3		BIALLELIC, autosomal or pseudoautosomal
+6	31857659	31862906	NEU1	3		BIALLELIC, autosomal or pseudoautosomal
+6	73593379	73654155	SLC17A5	3		BIALLELIC, autosomal or pseudoautosomal
+7	65960684	65982314	GUSB	3		BIALLELIC, autosomal or pseudoautosomal
+8	1755778	1801711	CLN8	3		BIALLELIC, autosomal or pseudoautosomal
+8	18055992	18084998	ASAH1	3		BIALLELIC, autosomal or pseudoautosomal
+8	43140455	43202855	HGSNAT	3		BIALLELIC, autosomal or pseudoautosomal
+9	36214441	36277056	GNE	3		BIALLELIC, autosomal or pseudoautosomal
+10	71816298	71851375	PSAP	3		BIALLELIC, autosomal or pseudoautosomal
+10	89213569	89414557	LIPA	3		BIALLELIC, autosomal or pseudoautosomal
+11	1752752	1764573	CTSD	3		BIALLELIC, autosomal or pseudoautosomal
+11	6390431	6394998	SMPD1	3		BIALLELIC, autosomal or pseudoautosomal
+11	6612763	6619461	TPP1	3		BIALLELIC, autosomal or pseudoautosomal
+12	64713445	64759447	GNS	3		BIALLELIC, autosomal or pseudoautosomal
+12	101745497	101830938	GNPTAB	3		BIALLELIC, autosomal or pseudoautosomal
+13	76990660	77019143	CLN5	3		BIALLELIC, autosomal or pseudoautosomal
+14	74476192	74494177	NPC2	3		BIALLELIC, autosomal or pseudoautosomal
+14	87837820	87993665	GALC	3		BIALLELIC, autosomal or pseudoautosomal
+15	68206992	68257211	CLN6	3		BIALLELIC, autosomal or pseudoautosomal
+15	72340919	72376476	HEXA	3		BIALLELIC, autosomal or pseudoautosomal
+16	1351923	1364113	GNPTG	3		BIALLELIC, autosomal or pseudoautosomal
+16	28474111	28495575	CLN3	3		BIALLELIC, autosomal or pseudoautosomal
+16	88813734	88856970	GALNS	3		BIALLELIC, autosomal or pseudoautosomal
+17	3636468	3661542	CTNS	3		BIALLELIC, autosomal or pseudoautosomal
+17	42536172	42544449	NAGLU	3		BIALLELIC, autosomal or pseudoautosomal
+17	68259182	68422731	ARSG	2		BIALLELIC, autosomal or pseudoautosomal
+17	80101556	80119879	GAA	3		BIALLELIC, autosomal or pseudoautosomal
+17	80206716	80220923	SGSH	3		BIALLELIC, autosomal or pseudoautosomal
+18	23506184	23586898	NPC1	3		BIALLELIC, autosomal or pseudoautosomal
+19	7522626	7534009	MCOLN1	3		BIALLELIC, autosomal or pseudoautosomal
+19	12646511	12666742	MAN2B1	3		BIALLELIC, autosomal or pseudoautosomal
+20	45890144	45898820	CTSA	3		BIALLELIC, autosomal or pseudoautosomal
+20	63895182	63936031	DNAJC5	3		MONOALLELIC, autosomal or pseudoautosomal, NOT imprinted
+22	42058354	42070842	NAGA	3		BIALLELIC, autosomal or pseudoautosomal
+22	50622754	50628173	ARSA	3		BIALLELIC, autosomal or pseudoautosomal
+X	101397803	101407925	GLA	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	120427827	120469365	LAMP2	3		X-LINKED: hemizygous mutation in males, monoallelic mutations in females may cause disease (may be less severe, later onset than males)
+X	149476990	149521096	IDS	3		X-LINKED: hemizygous mutation in males, biallelic mutations in females
