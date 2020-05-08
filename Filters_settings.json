@@ -1,67 +1,212 @@
 {
-"GENES":
-    {
-        "GROUPS": {
-            "global": {
-                "associated_values": ["pLI_gnomad", "GDI_phred"]    
-            }
-        }
+  "GENES": {
+    "DEFINITIONS": {
+      "numeric_fields": { 
+          "pLI_gnomad": ["gnomAD pLI", ">="],
+          "RVIS": ["RVIS intolerance", "<="],
+          "GDI_phred": ["Gene Damage Index", "<="],
+          "EDS": ["EDS score", ">="]
+      }
     },
-
-"VARIANTS":
-    {
-        "GROUPS": {
-            "global": {
-                 "associated_values": ["Consequence", "Max_pop_AF", "d_score"]
-            },
-            "missense": {
-                "definition": ["consequence", ["missense_variant"]],
-                "associated_values": ["CADD_PhredScore", "DANN_DANN", "REVEL_score"]
-            },
-            "splice": {
-                "definition": ["consequence", "%in%", ["intronic_variant","synoymous_variant","splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
-                "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_DEL_SpliceAI_max", "dbscSNV_ada", "dbscSNV_rf"]
-            },
-            "regulatory": {
-                "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant"]],
-                "associated_values": ["ReMM_score", "FIRE_FIRE", "DANN_DANN", "LinSight"]
-            }
-        },
-        "PRESETS": {
-            "missense": {
-                "severe": {
-                    "Logic": "AND",
-                    "values": {
-                        "CADD_phred": 20,
-                        "DANN_score": 0.9,
-                        "REVEL_score": 0.9
-                    }
-                },
-                "moderate": {
-                    "Logic": "AND",
-                    "values": {
-                        "CADD_phred": 15,
-                        "DANN_score": 0.8,
-                        "REVEL_score": 0.6
-                    }
-                }
-            },
-            "splice": {
-                "severe": {
-                    "Logic": "OR",
-                    "values": {
-                        "spliceAI_spliceAI_SNP_max": 0.8,
-                        "spliceAI_spliceAI_DEL_max": 0.8
-                    }
-                },
-                "moderate": {
-                    "Logic": "OR",
-                    "values": {
-                        "spliceAI_spliceAI_SNP_max": 0.6,
-                        "spliceAI_spliceAI_DEL_max": 0.6
-                    }
-                }
-            }
+    "DEFAULT": "zero",
+    "PRESETS": {
+      "global": {
+        "zero": {
+          "logic": "OR",
+          "values" : {
+            "pLI_gnomad": 0,
+            "GDI_phred": "max",
+            "RVIS": "max",
+            "EDS": "min"
+          }
         }
+      }
+    },
+    "GROUPS": {
+      "global": {
+        "associated_values": ["pLI_gnomad", "GDI_phred"]    
+      }
     }
+  },
+
+  "VARIANTS": {
+    "DEFINITIONS": {
+      "numeric_fields": { 
+          "d_score": ["var2reg d-score",">=", 0],
+          "max_pop_af": ["Max population AF", "<=" , "max"],
+          "cohort_af": ["Max cohort AF", "<=", "max"],
+          "CADD_PhredScore": ["CADD Phred",">=", 0],
+          "DANN_score": ["DANN score",">=", 0],
+          "CCR_pct": ["Conserved Coding Region pct",">=", 0],
+          "LinSight": ["LinSight score",">=", 0],
+          "ReMM_score": ["ReMM score",">=", 0],
+          "PhyloP100": ["PhyloP100", ">=", "min"],
+          "LoF_tolerance": ["LoF tolerance", "<=", 1],
+          "REVEL_score": ["ReMM score",">=", 0],
+          "MCAP_score": ["MCAP_score", "<=", 1],
+          "SpliceAI_SNP_SpliceAI_max": ["SpliceAI score",">=", 0],
+          "SpliceAI_INDEL_SpliceAI_max": ["SpliceAI score",">=", 0]
+      },
+      "factors_fields": {
+        "consequence": ["Consequence", "%in%", "ALL"],
+        "var_type": ["Variant type", "%in", "ALL"]
+      },
+      "binary_fields": {
+          "LowMappability": ["Low mappability regions", "exclude", false],
+          "LowComplexity": ["Low complexity regions", "exclude", false],
+          "SegDup": ["Segmental Duplication", "exclude", false],
+          "TFBS": ["TF binding site", "include", false],
+          "DNase": ["DNase peak", "include", false],
+          "UCNE": ["Ultra-conserved element", "include", false]
+      },
+      "reg_sources": {
+        "field": "db_source",
+        "sources": {
+          "database": {
+            "ENCODE cCREs": "BENGI", 
+            "FOCS": "FOCS", 
+            "HACER": "HACER", 
+            "FANTOM5": "FANTOM5", 
+            "Ensembl Regulatory Build": "EnsemblRegBuild",
+            "RefSeq Regulatory Build": "RefSeqRegBuild",
+            "VISTA enhancers": "VISTA",
+            "EPD6 curated promoters": "EPD6"
+          },
+          "computational": {
+            "ENCODE HMM profile": "ENCODE-HMM",
+            "DeepLearning DECRES": "DECRES",
+            "SegWey Encyclopedia": "SegWey"
+          },
+          "experimental": {
+            "CRISPRi-FlowFISH": "FulcoEtAl2019",
+            "CRISPR-Perturb": "GasperiniEtAl2019",
+            "Hi-C screening": "JungEtAl2019"
+          }
+        }
+      }
+    },
+    "GROUPS": {
+      "global": {
+           "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "d_score", "LowMappability", "LowComplexity", "SegDup"]
+      },
+      "missense": {
+          "definition": ["consequence", ["missense_variant"]],
+          "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
+      },
+      "splice": {
+          "definition": ["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+          "associated_values": ["consequence","SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
+      },
+      "intronic": {
+        "definition": ["consequence", ["intronic_variant"]],
+        "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
+      },
+      "regulatory": {
+          "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant"]],
+          "associated_values": ["ReMM_score", "DANN_score", "LinSight", "PhyloP100", "DNase", "TFBS", "UCNE"]
+      }
+    },
+    "PRESETS": {
+      "missense": {
+        "default": "moderate",
+        "configuration": {
+          "severe": {
+            "logic": "AND",
+            "values": {
+                "CADD_phred": 20,
+                "DANN_score": 0.9,
+                "REVEL_score": 0.8
+            }
+          },
+          "moderate": {
+            "logic": "AND",
+            "values": {
+                "CADD_phred": 15,
+                "DANN_score": 0.6,
+                "REVEL_score": 0.6
+            }
+          }
+        }
+      },
+      "splice": {
+        "default": "moderate",  
+        "configuration": {
+          "severe": {
+              "logic": "OR",
+              "values": {
+                  "spliceAI_spliceAI_SNP_max": 0.8,
+                  "spliceAI_spliceAI_INDEL_max": 0.8
+              }
+          },
+          "moderate": {
+              "logic": "OR",
+              "values": {
+                  "spliceAI_spliceAI_SNP_max": 0.6,
+                  "spliceAI_spliceAI_INDEL_max": 0.6
+              }
+          }
+        }
+      },
+      "intronic": {
+        "default": "severe",
+        "configuration": {
+          "severe": {
+            "logic": "OR",
+            "values": {
+                "SpliceAI_SNP_SpliceAI_max": 0.8,
+                "SpliceAI_INDEL_SpliceAI_max": 0.8
+            }
+          },
+          "moderate": {
+            "logic": "OR",
+            "values": {
+                "SpliceAI_SNP_SpliceAI_max": 0.6,
+                "SpliceAI_INDEL_SpliceAI_max": 0.6
+            }
+          }
+        }
+      },
+      "global": {
+        "default": "moderate",  
+        "configuration": {
+          "severe": {
+              "logic": "AND",
+              "values": {
+                  "cohort_af": 0.05,
+                  "max_pop_af": 0.001,
+                  "LowComplexity": true,
+                  "SegDup": true
+              }
+          },
+          "moderate": {
+              "logic": "AND",
+              "values": {
+                  "cohort_af": 0.1,
+                  "max_pop_af": 0.01
+              }
+          }
+        }
+      },
+      "regulatory": {
+        "default": "severe",  
+        "configuration": {
+          "severe": {
+              "logic": "AND",
+              "values": {
+                  "ReMM_score": 0.8,
+                  "LinSight": 0.6,
+                  "TFBS": true
+              }
+          },
+          "moderate": {
+              "logic": "OR",
+              "values": {
+                  "ReMM_score": 0.6,
+                  "LinSight": 0.5
+              }
+          }
+        }
+      }
+    }
+  }
 }

@@ -7,7 +7,9 @@
 
 # TODO Set up configurable filters
 
-#Install needed packages if missing
+##########################################
+### Install needed packages if missing ###
+##########################################
 list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
@@ -28,6 +30,9 @@ if(!("shinycssloaders" %in% installed.packages()[,"Package"])) {
     devtools::install_github('daattali/shinycssloaders',upgrade = FALSE)
 }
 
+#################
+### Libraries ###
+#################
 #options(repos = BiocManager::repositories())
 #getOption("repos")
 library(cyphr)
@@ -50,7 +55,11 @@ source("downloadModule.R")
 source("segregationModule.R")
 source("intersectBedModule.R")
 source("GQModule.R")
+source("filtersModule.R")
 
+#################
+### Constants ###
+#################
 APP_VERSION <- "1.0.8"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
@@ -278,80 +287,41 @@ colnames(HPO_genes) <- c("gene","HPO_id","HPO_name")
 HICF2_HPO <- read.table(getResource("HICF2_HPO_terms.tsv"), sep="\t", header=T, stringsAsFactors = F)
 HICF2_HPO <- HICF2_HPO %>% separate_rows(HPO, sep=",")
 
-#######################
-### Set environment ###
-#######################
+#################################
+### Environment configuration ###
+#################################
+
+## Read config files
+app_settings <- read_json("App_configuration.json")
+filters_settings <- read_json("Filters_settings.json")
 
 ##Set axes options for plots
-genes_axes_options <- c(
-    "GADO Zscore"= "gado_zscore", 
-    "Exomiser Pheno score"= "exomiser_gene_pheno_score",
-    "gnomAD pLI"= "pLI_gnomad",
-    "GDI phred"= "GDI_phred",
-    "RVIS intolerance"= "RVIS",
-    "EDS reg space score"= "EDS")
-variants_axes_options <- c(
-    "Maximum population AF"= "max_pop_af",
-    "d score"= "d_score",
-    "CADD phred"= "CADD_PhredScore", 
-    "DANN score"= "DANN_score",
-    "ReMM score" = "ReMM_score",
-    "SpliceAI score" = "SpliceAI_SNP_SpliceAI_max",
-    "dbscSNV splice score" = "dbscSNV_ada",
-    "phyloP100 conservation" = "PhyloP100",
-    "REVEL score" = "REVEL_score",
-    "MCAP score" = "MCAP_score",
-    "LinSight score" = "LinSight"
-    )
-variants_bar_options <- c(
-    "Region type" = "reg_type",
-    "Variant consequence" = "consequence",
-    "Variant type" = "var_type",
-    "PanelApp" = "PanelApp",
-    "Chromosome" = "chr")
+plot_axes <- list()
+for (n in names(app_settings$plot_axes)) {
+plot_axes[[n]] <- unlist(app_settings$plot_axes[[n]], use.names = T)
+}
 
 ##Plots formatting styles
 format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
                  axis.text.y = element_text(size=12))
 
-##Names of columns where filter are applied
-filter_cols_gene <- c("pLI_gnomAD","GDI_phred")
-filter_cols_vars <- c("d_score","SpliceAI_SpliceAI_max","max_pop_af","consequence","cohort_af")
-
 ##consequence groups for various variant categories
-reg_vars <- c("enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant") 
+reg_vars <- app_settings$var_groups$consequence_groups$reg_vars 
+#c("enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant") 
 
 ##var_type groups for various variant categories
-sv_vars <- c("DEL","DUP","INV","DEL:ME")
+sv_vars <- app_settings$var_groups$var_type_groups$sv_vars
+small_vars <- app_settings$var_groups$var_type_groups$small_vars
+#c("DEL","DUP","INV","DEL:ME")
 
-##classification of reg regions sources
-reg_sources <- list(
-    "database" = c(
-        "ENCODE cCREs" = "BENGI", 
-        "FOCS" = "FOCS", 
-        "HACER" = "HACER", 
-        "FANTOM5" = "FANTOM5", 
-        "Ensembl Regulatory Build" = "EnsemblRegBuild",
-        "RefSeq Regulatory Build" = "RefSeqRegBuild",
-        "VISTA enhancers" = "VISTA",
-        "EPD6 curated promoters" = "EPD6"),
-    "computational" = c(
-        "ENCODE HMM profile" = "ENCODE-HMM",
-        "DeepLearning DECRES" = "DECRES",
-        "SegWey Encyclopedia" = "SegWey"),
-    "experimental" = c(
-        "CRISPRi-FlowFISH" = "FulcoEtAl2019",
-        "CRISPR-Perturb" = "GasperiniEtAl2019",
-        "Hi-C screening" = "JungEtAl2019")
-)
+##Classification of reg regions sources
+reg_sources <- list()
+for (n in names(filters_settings$DEFINITIONS$reg_sources)) {
+  reg_sources[[n]] <- unlist(filters_settings$DEFINITIONS$reg_sources[[n]], use.names = T)
+}
 
 ##Set segregation columns names
-segregation_cols <- c(
-    "het_affected" = "het_aff", 
-    "het_unaffected" = "het_unaff", 
-    "hom_affected" = "hom_aff", 
-    "hom_unaffected" = "hom_unaff", 
-    "comphet_affected" = "comphet_aff" )
+segregation_cols <- unlist(app_settings$segregation_cols, use.names = T)
 
 ##Set reactive objects
 RV <- reactiveValues(
@@ -370,15 +340,13 @@ RV <- reactiveValues(
                                         href="https://variant-explorer.readthedocs.io/en/latest/usage/IGV_session.html") )
     )
 
-############################################
-### Read variants data and filter config ###
-############################################
+##########################
+### List RData objects ###
+##########################
 
 #and look for files in data_dir
 files <- list.files(data_dir, pattern = ".RData")
 samplesID <- gsub("\\.RData[.enc]*","",files, perl = T)
-
-filter_definitions <- read_json("Filters_definitions.json")
 
 ######################
 ### USER INTERFACE ###
@@ -413,11 +381,16 @@ ui <- dashboardPage(
             menuItem("PanelApp and gene lists", tabName = "gene_lists", icon = icon("th")),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
             menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th")),
-            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
+            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th")),
+            menuItem("test", tabName= "test_tab", icon = icon("th"))
         )
     ),
     dashboardBody(
         tabItems(
+            tabItem(tabName = "test_tab", 
+                    uiOutput("vars_filters_UI"),
+                    DT::dataTableOutput("filters_table")
+            ),
             tabItem(tabName = "overview",
                     fluidRow(
                         box(title = "Pedigree", width=6, status = "primary", solidHeader = TRUE,
@@ -591,13 +564,13 @@ ui <- dashboardPage(
                     fluidRow(column(6,withSpinner(plotlyOutput("summary_variants_filters", width = "100%"))), column(6,withSpinner(plotlyOutput("summary_genes_filters", width = "100%")))),
                     
                     h3("Genes filter evaluation"),
-                    withSpinner(plotSelectedUI("genes_scatter", variables=list("x"=genes_axes_options,"y"=genes_axes_options), plotly=TRUE)),
+                    withSpinner(plotSelectedUI("genes_scatter", variables=list("x"=plot_axes[["genes_axes_options"]],"y"=plot_axes[["genes_axes_options"]]), plotly=TRUE)),
                     br(),
                     
                     h3("Variants filter evaluation"),
-                    withSpinner(plotSelectedUI("variants_scatter", variables=list("x"=variants_axes_options,"y"=variants_axes_options), set_limits=c("x","y"), plotly=FALSE)),
+                    withSpinner(plotSelectedUI("variants_scatter", variables=list("x"=plot_axes[["variants_axes_options"]],"y"=plot_axes[["variants_axes_options"]]), set_limits=c("x","y"), plotly=FALSE)),
                     br(),
-                    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=variants_bar_options), plotly=FALSE))    
+                    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=plot_axes[["variants_bar_options"]]), plotly=FALSE))    
             ),
             tabItem(tabName = "filter_results_genes",
                     fluidRow(
@@ -726,8 +699,8 @@ server <- function(input, output, session) {
             RV$data <- readRDS(paste0(data_dir,"/",input$CaseCode,".RData"))
         }
         if (inherits(RV$data, "list")) {
-            RV$data$variants_df <- RV$data$variants_df %>% replace_na(filter_definitions$fill_na_vars)
-            RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(filter_definitions$fill_na_genes)
+            RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
+            RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
@@ -1313,6 +1286,16 @@ server <- function(input, output, session) {
     ### Filters tab
     #################
     
+    output$vars_filters_UI <- renderUI({ 
+      filtersVariantsUI("variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars)
+    })
+    
+    callModule(filtersVariants, "variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars)
+    
+    output$filters_table <- DT::renderDataTable(selection="none", {
+      callModule(getFiltersDF, "variants_filters", filters_settings$VARIANTS)
+    })
+    
     output$d_score <- renderUI({
         sliderInput("d_score_filter", "Min d_score:",
                     min = 0,
@@ -1329,7 +1312,7 @@ server <- function(input, output, session) {
     output$spliceAI <- renderUI({
         sliderInput("spliceAI_filter", "Min spliceAI score:",
                     min = 0,
-                    max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != filter_definitions$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
+                    max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != app_settings$fill_na$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -1337,7 +1320,7 @@ server <- function(input, output, session) {
     output$spliceAI_intron <- renderUI({
       sliderInput("spliceAI_intron_filter", "Min spliceAI score:",
                   min = 0,
-                  max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != filter_definitions$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
+                  max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != app_settings$fill_na$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
                   value = 0,
                   step = 0.02)
     })
@@ -1345,7 +1328,7 @@ server <- function(input, output, session) {
     output$CADD <- renderUI({
         sliderInput("CADD_filter", "Min CADD phred:",
                     min = 0,
-                    max = max(RV$data$variants_df$CADD_PhredScore[RV$data$variants_df$CADD_PhredScore != filter_definitions$fill_na_vars$CADD_PhredScore], na.rm = T),
+                    max = max(RV$data$variants_df$CADD_PhredScore[RV$data$variants_df$CADD_PhredScore != app_settings$fill_na$fill_na_vars$CADD_PhredScore], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -1370,7 +1353,7 @@ server <- function(input, output, session) {
     output$LinSight <- renderUI({
         sliderInput("LinSight_filter", "Min LinSight score:",
                     min = 0,
-                    max = max(RV$data$variants_df$LinSight[RV$data$variants_df$LinSight != filter_definitions$fill_na_vars$LinSight], na.rm = T),
+                    max = max(RV$data$variants_df$LinSight[RV$data$variants_df$LinSight != app_settings$fill_na$fill_na_vars$LinSight], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
@@ -1378,14 +1361,14 @@ server <- function(input, output, session) {
     output$ReMM <- renderUI({
         sliderInput("ReMM_filter", "Min ReMM score:",
                     min = 0,
-                    max = max(RV$data$variants_df$ReMM_score[RV$data$variants_df$ReMM_score != filter_definitions$fill_na_vars$ReMM_score], na.rm = T),
+                    max = max(RV$data$variants_df$ReMM_score[RV$data$variants_df$ReMM_score != app_settings$fill_na$fill_na_vars$ReMM_score], na.rm = T),
                     value = 0,
                     step = 0.02)
     })
     
     output$PhyloP100 <- renderUI({
         sliderInput("PhyloP100_filter", "Min PhyloP100 score:",
-                    min = min(RV$data$variants_df$PhyloP100[RV$data$variants_df$PhyloP100 != filter_definitions$fill_na_vars$PhyloP100], na.rm = T),
+                    min = min(RV$data$variants_df$PhyloP100[RV$data$variants_df$PhyloP100 != app_settings$fill_na$fill_na_vars$PhyloP100], na.rm = T),
                     max = max(RV$data$variants_df$PhyloP100, na.rm = T),
                     value = 0,
                     step = 0.02)
@@ -1402,7 +1385,7 @@ server <- function(input, output, session) {
     output$REVEL <- renderUI({
         sliderInput("REVEL_filter", "Min REVEL score:",
                     min = 0,
-                    max = max(RV$data$variants_df$REVEL_score[RV$data$variants_df$REVEL_score != filter_definitions$fill_na_vars$REVEL_score], na.rm = T),
+                    max = max(RV$data$variants_df$REVEL_score[RV$data$variants_df$REVEL_score != app_settings$fill_na$fill_na_vars$REVEL_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
@@ -1410,7 +1393,7 @@ server <- function(input, output, session) {
     output$DANN <- renderUI({
         sliderInput("DANN_filter", "Min DANN score:",
                     min = 0,
-                    max = max(RV$data$variants_df$DANN_score[RV$data$variants_df$DANN_score != filter_definitions$fill_na_vars$DANN_score], na.rm = T),
+                    max = max(RV$data$variants_df$DANN_score[RV$data$variants_df$DANN_score != app_settings$fill_na$fill_na_vars$DANN_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
@@ -1418,7 +1401,7 @@ server <- function(input, output, session) {
     output$MCAP <- renderUI({
         sliderInput("MCAP_filter", "Min M-CAP score:",
                     min = 0,
-                    max = max(RV$data$variants_df$MCAP_score[RV$data$variants_df$MCAP_score != filter_definitions$fill_na_vars$MCAP_score], na.rm = T),
+                    max = max(RV$data$variants_df$MCAP_score[RV$data$variants_df$MCAP_score != app_settings$fill_na$fill_na_vars$MCAP_score], na.rm = T),
                     value = 0,
                     step = 0.01)
     })
