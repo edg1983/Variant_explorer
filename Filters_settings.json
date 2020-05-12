@@ -2,31 +2,42 @@
   "GENES": {
     "DEFINITIONS": {
       "numeric_fields": { 
-          "pLI_gnomad": ["gnomAD pLI", ">="],
-          "RVIS": ["RVIS intolerance", "<="],
-          "GDI_phred": ["Gene Damage Index", "<="],
-          "EDS": ["EDS score", ">="]
-      }
-    },
-    "DEFAULT": "zero",
-    "PRESETS": {
-      "global": {
-        "zero": {
-          "logic": "OR",
-          "values" : {
-            "pLI_gnomad": 0,
-            "GDI_phred": "max",
-            "RVIS": "max",
-            "EDS": "min"
-          }
-        }
+          "pLI_gnomad": ["gnomAD pLI", ">=", 0],
+          "RVIS": ["RVIS intolerance", "<=", "max"],
+          "GDI_phred": ["Gene Damage Index", "<=", "max"],
+          "EDS": ["EDS score", ">=", "min"]
       }
     },
     "GROUPS": {
       "global": {
-        "associated_values": ["pLI_gnomad", "GDI_phred"]    
+        "associated_values": ["pLI_gnomad", "GDI_phred", "RVIS", "EDS"]    
+      }
+    },
+    "PRESETS": {
+      "global": {
+        "default": "no filter",  
+        "configuration": {
+          "no filter": {
+            "logic": "OR",
+            "values" : {
+              "pLI_gnomad": 0,
+              "GDI_phred": "max",
+              "RVIS": "max",
+              "EDS": "min"
+            }
+          },
+          "intolerant genes": {
+            "logic": "OR",
+            "values": {
+              "pLI_gnomad": 0.9,
+              "GDI_phred": 13.84,
+              "RVIS": -1
+            }
+          }
+        }
       }
     }
+
   },
 
   "VARIANTS": {
@@ -42,60 +53,63 @@
           "ReMM_score": ["ReMM score",">=", 0],
           "PhyloP100": ["PhyloP100", ">=", "min"],
           "LoF_tolerance": ["LoF tolerance", "<=", 1],
-          "REVEL_score": ["ReMM score",">=", 0],
+          "REVEL_score": ["REVEL score",">=", 0],
           "MCAP_score": ["MCAP_score", "<=", 1],
-          "SpliceAI_SNP_SpliceAI_max": ["SpliceAI score",">=", 0],
-          "SpliceAI_INDEL_SpliceAI_max": ["SpliceAI score",">=", 0]
+          "SpliceAI_SNP_SpliceAI_max": ["SpliceAI score SNP",">=", 0],
+          "SpliceAI_INDEL_SpliceAI_max": ["SpliceAI score INDEL",">=", 0]
       },
       "factors_fields": {
         "consequence": ["Consequence", "%in%", "ALL"],
-        "var_type": ["Variant type", "%in", "ALL"]
+        "var_type": ["Variant type", "%in%", "ALL"],
+        "reg_type": ["Gene association", "%in%", "ALL"],
+        "db_source": ["Data source", "grep", "SPLIT ,"]
       },
       "binary_fields": {
-          "LowMappability": ["Low mappability regions", "exclude", false],
-          "LowComplexity": ["Low complexity regions", "exclude", false],
-          "SegDup": ["Segmental Duplication", "exclude", false],
-          "TFBS": ["TF binding site", "include", false],
-          "DNase": ["DNase peak", "include", false],
-          "UCNE": ["Ultra-conserved element", "include", false]
+          "LowMappability": ["exclude low mappability regions", "exclude", false],
+          "LowComplexity": ["exclude low complexity regions", "exclude", false],
+          "SegDup": ["exclude segmental Duplication", "exclude", false],
+          "TFBS": ["include TF binding site", "include", false],
+          "DNase": ["include DNase peak", "include", false],
+          "UCNE": ["include ultra-conserved element", "include", false]
+      }
+    },
+    "FACTORSMAP": {
+      "db_source": {
+          "ENCODE cCREs": "BENGI", 
+          "FOCS": "FOCS", 
+          "HACER": "HACER", 
+          "FANTOM5": "FANTOM5", 
+          "Ensembl Regulatory": "EnsemblRegBuild",
+          "RefSeq Regulatory": "RefSeqRegBuild",
+          "VISTA enhancers": "VISTA",
+          "EPD6 promoters": "EPD6",
+          "ENCODE HMM profile": "ENCODE-HMM",
+          "DeepLearning DECRES": "DECRES",
+          "SegWey Encyclopedia": "SegWey",
+          "CRISPRi-FlowFISH": "FulcoEtAl2019",
+          "CRISPR-Perturb": "GasperiniEtAl2019",
+          "Hi-C screening": "JungEtAl2019",
+          "Databases": ["ENCODE cCREs", "Ensembl Regulatory", "FANTOM5", "FOCS", "HACER", "RefSeq Regulatory", "VISTA enhancers", "EPD6 promoters"],
+          "Computational": ["ENCODE HMM profile", "DeepLearning DECRES", "SegWey Encyclopedia"],
+          "Experimental": ["CRISPRi-FlowFISH", "CRISPR-Perturb", "Hi-C screening"]
       },
-      "reg_sources": {
-        "field": "db_source",
-        "sources": {
-          "database": {
-            "ENCODE cCREs": "BENGI", 
-            "FOCS": "FOCS", 
-            "HACER": "HACER", 
-            "FANTOM5": "FANTOM5", 
-            "Ensembl Regulatory Build": "EnsemblRegBuild",
-            "RefSeq Regulatory Build": "RefSeqRegBuild",
-            "VISTA enhancers": "VISTA",
-            "EPD6 curated promoters": "EPD6"
-          },
-          "computational": {
-            "ENCODE HMM profile": "ENCODE-HMM",
-            "DeepLearning DECRES": "DECRES",
-            "SegWey Encyclopedia": "SegWey"
-          },
-          "experimental": {
-            "CRISPRi-FlowFISH": "FulcoEtAl2019",
-            "CRISPR-Perturb": "GasperiniEtAl2019",
-            "Hi-C screening": "JungEtAl2019"
-          }
-        }
+      "reg_type": {
+        "Closest gene":  "closest_gene", 
+        "From database": "reg_db"
       }
     },
     "GROUPS": {
       "global": {
            "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "d_score", "LowMappability", "LowComplexity", "SegDup"]
       },
+      "comphet": {"associated_values": ["consequence"] },
       "missense": {
           "definition": ["consequence", ["missense_variant"]],
           "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
       },
       "splice": {
           "definition": ["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
-          "associated_values": ["consequence","SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
+          "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
       },
       "intronic": {
         "definition": ["consequence", ["intronic_variant"]],
@@ -103,7 +117,7 @@
       },
       "regulatory": {
           "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant"]],
-          "associated_values": ["ReMM_score", "DANN_score", "LinSight", "PhyloP100", "DNase", "TFBS", "UCNE"]
+          "associated_values": ["ReMM_score", "DANN_score", "LinSight", "PhyloP100", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
       }
     },
     "PRESETS": {
@@ -113,7 +127,7 @@
           "severe": {
             "logic": "AND",
             "values": {
-                "CADD_phred": 20,
+                "CADD_PhredScore": 20,
                 "DANN_score": 0.9,
                 "REVEL_score": 0.8
             }
@@ -121,7 +135,7 @@
           "moderate": {
             "logic": "AND",
             "values": {
-                "CADD_phred": 15,
+                "CADD_PhredScore": 15,
                 "DANN_score": 0.6,
                 "REVEL_score": 0.6
             }
@@ -134,15 +148,15 @@
           "severe": {
               "logic": "OR",
               "values": {
-                  "spliceAI_spliceAI_SNP_max": 0.8,
-                  "spliceAI_spliceAI_INDEL_max": 0.8
+                  "SpliceAI_SNP_SpliceAI_max": 0.8,
+                  "SpliceAI_INDEL_SpliceAI_max": 0.8
               }
           },
           "moderate": {
               "logic": "OR",
               "values": {
-                  "spliceAI_spliceAI_SNP_max": 0.6,
-                  "spliceAI_spliceAI_INDEL_max": 0.6
+                  "SpliceAI_SNP_SpliceAI_max": 0.6,
+                  "SpliceAI_INDEL_SpliceAI_max": 0.6
               }
           }
         }
@@ -172,6 +186,14 @@
           "severe": {
               "logic": "AND",
               "values": {
+                  "consequence": [
+                    "exonic_sv",
+                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                    "stop_gained", "stop_lost", "start_lost",
+                    "missense_variant",
+                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant"
+                  ],
                   "cohort_af": 0.05,
                   "max_pop_af": 0.001,
                   "LowComplexity": true,
@@ -181,6 +203,15 @@
           "moderate": {
               "logic": "AND",
               "values": {
+                  "consequence": [
+                    "exonic_sv", "utr_sv",
+                    "3_prime_UTR_variant", "5_prime_UTR_variant",
+                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                    "stop_gained", "stop_lost", "start_lost",
+                    "missense_variant", "synonymous_variant",
+                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant"
+                  ],
                   "cohort_af": 0.1,
                   "max_pop_af": 0.01
               }

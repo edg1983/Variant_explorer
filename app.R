@@ -5,8 +5,6 @@
 # Input are encrypted RData objects created with Prepare_data.R
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
 
-# TODO Set up configurable filters
-
 ##########################################
 ### Install needed packages if missing ###
 ##########################################
@@ -50,6 +48,7 @@ library(jsonlite)
 library(scattermore)
 library(shinycssloaders)
 library(ontologyIndex)
+library(stringr)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
@@ -307,18 +306,10 @@ format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
 
 ##consequence groups for various variant categories
 reg_vars <- app_settings$var_groups$consequence_groups$reg_vars 
-#c("enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant") 
 
 ##var_type groups for various variant categories
 sv_vars <- app_settings$var_groups$var_type_groups$sv_vars
 small_vars <- app_settings$var_groups$var_type_groups$small_vars
-#c("DEL","DUP","INV","DEL:ME")
-
-##Classification of reg regions sources
-reg_sources <- list()
-for (n in names(filters_settings$DEFINITIONS$reg_sources)) {
-  reg_sources[[n]] <- unlist(filters_settings$DEFINITIONS$reg_sources[[n]], use.names = T)
-}
 
 ##Set segregation columns names
 segregation_cols <- unlist(app_settings$segregation_cols, use.names = T)
@@ -372,7 +363,13 @@ ui <- dashboardPage(
         sidebarMenu(id = "tabs",
             menuItem("Variants overview", tabName = "overview", icon = icon("th")),
             menuItem("Create custom genes list", tabName = "custom_genes_list_builder", icon = icon("th")),
-            menuItem("Filters settings", tabName = "filters", icon = icon("th")),
+            menuItem("Filters settings", icon = icon("th"),
+              menuSubItem("Overview", tabName = "filters_overview_tab"),
+              menuSubItem("Variants", tabName = "variants_filters_tab"),
+              menuSubItem("Segregation", tabName = "segregation_filters_tab"),
+              menuSubItem("Genes", tabName = "genes_filters_tab"),
+              menuSubItem("Regions and ROH", tabName = "regions_filters_tab")
+            ),
             menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
             menuItem("Results", icon = icon("th"),
                 menuSubItem("Filtered genes", tabName = "filter_results_genes"),
@@ -381,16 +378,11 @@ ui <- dashboardPage(
             menuItem("PanelApp and gene lists", tabName = "gene_lists", icon = icon("th")),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
             menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th")),
-            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th")),
-            menuItem("test", tabName= "test_tab", icon = icon("th"))
+            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
         )
     ),
     dashboardBody(
         tabItems(
-            tabItem(tabName = "test_tab", 
-                    uiOutput("vars_filters_UI"),
-                    DT::dataTableOutput("filters_table")
-            ),
             tabItem(tabName = "overview",
                     fluidRow(
                         box(title = "Pedigree", width=6, status = "primary", solidHeader = TRUE,
@@ -487,77 +479,55 @@ ui <- dashboardPage(
                   DT::dataTableOutput("hpo_selection_table")
               )
             ),
-            tabItem(tabName = "filters",
-                    column(12, align="center", actionButton(inputId = "Apply_filters", label = "Apply filters")),
-                    fluidRow(hr()),
-                    
-                    fluidRow(
-                        box(title = "Variant filters", width = 12, status = "primary", solidHeader = TRUE,
+            tabItem(tabName = "filters_overview_tab", 
+                    fluidRow(column(3,actionButton("set_filters","Configure filters"), align="center"),
+                             column(3,actionButton("apply_filters","Apply filters"), align="center"),
+                             column(3,downloadObjUI("get_json_filters", label = "Save filters settings"), align="center"),
+                             column(3,fileInput(inputId = "load_filters",label = "Load filters:", multiple=FALSE, accept=".json", placeholder = "json file"), align="center")),
+                    hr(),
+                    h3("Variants filters"),
+                    DT::dataTableOutput("vars_filters_table"),
+                    h3("Segregation filters"),
+                    DT::dataTableOutput("segregation_filters_table"),
+                    h3("Gene scores filters"),
+                    DT::dataTableOutput("genes_filters_table"),
+                    h3("Genomic regions filters"),
+                    DT::dataTableOutput("regions_filters_table")
+            ),
+            tabItem(tabName = "variants_filters_tab",
+                    fluidRow(column(12, align="center", actionButton("next_variants_filters", "Save and next"))),
+                    hr(),
+                    uiOutput("vars_filters_UI")
+            ),
+            tabItem(tabName = "segregation_filters_tab", 
+                    fluidRow(column(12, align="center",actionButton("next_segregation_filters", "Save and next"))),
+                    hr(),
+                    box(title = "Segregation filters", id = "segregation_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, width=12,
                         fluidRow(
-                            column(4,
-                                h4("General filters"),
-                                uiOutput("d_score"),
-                                uiOutput("Max_pop_AF"),
-                                uiOutput("Cohort_AF"),
-                                uiOutput("var_type_select"),
-                                uiOutput("var_consequence"),
-                                uiOutput("custom_bed_check"),
-                                checkboxGroupInput("vars_anno_regions","Remove variants included in:", 
-                                                   choices = c("Segmental duplications" = "SegDup", "Low complexity regions" = "LowComplexity", "Highly variable genes" = "TopVariableGenes"),
-                                                   inline = FALSE) ),
-                            column(4,
-                                h4("Missense filters"),
-                                uiOutput("CADD"),
-                                uiOutput("DANN"),
-                                uiOutput("MCAP"),
-                                uiOutput("REVEL") ),
-                            column(4,
-                                h4("Splice filters"),   
-                                uiOutput("spliceAI"),
-                                h4("Intron filters"),
-                                uiOutput("spliceAI_intron")) ),
-                        fluidRow(
-                            column(4, 
-                                h4("Regulatory filters"),
-                                uiOutput("DB_sources"),
-                                selectInput("reg_connected_gene", "Gene connection:", choices = c("ALL" = "ALL", "Closest gene" = "closest_gene", "From database" = "reg_db"), multiple = TRUE, selected="ALL"),
-                                uiOutput("LinSight"),
-                                uiOutput("ReMM"),
-                                uiOutput("PhyloP100"),
-                                uiOutput("LoF_tolerance"),
-                                checkboxGroupInput("NC_anno_regions","Select only variants included in:", 
-                                                   choices = c("TFBS" = "TFBS", "DNase peak" = "DNase", "Ultra-conserved element" = "UCNE"),
-                                                   inline = TRUE) ),
-                            column(4,
-                                h4("Compound het filter"),
-                                "At least one of the variant must have the selected consequence",
-                                uiOutput("comphet_consequence") ) )
-                        )
-                    ),
-                    fluidRow(
-                        box(title = "Gene filters", id = "gene_filters", status = "primary", solidHeader = TRUE,
-                        collapsible = TRUE,
-                        uiOutput("pLI"),
-                        uiOutput("GDI"),
-                        uiOutput("RVIS"),
-                        uiOutput("EDS")),
-            
-                        box(title = "Segregation filters", id = "segregation_filters", status = "primary", solidHeader = TRUE,
-                        collapsible = TRUE,
-                        fluidRow(
-                            column(6, textOutput("Total_affected")),
-                            column(6, textOutput("Total_unaffected")) ),
+                          column(6, textOutput("Total_affected")),
+                          column(6, textOutput("Total_unaffected")) ),
                         uiOutput("segregation_controls"),
                         "Number of affected / unaffected carrying the variant with the given genotype",
                         "Homozygous and heterozygous conditions evaluated as AND, comphet as OR",
                         uiOutput("GQfilter_controls")
-                        ) 
-                    ),
-                    fluidRow(box(title = "ROH regions filter", id = "ROH_filters_box", status = "primary", solidHeader = TRUE,
-                        collapsible = TRUE, collapsed = FALSE,
+                    ) 
+            ),
+            tabItem(tabName = "genes_filters_tab",
+                    fluidRow(column(12, align="center",actionButton("next_genes_filters", "Save and next"))),
+                    hr(),
+                    uiOutput("genes_filters_UI")
+            ),
+            tabItem(tabName = "regions_filters_tab",
+                    fluidRow(column(12,align="center",actionButton("next_regions_filters", "Save and finish"))),
+                    hr(),
+                    box(title = "Genomic regions filter", id = "genomic_filters_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = FALSE, width = 12, 
+                        h3("ROH regions"),
                         uiOutput("ROH_sample_select"),
-                        uiOutput("ROH_filters_UI") )
-                    )
+                        uiOutput("ROH_filters_UI"),
+                        h3("Custom BED regions"),
+                        uiOutput("custom_bed_check"))
             ),
             tabItem(tabName = "filter_explorer",
                     h3("Summary of filters effect"),
@@ -582,7 +552,11 @@ ui <- dashboardPage(
                     DT::dataTableOutput("customGenesTable"),
                     hr(),
                     fluidRow(column(8), 
-                             column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results")))
+                             column(3, offset=1,downloadObjUI(id = "save_results", label = "Download results"))),
+                    br(),
+                    box(title = "Applied filters", id = "effective_filters_box", status = "primary", solidHeader = TRUE, collapsible = TRUE, collapsed=TRUE, width = 12,
+                        DT::dataTableOutput("effective_filters_table")
+                    )
             ),
             tabItem(tabName = "filter_results_variants",
                     selectInput("vars_results_genes", "Show variants for:", choices = c("ALL GENES", "CUSTOM GENE LIST"), selected = "ALL GENES", multiple = FALSE),
@@ -674,7 +648,6 @@ ui <- dashboardPage(
 ########################
 
 server <- function(input, output, session) {
-    
     ################
     ### Load Files 
     ################
@@ -682,7 +655,7 @@ server <- function(input, output, session) {
     observeEvent(input$decrypt_button, {
         #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
         
-        #Reset notifications, messages, custom bed and custom genes
+        #Reset relevant values when a new sample is loaded
         #RV$messages <- list()
         RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
         RV$customBed_ranges <- FALSE
@@ -691,6 +664,15 @@ server <- function(input, output, session) {
         RV$selected_gene <- FALSE
         RV$custom_genes_n_loaded <- "NO"
         RV$custom_genes_txt_length <- 0
+        RV$vars_pass_GQ <- NULL
+        RV$vars_pass_BED <- NULL
+        RV$vars_pass_ROH <- NULL 
+        RV$vars_pass_segregation <- NULL
+        RV$vars_pass_filters <- NULL
+        RV$vars_filters_df <- NULL
+        RV$segregation_filters_df <- NULL
+        RV$genes_filters_df <- NULL
+        RV$regions_filters_df <- NULL
         
         #Load data from plain or encrypted object
         if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
@@ -737,7 +719,6 @@ server <- function(input, output, session) {
 
     observeEvent(input$custom_bed, {
         req(input$custom_bed)
-        message(input$custom_bed$datapath)
         tryCatch({
         bed_df <- read.table(input$custom_bed$datapath, sep="\t", header=F, stringsAsFactors = F)
 
@@ -765,181 +746,35 @@ server <- function(input, output, session) {
     })
     
     #######################################
-    ### Apply filters on button click
-    #######################################
-        
-    observeEvent(input$Apply_filters, {
-        if ("ALL" %in% input$consequence) { 
-            RV$accepted_consequence <- sort(unique(RV$data$variants_df$consequence))    
-        } else {
-            RV$accepted_consequence <- input$consequence
-        }
-        
-        if ("ALL" %in% input$var_type) { 
-            RV$accepted_vartype <- sort(unique(RV$data$variants_df$var_type))    
-        } else {
-            RV$accepted_vartype <- input$var_type
-        }
-        
-        
-        if ("ALL" %in% input$comphet_consequence_filter) { 
-            RV$comphet_consequence <- sort(unique(RV$data$variants_df$consequence))    
-        } else {
-            RV$comphet_consequence <- input$comphet_consequence_filter
-        }
-        
-        if ("ALL" %in% input$reg_db_select) { 
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, reg_sources$database)    
-        } else {
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, input$reg_db_select)
-        }
-        
-        if ("ALL" %in% input$reg_comp_select) { 
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, reg_sources$computational)     
-        } else {
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, input$reg_comp_select)
-        }
-        
-        if ("ALL" %in% input$reg_exp_select) { 
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, reg_sources$experimental)     
-        } else {
-            RV$accepted_reg_db <- c(RV$accepted_reg_db, input$reg_exp_select)
-        }
-        
-        if ("ALL" %in% input$reg_connected_gene) { 
-            RV$accepted_connected_gene <- c("closest_gene", "reg_db")     
-        } else {
-            RV$accepted_connected_gene <- input$reg_connected_gene
-        }
-        
-        updateTabItems(session, "tabs", "filter_results_genes")
-    })    
-
-    #######################################
     ### Data reactive tables configuration
     #######################################
     
-    segregating_vars <- reactive({
-        input$Apply_filters
-        shiny::validate(need(inherits(RV$data, "list"), FALSE))
-        isolate(
-            callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
-        )
-    })
-    
     variants_df <- reactive({
-        input$Apply_filters
+        #input$Apply_filters
         shiny::validate(need(inherits(RV$data, "list"), FALSE))
         
-        isolate({
-            
-            #Get rec_id for reg variants in accepted db sources
-            accepted_reg_recid <- RV$data$variants_df$rec_id[grep(paste(RV$accepted_reg_db, collapse="|"), RV$data$variants_df$db_source)]
-           
-            #Read which regions are selected from checkboxes and convert to 0/1 values
-            NC_reg_anno <- makeBoolean(c("TFBS","DNase","UCNE"), input$NC_anno_regions, logic = "include")
-            var_reg_anno <- makeBoolean(c("SegDup","LowComplexity","TopVariableGenes"), input$vars_anno_regions, logic = "exclude")
-            
-            ##ROH FILTER, BED FILTER and GQ FILTER
-            #These filters are high-level and applied before all others
-            #call the bed regions module and get rec_id for variants in the ROH regions
-            if (!is.null(RV$data$ROH_ranges)) {
-                #message("call bed module")
-                vars_pass_ROH <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges[[input$ROH_sample]], multiplier=1000)
-            } else {
-                vars_pass_ROH <- RV$data$variants_df$rec_id
-            }
-            
-            #call the bed regions module and get rec_id for variants in the custom BED regions
-            if (inherits(RV$customBed_ranges, "GRanges")) {
-                vars_pass_BED <- callModule(bedfilterModule,"bed_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$customBed_ranges)
-            } else {
-                vars_pass_BED <- RV$data$variants_df$rec_id
-            }
-            
-            #Get rec_id for variants passing the GQ filter
-            vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
-                                       variants_df = RV$data$variants_df, 
-                                       GQ_cols = RV$GQ_cols_all, 
-                                       affected_cols = RV$GQ_cols_affected,
-                                       exclude_var_type = sv_vars)
-            
-            #Pre-filter variants_df and retain only vars passing ROH and GQ filters
-            vars_pass <- unique(intersect(intersect(vars_pass_ROH, vars_pass_GQ), vars_pass_BED))
-            prefilter_vars <- as.data.frame(RV$data$variants_df %>% filter(rec_id %in% vars_pass))
-            
-            ## FILTER VARS  
-            #first select variants that pass the filters
-            pass_vars <- as.data.frame(prefilter_vars %>% 
-                filter(! (
-                    d_score < input$d_score_filter | 
-                    var_type %nin% RV$accepted_vartype |
-                    consequence %nin% RV$accepted_consequence |
-                    max_pop_af > input$MaxPopAF_filter |
-                    cohort_af > input$CohortAF_filter |
-                    SegDup %nin% var_reg_anno$SegDup |
-                    LowComplexity %nin% var_reg_anno$LowComplexity |
-                    TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
-                    (reg_type == "splicing" & var_type == "INDEL" &
-                        SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) |
-                    (reg_type == "splicing" & var_type == "SNV" & 
-                        SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter) |
-                    (consequence == "intron_variant" & var_type == "INDEL" &
-                        SpliceAI_INDEL_SpliceAI_max < input$spliceAI_intron_filter) |
-                    (consequence == "intron_variant" & var_type == "SNV" &
-                        SpliceAI_SNP_SpliceAI_max < input$spliceAI_intron_filter) |
-                    (consequence == "missense_variant" &
-                         (CADD_PhredScore < input$CADD_filter | 
-                              REVEL_score < input$REVEL_filter |
-                              MCAP_score < input$MCAP_filter |
-                              DANN_score < input$DANN_filter)) |
-                    (consequence %in% reg_vars &
-                         ((ReMM_score < input$ReMM_filter |
-                              LinSight < input$LinSight_filter |
-                              PhyloP100 < input$PhyloP100_filter |
-                              LoF_tolerance > input$LoFtolerance_filter) |
-                         rec_id %nin% accepted_reg_recid |
-                         reg_type %nin% RV$accepted_connected_gene |
-                         TFBS %nin% NC_reg_anno$TFBS |
-                         DNase %nin% NC_reg_anno$DNase |
-                         UCNE %nin% NC_reg_anno$UCNE))
-                )))
-            
-            #COMPHET FILTERING
-            #Select comphet where both vars pass variants filters
-            comphet_accepted <- RV$data$comphet_df %>% filter(
-                    v1 %in% pass_vars$rec_id &
-                    v2 %in% pass_vars$rec_id)
-            
-            #COMPHET specific consequence
-            #This filter allow to select comphet where at least 1 var as the given consequence
-            #From pass vars select only the ones with accepted consequence
-            #based on the comphet consequence filter
-            comphet_accepted_vars <- as.data.frame(pass_vars %>%
-                filter(consequence %in% RV$comphet_consequence) )
-            
-            #Get the final list of vars in accepted comphet
-            #from comphet select combo when: 
-            #both vars in the combo passed the general variants filters (comphet_accepted df)
-            #at least one var in the combo pass the comphet consequence filter
-            #the combo passed segregation filters
-            comphet_single_vars <- comphet_accepted %>% filter(
-                rec_id %in% segregating_vars() &
-                (v1 %in% comphet_accepted_vars$rec_id |
-                v2 %in% comphet_accepted_vars$rec_id) ) %>% gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
-            
-            #GET THE FINAL LIST OF ACCEPTED VARS
-            #the final list of segregating accepted vars is now equal to
-            #single vars passing filters and segregation
-            #vars part of a comphet passing all filters + segregation
-            accepted_vars_list <- intersect(segregating_vars(), pass_vars$rec_id)
-            accepted_vars_list <- unique(c(accepted_vars_list, comphet_single_vars$VarID))
-            
-            #return variants dataframe with updated Class column (PASS/FILTER)
-            as.data.frame(RV$data$variants_df %>% mutate(Class = ifelse(
-                rec_id %in% accepted_vars_list,
-                "PASS","FILTER") ) )
-        })
+        ## FILTER VARS
+        #Get the final list of vars in accepted comphet intersecting filters and segregation
+        comphet_final_vars <- RV$data$comphet_df %>% filter(
+            rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet)) %>% 
+          gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
+        
+        #GET THE FINAL LIST OF ACCEPTED VARS
+        #the final list of segregating accepted vars is now equal to
+        #single vars passing filters and segregation
+        #vars part of a comphet passing all filters + segregation
+        accepted_vars_list <- unique(intersect(intersect(intersect(intersect(
+          RV$vars_pass_ROH, RV$vars_pass_GQ), 
+          RV$vars_pass_BED),
+          RV$vars_pass_filters$vars),
+          RV$vars_pass_segregation))
+        
+        accepted_vars_list <- unique(c(accepted_vars_list, comphet_final_vars$VarID))
+        
+        #return variants dataframe with updated Class column (PASS/FILTER)
+        as.data.frame(RV$data$variants_df %>% mutate(Class = ifelse(
+            rec_id %in% accepted_vars_list,
+            "PASS","FILTER") ) )
     })
     
     comphet_df <- reactive({
@@ -948,7 +783,7 @@ server <- function(input, output, session) {
         as.data.frame(RV$data$comphet_df %>% mutate(Class = ifelse(
             v1 %in% filtered_vars_list & 
             v2 %in% filtered_vars_list &
-            rec_id %in% segregating_vars(), "PASS", "FILTER")))
+            rec_id %in% RV$vars_pass_segregation, "PASS", "FILTER")))
     })
     
     genes_df <- reactive({
@@ -957,15 +792,9 @@ server <- function(input, output, session) {
             comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
         
         #Filters on gene scores are applied
-        genes_above_score <- as.data.frame(RV$data$genes_scores %>% filter(
-            pLI_gnomad >= input$pLI_filter & 
-            GDI_phred <= input$GDI_filter &
-            RVIS <= input$RVIS_filter &
-            EDS >= input$EDS_filter))
-            
         as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
             variants %in% RV$filtered_vars_list & 
-            gene %in% genes_above_score$gene, "PASS", "FILTER")))    
+            gene %in% RV$genes_pass_filters, "PASS", "FILTER")))    
     })
     
     genes_scores <- reactive({
@@ -974,6 +803,7 @@ server <- function(input, output, session) {
             gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
     })
     
+    #TODO - FIX SUMM TABLES TO READ FROM NEW FILTERS DF
     filters_summ_genes <- reactive ({
         tot_genes <- nrow(genes_scores())
         
@@ -1282,231 +1112,220 @@ server <- function(input, output, session) {
       genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
     })
     
-    #################
-    ### Filters tab
-    #################
+    ######################
+    ### Filters Overview
+    ######################
+    
+    #Apply the filters and go to gene result page
+    observeEvent(input$apply_filters, {
+      shiny::validate(need(inherits(RV$data, "list"), FALSE))
+      req(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df)
+      
+      #VARIANTS FILTER
+      RV$vars_pass_filters <- callModule(getPASSVars_filters, "variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
+      
+      #GENE SCORES FILTER
+      RV$genes_pass_filters <- callModule(getPASSGenes_filters, "genes_filters", filters_settings$GENES, RV$data$genes_scores)
+      
+      #SEGREGATION FILTER
+      RV$vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
+
+      #ROH FILTER
+      #call the bed regions module and get rec_id for variants in the ROH regions
+      if (!is.null(RV$data$ROH_ranges)) {
+        #message("call bed module")
+        RV$vars_pass_ROH <- callModule(bedfilterModule,"ROH_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$data$ROH_ranges, multiplier=1000)
+      } else {
+        RV$vars_pass_ROH <- RV$data$variants_df$rec_id
+      }
+      
+      #BED REGIONS FILTER
+      #call the bed regions module and get rec_id for variants in the custom BED regions
+      if (inherits(RV$customBed_ranges, "GRanges")) {
+        RV$vars_pass_BED <- callModule(bedfilterModule,"bed_filter",variants_ranges=RV$data$variants_ranges, bed_ranges=RV$customBed_ranges)
+      } else {
+        RV$vars_pass_BED <- RV$data$variants_df$rec_id
+      }
+      
+      #Get rec_id for variants passing the GQ filter
+      RV$vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
+                                 variants_df = RV$data$variants_df, 
+                                 GQ_cols = RV$GQ_cols_all, 
+                                 affected_cols = RV$GQ_cols_affected,
+                                 exclude_var_type = sv_vars)
+      
+      req(RV$vars_pass_GQ, RV$vars_pass_BED, RV$vars_pass_ROH, RV$vars_pass_segregation, RV$vars_pass_filters)
+      RV$effective_filters <- rbind(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df) #TABLES OF FILTERS
+      updateTabItems(session, "tabs", "filter_results_genes")
+    }) 
+    
+    #Start filter configuration by moving to variant filters tab
+    observeEvent(input$set_filters, {
+      updateTabItems(session, "tabs", "variants_filters_tab")
+    })
+    
+    #Generate json of filters settings and save to file
+    filters_json <- reactive ({
+      variants_json <- callModule(getJSON_filters, "variants_filters", filters_settings$VARIANTS)
+      segregation_json <- callModule(getJSON_segregation, "segregation")
+      GQ_json <- callModule(getJSON_GQ, "GQ_filter")
+      genes_json <- callModule(getJSON_filters, "genes_filters", filters_settings$GENES)
+      ROH_json <- callModule(getJSON_regions, "ROH_filter")
+      BED_json <- callModule(getJSON_regions, "bed_filter")
+      
+      filters_config <- list(VARIANTS = variants_json,
+                             SEGREGATION = segregation_json,
+                             GQ = GQ_json,
+                             GENES = genes_json,
+                             ROH = ROH_json,
+                             BED = BED_json)
+      return(filters_config)
+    })
+  
+    callModule(downloadObj, id="get_json_filters", output_prefix="Effective_filter.json", output_data=filters_json())
+    
+    #Load filter setting from json file
+    observeEvent(input$load_filters, {
+      req(input$load_filters)
+      #tryCatch({
+        filters_json <- read_json(input$load_filters$datapath)
+        #updateTabItems(session, "tabs", "variants_filters_tab")
+        callModule(loadSettings_filters, "variants_filters", filters_json$VARIANTS, filters_settings$VARIANTS)
+        
+        #updateTabItems(session, "tabs", "segregation_filters_tab")
+        callModule(loadSettings_segregation, "segregation", filters_json$SEGREGATION)
+        callModule(loadSettings_GQ, "GQ_filter", filters_json$GQ)
+        
+        #updateTabItems(session, "tabs", "genes_filters_tab")
+        callModule(loadSettings_filters, "genes_filters", filters_json$GENES, filters_settings$GENES)
+        
+        #updateTabItems(session, "tabs", "regions_filters_tab")
+        callModule(loadSettings_regions, "ROH_filter", filters_json$ROH)
+        callModule(loadSettings_regions, "bed_filter", filters_json$BED)
+        
+        #updateTabItems(session, "tabs", "filters_overview_tab")
+        RV$vars_filters_df <- callModule(getDF_filters, "variants_filters", filters_settings$VARIANTS)
+        df1 <- callModule(getDF_segregation, "segregation")
+        df2 <- callModule(getDF_GQ, "GQ_filter")
+        RV$segregation_filters_df <- rbind(df1, df2)
+        RV$genes_filters_df <- callModule(getDF_filters, "genes_filters", filters_settings$GENES)
+        df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
+        df2 <- callModule(getDF_regions, "ROH_filter", "ROH")
+        RV$regions_filters_df <- rbind(df1, df2) 
+      #}, error=function(cond) {
+      #  RV$notifications[["filters_file"]] <- notificationItem(
+      #    text = paste0("Failed loading filters configuration"),
+      #    icon = icon("exclamation-circle"),
+      #    status = "danger")
+      #})
+      
+    })
+    
+    #Data tables summarizing filters settings
+    output$vars_filters_table <- DT::renderDataTable(selection="none", {
+      shiny::validate(need(RV$vars_filters_df,"Variants filters not configured"))
+      RV$vars_filters_df
+    })
+    
+    output$segregation_filters_table <- DT::renderDataTable(selection="none", {
+      shiny::validate(need(RV$segregation_filters_df,"Segregation filters not configured"))
+      RV$segregation_filters_df
+    })
+    
+    output$genes_filters_table <- DT::renderDataTable(selection="none", {
+      shiny::validate(need(RV$genes_filters_df,"Genes filters not configured"))
+      RV$genes_filters_df  
+    })
+    
+    output$regions_filters_table <- DT::renderDataTable(selection="none", {
+      shiny::validate(need(RV$regions_filters_df,"Regions filters not configured"))
+      RV$regions_filters_df
+    })
+    
+    ##########################
+    ### Variants filters tab
+    ##########################
+    
+    observeEvent(input$next_variants_filters, {
+      RV$vars_filters_df <- callModule(getDF_filters, "variants_filters", filters_settings$VARIANTS)
+      updateTabItems(session, "tabs", "segregation_filters_tab")
+    })
     
     output$vars_filters_UI <- renderUI({ 
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
       filtersVariantsUI("variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars)
     })
-    
-    callModule(filtersVariants, "variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars)
-    
-    output$filters_table <- DT::renderDataTable(selection="none", {
-      callModule(getFiltersDF, "variants_filters", filters_settings$VARIANTS)
-    })
-    
-    output$d_score <- renderUI({
-        sliderInput("d_score_filter", "Min d_score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$d_score, na.rm = T),
-                    value = 0,
-                    step = 0.05)
-    })
-    
-    output$custom_bed_check <- renderUI({
-        shiny::validate(need(inherits(RV$customBed_ranges, "GRanges"), "No custom BED"))
-        bedcontrolUI("bed_filter", label = "Select only vars in custom regions")
-    })
-    
-    output$spliceAI <- renderUI({
-        sliderInput("spliceAI_filter", "Min spliceAI score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != app_settings$fill_na$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
-                    value = 0,
-                    step = 0.02)
-    })
-    
-    output$spliceAI_intron <- renderUI({
-      sliderInput("spliceAI_intron_filter", "Min spliceAI score:",
-                  min = 0,
-                  max = max(RV$data$variants_df$SpliceAI_SNP_SpliceAI_max[RV$data$variants_df$SpliceAI_SNP_SpliceAI_max != app_settings$fill_na$fill_na_vars$SpliceAI_SNP_SpliceAI_max], na.rm = T),
-                  value = 0,
-                  step = 0.02)
-    })
-    
-    output$CADD <- renderUI({
-        sliderInput("CADD_filter", "Min CADD phred:",
-                    min = 0,
-                    max = max(RV$data$variants_df$CADD_PhredScore[RV$data$variants_df$CADD_PhredScore != app_settings$fill_na$fill_na_vars$CADD_PhredScore], na.rm = T),
-                    value = 0,
-                    step = 0.02)
-    })
-    
-    output$DB_sources <- renderUI({
-        values <- sort(unique(RV$data$variants_df$db_source))
-        values_db <- reg_sources[["database"]][reg_sources[["database"]] %in% values]
-        values_db <- c("ALL" = "ALL", values_db)
-        values_computational <- reg_sources[["computational"]][reg_sources[["computational"]] %in% values]
-        values_computational <- c("ALL" = "ALL", values_computational)
-        values_experimental <- reg_sources[["experimental"]][reg_sources[["experimental"]] %in% values]
-        values_experimental <- c("ALL" = "ALL", values_experimental)
+
+    callModule(observeFilters, "variants_filters", 
+               filters_settings = filters_settings$VARIANTS, 
+               variants_df = RV$data$variants_df, 
+               na_values = app_settings$fill_na$fill_na_vars)
         
-        tagList(
-            selectInput("reg_db_select", "Database sources:", choices = values_db, multiple=TRUE, selected="ALL"),
-            selectInput("reg_comp_select", "Computational sources:", choices = values_computational, multiple=TRUE, selected="ALL"),
-            selectInput("reg_exp_select", "Experimental sources:", choices = values_experimental, multiple=TRUE, selected="ALL")
-        )
-        
-    })
+    #############################
+    ### Segregation Filters tab
+    #############################
     
-    output$LinSight <- renderUI({
-        sliderInput("LinSight_filter", "Min LinSight score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$LinSight[RV$data$variants_df$LinSight != app_settings$fill_na$fill_na_vars$LinSight], na.rm = T),
-                    value = 0,
-                    step = 0.02)
-    })
-    
-    output$ReMM <- renderUI({
-        sliderInput("ReMM_filter", "Min ReMM score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$ReMM_score[RV$data$variants_df$ReMM_score != app_settings$fill_na$fill_na_vars$ReMM_score], na.rm = T),
-                    value = 0,
-                    step = 0.02)
-    })
-    
-    output$PhyloP100 <- renderUI({
-        sliderInput("PhyloP100_filter", "Min PhyloP100 score:",
-                    min = min(RV$data$variants_df$PhyloP100[RV$data$variants_df$PhyloP100 != app_settings$fill_na$fill_na_vars$PhyloP100], na.rm = T),
-                    max = max(RV$data$variants_df$PhyloP100, na.rm = T),
-                    value = 0,
-                    step = 0.02)
-    })
-    
-    output$LoF_tolerance <- renderUI({
-        sliderInput("LoFtolerance_filter", "Max LoF tolerance score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$LoF_tolerance, na.rm = T),
-                    value = 1,
-                    step = 0.02)        
-    })
-    
-    output$REVEL <- renderUI({
-        sliderInput("REVEL_filter", "Min REVEL score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$REVEL_score[RV$data$variants_df$REVEL_score != app_settings$fill_na$fill_na_vars$REVEL_score], na.rm = T),
-                    value = 0,
-                    step = 0.01)
-    })
-    
-    output$DANN <- renderUI({
-        sliderInput("DANN_filter", "Min DANN score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$DANN_score[RV$data$variants_df$DANN_score != app_settings$fill_na$fill_na_vars$DANN_score], na.rm = T),
-                    value = 0,
-                    step = 0.01)
-    })
-    
-    output$MCAP <- renderUI({
-        sliderInput("MCAP_filter", "Min M-CAP score:",
-                    min = 0,
-                    max = max(RV$data$variants_df$MCAP_score[RV$data$variants_df$MCAP_score != app_settings$fill_na$fill_na_vars$MCAP_score], na.rm = T),
-                    value = 0,
-                    step = 0.01)
-    })
-    
-    output$Max_pop_AF <- renderUI({
-        sliderInput("MaxPopAF_filter", "Max population AF:",
-                    min = 0,
-                    max = max(RV$data$variants_df$max_pop_af, na.rm = T),
-                    value = max(RV$data$variants_df$max_pop_af, na.rm = T),
-                    step = 0.001)
-    })
-    
-    output$Cohort_AF <- renderUI({
-        sliderInput("CohortAF_filter", "Max cohort AF:",
-                    min = 0,
-                    max = max(RV$data$variants_df$cohort_af, na.rm = T),
-                    value = max(RV$data$variants_df$cohort_af, na.rm = T),
-                    step = 0.001)
-    })
-    
-    output$pLI <- renderUI({
-        sliderInput("pLI_filter", "Min gnomad pLI:",
-                    min = 0,
-                    max = max(RV$data$genes_scores$pLI_gnomad[RV$data$genes_scores$pLI_gnomad != 99], na.rm = T),
-                    value = 0,
-                    step = 0.05)
-    })
-    
-    output$GDI <- renderUI({
-        startvalue = 0
-        sliderInput("GDI_filter", "Max phred GDI:",
-                    min = 0,
-                    max = max(RV$data$genes_scores$GDI_phred, na.rm = T),
-                    value = max(RV$data$genes_scores$GDI_phred, na.rm = T),
-                    step = 0.05)
-    })
-    
-    output$RVIS <- renderUI({
-        startvalue = 0
-        sliderInput("RVIS_filter", "Max RVIS score:",
-                    min = min(RV$data$genes_scores$RVIS[RV$data$genes_scores$RVIS != -99], na.rm = T),
-                    max = max(RV$data$genes_scores$RVIS, na.rm = T),
-                    value = max(RV$data$genes_scores$RVIS, na.rm = T),
-                    step = 0.05)
-    })
-    
-    output$EDS <- renderUI({
-        startvalue = 0
-        sliderInput("EDS_filter", "Min EDS score:",
-                    min = 0,
-                    max = max(RV$data$genes_scores$EDS[RV$data$genes_scores$EDS != 99], na.rm = T),
-                    value = 0,
-                    step = 0.05)
+    observeEvent(input$next_segregation_filters, {
+      df1 <- callModule(getDF_segregation, "segregation")
+      df2 <- callModule(getDF_GQ, "GQ_filter")
+      RV$segregation_filters_df <- rbind(df1, df2)
+      updateTabItems(session, "tabs", "genes_filters_tab")
     })
     
     output$segregation_controls <- renderUI({
-        segregationUI("segregation", choices_affected = RV$data$values_affected, choices_unaffected=RV$data$values_unaffected)
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
+      segregationUI("segregation", choices_affected = RV$data$values_affected, choices_unaffected=RV$data$values_unaffected)
     })
     
     output$GQfilter_controls <- renderUI({
-        message(RV$maxGQ)
-        GQfilterUI("GQ_filter",maxGQ = RV$maxGQ, defaultGQ=10)    
+      GQfilterUI("GQ_filter",maxGQ = RV$maxGQ, defaultGQ=10)    
     })
     
-    output$var_consequence <- renderUI({
-        if ("ALL" %nin% input$var_type) {
-            var_types <- sort(unique(RV$data$variants_df$consequence[RV$data$variants_df$var_type %in% input$var_type]))
-        } else {
-            var_types <- sort(unique(RV$data$variants_df$consequence))
-        }
-        names(var_types) <- var_types
-        var_types <- c("ALL" = "ALL", var_types)
-        selectInput("consequence", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
+    #######################
+    ### Genes filters tab
+    #######################
+    
+    observeEvent(input$next_genes_filters, {
+      RV$genes_filters_df <- callModule(getDF_filters, "genes_filters", filters_settings$GENES)
+      updateTabItems(session, "tabs", "regions_filters_tab")
     })
     
-    output$var_type_select <- renderUI({
-        var_types <- sort(unique(RV$data$variants_df$var_type))
-        names(var_types) <- sort(unique(RV$data$variants_df$var_type))
-        var_types <- c("ALL" = "ALL", var_types)
-        selectInput("var_type", "Variant type:", choices = var_types, multiple=TRUE, selected="ALL")
+    output$genes_filters_UI <- renderUI({ 
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
+      filtersVariantsUI("genes_filters", filters_settings$GENES, RV$data$genes_scores, app_settings$fill_na$fill_na_genes)
     })
     
-    output$comphet_consequence <- renderUI({
-        var_types <- sort(unique(RV$data$variants_df$consequence))
-        names(var_types) <- sort(unique(RV$data$variants_df$consequence))
-        var_types <- c("ALL" = "ALL", var_types)
-        selectInput("comphet_consequence_filter", "Variant consequence:", choices = var_types, multiple=TRUE, selected="ALL")
+    callModule(observeFilters, "genes_filters", 
+               filters_settings = filters_settings$GENES,
+               variants_df = RV$data$genes_scores, 
+               na_values = app_settings$fill_na$fill_na_genes)
+    
+    #########################
+    ### Regions Filters tab 
+    #########################
+    
+    observeEvent(input$next_regions_filters, {
+      df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
+      df2 <- callModule(getDF_regions, "ROH_filter", "ROH")
+      RV$regions_filters_df <- rbind(df1, df2)  
+      updateTabItems(session, "tabs", "filters_overview_tab")
     })
     
-    output$ROH_sample_select <- renderUI ({
-        selectInput("ROH_sample", label = "Select sample:", choices = names(RV$data$ROH_ranges), multiple = FALSE, selected = "AFFECTED_SHARED")
+    output$custom_bed_check <- renderUI({
+      shiny::validate(need(inherits(RV$customBed_ranges, "GRanges"), "No custom BED"))
+      bedcontrolUI("bed_filter", label = "custom regions", )
     })
+    
+    #output$ROH_sample_select <- renderUI ({
+    #    selectInput("ROH_sample", label = "Select sample:", choices = names(RV$data$ROH_ranges), multiple = FALSE, selected = "AFFECTED_SHARED")
+    #})
     
     output$ROH_filters_UI <- renderUI({ 
-        shiny::validate(need(!is.null(RV$data$ROH_ranges), "No ROH regions loaded"))
-    
-        bedcontrolUI("ROH_filter", label = "Select only vars in ROH regions", 
-            slider_config = c(
-                "label" = "ROH min dimension (kb)",
-                "min" = 0,
-                "max" = max(RV$data$ROH_ranges[[input$ROH_sample]]$value) / 1000,
-                "step" = 10,
-                "value" = 250
-            ))
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))  
+      shiny::validate(need(inherits(RV$data$ROH_ranges, "list"), "No ROH regions loaded"))
+      bedcontrolUI("ROH_filter", label = "ROH regions", ranges=RV$data$ROH_ranges, slider=TRUE, samples=TRUE)
     })
+    callModule(configureSlider, "ROH_filter", ranges=RV$data$ROH_ranges, scale_value=1000)
 
     ########################
     ### Filter Explorer tab
@@ -1586,6 +1405,10 @@ server <- function(input, output, session) {
         genesTable_proxy %>% selectRows(row_idx) 
     })
     
+    output$effective_filters_table <- DT::renderDataTable(selection="none", {
+      RV$effective_filters
+    })
+    
     callModule(downloadObj, id = "save_results",
     output_prefix=input$CaseCode,
     output_data = list(
@@ -1595,7 +1418,8 @@ server <- function(input, output, session) {
         "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list) %>% 
                             gather(key="Variant",value = "varID", v1:v2) %>% 
                             inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="rec_id")) %>%
-                            select(-Class.x,-Class.y))),
+                            select(-Class.x,-Class.y)),
+        "applied_filters.json" = filters_json()),
     zip_archive = paste0(input$CaseCode, ".results.zip") )
     
     ########################
@@ -1833,7 +1657,6 @@ server <- function(input, output, session) {
                               RV$data$unaffected_samples,
                               VCF_file = paste0(VCF_dir,"/",RV$data$pedigree, ".PASS.NORM.vcf.gz"))
         
-        message(igv_xml)
         #jigv_command <- paste("jigv --region", region,
         #                      paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
         #                      paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
@@ -1919,6 +1742,13 @@ server <- function(input, output, session) {
         
         ggplotly(cov_plot, tooltip = c("color","y"), dynamicTicks = T)
     })
+
+    outputOptions(output, "vars_filters_UI", suspendWhenHidden = FALSE)
+    outputOptions(output, "segregation_controls", suspendWhenHidden = FALSE)
+    outputOptions(output, "GQfilter_controls", suspendWhenHidden = FALSE)
+    outputOptions(output, "genes_filters_UI", suspendWhenHidden = FALSE)
+    outputOptions(output, "custom_bed_check", suspendWhenHidden = FALSE)
+    outputOptions(output, "ROH_filters_UI", suspendWhenHidden = FALSE)    
 }
 
 # Run the application 

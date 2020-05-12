@@ -81,3 +81,36 @@ segregationModule <- function(input, output, session, segregation_df, cols_names
   
   return(seg_vars_list)
 }
+
+getDF_segregation <- function(input, output, session) {
+  filters_df <- data.frame(group=character(), filter=character(), value=character(), stringsAsFactors = F)
+  ctrl_names <- names(input)
+
+    for (n in ctrl_names) {
+      newline <- c("segregation", n, input[[n]])
+      filters_df[nrow(filters_df)+1,] <- newline
+    }
+  filters_df <- filters_df[order(filters_df$filter),]
+  return(filters_df)
+}
+
+getJSON_segregation <- function(input, output, session) {
+  filters_json <- list()
+  ctrl_names <- names(input)
+  
+  for (n in ctrl_names) {
+    filters_json[[n]] <- input[[n]]
+  }
+  
+  return(filters_json) 
+}
+
+loadSettings_segregation <- function(input, output, session, filters_values) {
+  for (v in names(filters_values)) {
+    if (v %in% names(input)) {
+      updateSelectInput(session, inputId = v, selected = filters_values[[v]])
+    } else {
+      message("LOAD WARNING: ",v, " control not found in the segregation module")
+    }
+  }
+}

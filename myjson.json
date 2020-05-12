@@ -1,0 +1,1 @@
+["{\n  \"VARIANTS\": {\n    \"missense\": {\n      \"CADD\": 20,\n      \"DANN\": 0.5,\n      \"REVEL\": 0.5\n    },\n    \"splicing\": {\n      \"SpliceAI_snp\": 0.4\n    },\n    \"comphet\": {\n      \"consequence\": [\"missense\", \"frameshift\"]\n    }\n  },\n  \"GENES\": {\n    \"global\": {\n      \"pLI\": 0.5,\n      \"GDI\": 13\n    }\n  }\n}"]

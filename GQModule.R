@@ -11,7 +11,7 @@ GQfilterUI <- function(id, maxGQ, defaultGQ) {
   tagList(
     h4("GQ filter"),
     fluidRow(
-      column(4,selectInput(ns("GQ_samples"), "Apply to:", choices = c("ANY", "ALL", "AFFECTED"), multiple=FALSE, selected = "ANY")),
+      column(4,selectInput(ns("GQ_samples"), "Apply to:", choices = c("ANY", "ALL", "AFFECTED"), multiple=FALSE, selected = "AFFECTED")),
       column(8,sliderInput(ns("GQ_value"), label = "Min GQ value", min = 0, max = maxGQ, step = 1, value = defaultGQ))
     )
   )
@@ -40,4 +40,35 @@ GQfilterModule <- function(input, output, session, variants_df, GQ_cols, affecte
   pass_vars_list <- pass_vars$rec_id
   
   return(pass_vars_list)
+}
+
+getDF_GQ <- function(input, output, session) {
+  filters_df <- data.frame(group=character(), filter=character(), value=character(), stringsAsFactors = F)
+  ctrl_names <- names(input)
+  
+  for (n in ctrl_names) {
+    newline <- c("GQ", n, input[[n]])
+    filters_df[nrow(filters_df)+1,] <- newline
+  }
+  return(filters_df)
+}
+
+getJSON_GQ <- function(input, output, session) {
+  filters_json <- list()
+  ctrl_names <- names(input)
+
+    for (n in ctrl_names) {
+      filters_json[[n]] <- input[[n]]
+    }
+
+  return(filters_json) 
+}
+
+loadSettings_GQ <- function(input, output, session, filters_values) {
+  if (!is.null(filters_values$GQ_samples)) {
+    updateSelectInput(session, inputId = "GQ_samples", selected = filters_values$GQ_samples)
+  } 
+  if (!is.null(filters_values$GQ_value)) {
+    updateSliderInput(session, inputId = "GQ_value", value = as.numeric(filters_values$GQ_value))
+  }
 }
