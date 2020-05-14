@@ -117,6 +117,6 @@ loadSettings_regions <- function(input, output, session, filters_values) {
       updateSliderInput(session, inputId = "bed_limit", value = as.numeric(filters_values$bed_limit))
     }
     if (!is.null(filters_values$sample_select)) {
-      updateSelectInput(session, inputId = "sample_select", value = filters_values$sample_select)
+      updateSelectInput(session, inputId = "sample_select", selected = filters_values$sample_select)
     }
 }

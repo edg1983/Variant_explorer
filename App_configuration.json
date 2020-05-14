@@ -14,7 +14,8 @@
     "het_unaffected": "het_unaff", 
     "hom_affected": "hom_aff", 
     "hom_unaffected": "hom_unaff", 
-    "comphet_affected": "comphet_aff"   
+    "comphet_affected": "comphet_aff",
+    "dnm_affected": "sup_dnm"
   },
   "plot_axes": {
     "genes_axes_options": {

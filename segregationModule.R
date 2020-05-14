@@ -25,32 +25,38 @@ segregationUI <- function(id, choices_affected, choices_unaffected) {
   homozygous_controls <- tagList(
     h4("Homozygous"),
     selectInput(ns("hom_affected"), "Affected carriers:", choices = choices_affected, multiple=FALSE, selected = "1"),
-    selectInput(ns("hom_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "equal"),
+    selectInput(ns("hom_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "=="),
     selectInput(ns("hom_unaffected"), "Unaffected carriers:", choices = choices_unaffected, multiple=FALSE, selected = "0"),
-    selectInput(ns("hom_unaffected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "equal")
+    selectInput(ns("hom_unaffected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "==")
   )
   
   heterozygous_controls <- tagList(
     h4("Heterozygous"),
     selectInput(ns("het_affected"), "Affected carriers:", choices = choices_affected, multiple=FALSE, selected = "1"),
-    selectInput(ns("het_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "equal"),
+    selectInput(ns("het_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "=="),
     selectInput(ns("het_unaffected"), "Unaffected carriers:", choices = choices_unaffected, multiple=FALSE, selected = "0"),
-    selectInput(ns("het_unaffected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "equal")
+    selectInput(ns("het_unaffected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "==")
   )
   
   comphet_controls <- tagList(
     h4("Compound hets"),
     selectInput(ns("comphet_affected"), "Affected carriers:", choices = choices_affected, multiple=FALSE, selected = "1"),
-    selectInput(ns("comphet_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "equal")
+    selectInput(ns("comphet_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = "==")
   )
   
-  output <- tagList(
-    column(4,homozygous_controls),
-    column(4,heterozygous_controls),
-    column(4,comphet_controls)
+  dnm_controls <- tagList(
+    h4("High-confident denovo"),
+    selectInput(ns("dnm_affected"), "Affected carriers:", choices = choices_affected, multiple=FALSE, selected = "0"),
+    selectInput(ns("dnm_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = ">=")
   )
-  output <- tagList(fluidRow(output))
-
+  
+  output <- tagList(fluidRow(
+              column(4,homozygous_controls),
+              column(4,heterozygous_controls),
+              column(4,comphet_controls) ),
+              fluidRow(column(4), column(4, align="center", dnm_controls), column(4))
+            )
+  #output <- tagList(fluidRow(output))
 }
 
 #cols_names is a named vector of 5 elements describing columns names for segregation counts
@@ -74,8 +80,9 @@ segregationModule <- function(input, output, session, segregation_df, cols_names
                     !!selectFilter(cols_names["het_unaffected"], input$het_unaffected_op, input$het_unaffected))
   hom_expr <- quo(!!selectFilter(cols_names["hom_affected"], input$hom_affected_op, input$hom_affected) &
                     !!selectFilter(cols_names["hom_unaffected"], input$hom_unaffected_op, input$hom_unaffected))
+  dnm_expr <- selectFilter(cols_names["dnm_affected"], input$dnm_affected_op, input$dnm_affected)
   comphet_expr <- selectFilter(cols_names["comphet_affected"], "==", "0")
-  segregation_expr <- quo(!!het_expr & !!hom_expr & !!comphet_expr)
+  segregation_expr <- quo(!!het_expr & !!hom_expr & !!comphet_expr & !!dnm_expr)
   seg_vars <- as.data.frame(segregation_df %>% filter(!!segregation_expr))
   seg_vars_list <- c(seg_vars_list,seg_vars$rec_id)
   

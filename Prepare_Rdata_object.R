@@ -109,7 +109,7 @@ if (from_config==TRUE) {
     comphet_df$Class <- "PASS"
     newlist$comphet_df <- comphet_df
     
-    #load variants data and set pop AD to zero when missing
+    #load variants data
     variants_df <- loadData(paste0(newlist$variant_file))
     variants_df$Class <- "PASS"
     variants_ranges <- GRanges(seqnames = variants_df$chr, ranges = IRanges(variants_df$start, end=variants_df$end),ID=variants_df$rec_id)
@@ -156,13 +156,13 @@ if (from_config==TRUE) {
     if (nrow(newlist$comphet_df) > 0) {
       seg_df1 <- as.data.frame(
         newlist$comphet_df %>% select(rec_id,num_aff) %>% 
-        mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0) %>%
+        mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0, sup_dnm=0) %>%
         dplyr::rename(comphet_aff = num_aff) )
     } else {
       seg_df1 <- NULL
     }
     seg_df2 <- as.data.frame(
-      newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff) %>%
+      newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff,sup_dnm) %>%
         mutate(comphet_aff = 0) )
     newlist$segregation_df <- rbind(seg_df1, seg_df2)
     

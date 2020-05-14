@@ -8,7 +8,7 @@
 ##########################################
 ### Install needed packages if missing ###
 ##########################################
-list.of.packages <- c("cyphr","shiny", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
+list.of.packages <- c("cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -35,6 +35,7 @@ if(!("shinycssloaders" %in% installed.packages()[,"Package"])) {
 #getOption("repos")
 library(cyphr)
 library(shiny)
+library(shinyBS)
 library(DT)
 library(dplyr)
 library(plotly)
@@ -59,7 +60,7 @@ source("filtersModule.R")
 #################
 ### Constants ###
 #################
-APP_VERSION <- "1.0.8"
+APP_VERSION <- "1.1.0"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -104,25 +105,6 @@ decrypt_datafile = function(inf, pwd) {
         return(0)
     })
     return (d)
-}
-
-makeBoolean <- function(myvalues,myvector, logic="include") {
-    if (logic=="include") { 
-        true_value <- 1
-    }
-    if (logic=="exclude") { 
-        true_value <- 0
-    }
-    
-    outlist <- list()
-    for (v in myvalues) {
-        if (v %in% myvector) {
-            outlist[[v]] = true_value
-        } else {
-            outlist[[v]] = c(0,1)
-        }
-    }
-    return(outlist)
 }
 
 makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_file, BAM_path=BAM_dir, SV_file=SV_VCF) {
@@ -423,6 +405,7 @@ ui <- dashboardPage(
               DT::dataTableOutput("custom_genes_table"),
               fluidRow(column(12, align="center",
                 actionButton("custom_genes_reset", "Reset list"),
+                bsTooltip("custom_genes_reset", "Empty and reset the gene list"),
                 actionButton("custom_genes_remove", "Remove selected")
               )),
               hr(),
@@ -682,6 +665,8 @@ server <- function(input, output, session) {
         }
         if (inherits(RV$data, "list")) {
             RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
+            RV$data$segregation_df$sup_dnm <- 0
+            RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
             RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
@@ -790,7 +775,7 @@ server <- function(input, output, session) {
         RV$filtered_vars_list <- unique(c(
             variants_df()$rec_id[variants_df()$Class == "PASS"], 
             comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
-        
+
         #Filters on gene scores are applied
         as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
             variants %in% RV$filtered_vars_list & 
@@ -1123,13 +1108,16 @@ server <- function(input, output, session) {
       
       #VARIANTS FILTER
       RV$vars_pass_filters <- callModule(getPASSVars_filters, "variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
+      message("PASS VARS FILTERS ", length(RV$vars_pass_filters$vars))
       
       #GENE SCORES FILTER
       RV$genes_pass_filters <- callModule(getPASSGenes_filters, "genes_filters", filters_settings$GENES, RV$data$genes_scores)
+      message("PASS GENES ", length(RV$genes_pass_filters))
       
       #SEGREGATION FILTER
       RV$vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
-
+      message("PASS SEGREGATION ", length(RV$vars_pass_segregation))
+      
       #ROH FILTER
       #call the bed regions module and get rec_id for variants in the ROH regions
       if (!is.null(RV$data$ROH_ranges)) {
@@ -1138,6 +1126,7 @@ server <- function(input, output, session) {
       } else {
         RV$vars_pass_ROH <- RV$data$variants_df$rec_id
       }
+      message("PASS ROH ", length(RV$vars_pass_ROH))
       
       #BED REGIONS FILTER
       #call the bed regions module and get rec_id for variants in the custom BED regions
@@ -1146,6 +1135,7 @@ server <- function(input, output, session) {
       } else {
         RV$vars_pass_BED <- RV$data$variants_df$rec_id
       }
+      message("PASS BED ", length(RV$vars_pass_BED))
       
       #Get rec_id for variants passing the GQ filter
       RV$vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
@@ -1153,6 +1143,7 @@ server <- function(input, output, session) {
                                  GQ_cols = RV$GQ_cols_all, 
                                  affected_cols = RV$GQ_cols_affected,
                                  exclude_var_type = sv_vars)
+      message("PASS GQ ", length(RV$vars_pass_GQ))
       
       req(RV$vars_pass_GQ, RV$vars_pass_BED, RV$vars_pass_ROH, RV$vars_pass_segregation, RV$vars_pass_filters)
       RV$effective_filters <- rbind(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df) #TABLES OF FILTERS
@@ -1187,17 +1178,17 @@ server <- function(input, output, session) {
     #Load filter setting from json file
     observeEvent(input$load_filters, {
       req(input$load_filters)
-      #tryCatch({
+      tryCatch({
         filters_json <- read_json(input$load_filters$datapath)
         #updateTabItems(session, "tabs", "variants_filters_tab")
-        callModule(loadSettings_filters, "variants_filters", filters_json$VARIANTS, filters_settings$VARIANTS)
+        callModule(loadSettings_filters, "variants_filters", filters_settings$VARIANTS, filters_json$VARIANTS)
         
         #updateTabItems(session, "tabs", "segregation_filters_tab")
         callModule(loadSettings_segregation, "segregation", filters_json$SEGREGATION)
         callModule(loadSettings_GQ, "GQ_filter", filters_json$GQ)
         
         #updateTabItems(session, "tabs", "genes_filters_tab")
-        callModule(loadSettings_filters, "genes_filters", filters_json$GENES, filters_settings$GENES)
+        callModule(loadSettings_filters, "genes_filters", filters_settings$GENES, filters_json$GENES)
         
         #updateTabItems(session, "tabs", "regions_filters_tab")
         callModule(loadSettings_regions, "ROH_filter", filters_json$ROH)
@@ -1212,12 +1203,17 @@ server <- function(input, output, session) {
         df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
         df2 <- callModule(getDF_regions, "ROH_filter", "ROH")
         RV$regions_filters_df <- rbind(df1, df2) 
-      #}, error=function(cond) {
-      #  RV$notifications[["filters_file"]] <- notificationItem(
-      #    text = paste0("Failed loading filters configuration"),
-      #    icon = icon("exclamation-circle"),
-      #    status = "danger")
-      #})
+
+        RV$notifications[["filters_file"]] <- notificationItem(
+          text = paste0("Filters configuration loaded correctly"),
+          icon = icon("check-circle"),
+          status = "success")
+      }, error=function(cond) {
+        RV$notifications[["filters_file"]] <- notificationItem(
+         text = paste0("Failed loading filters configuration"),
+          icon = icon("exclamation-circle"),
+          status = "danger")
+      })
       
     })
     
@@ -1253,14 +1249,14 @@ server <- function(input, output, session) {
     
     output$vars_filters_UI <- renderUI({ 
       shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
-      filtersVariantsUI("variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars)
+      filtersVariantsUI("variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars, filters_settings$TOOLTIPS)
     })
-
+    
     callModule(observeFilters, "variants_filters", 
                filters_settings = filters_settings$VARIANTS, 
                variants_df = RV$data$variants_df, 
                na_values = app_settings$fill_na$fill_na_vars)
-        
+    
     #############################
     ### Segregation Filters tab
     #############################
@@ -1292,7 +1288,7 @@ server <- function(input, output, session) {
     
     output$genes_filters_UI <- renderUI({ 
       shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
-      filtersVariantsUI("genes_filters", filters_settings$GENES, RV$data$genes_scores, app_settings$fill_na$fill_na_genes)
+      filtersVariantsUI("genes_filters", filters_settings$GENES, RV$data$genes_scores, app_settings$fill_na$fill_na_genes, filters_settings$TOOLTIPS)
     })
     
     callModule(observeFilters, "genes_filters", 
@@ -1597,6 +1593,7 @@ server <- function(input, output, session) {
         #comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", V1:V2)
         
         #as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name))
+        message("Selected gene: ", gene_name())
         as.data.frame(variants_df() %>% filter(Class == "PASS", gene == gene_name(), rec_id %nin% gene_comphet_vars_df()$varID)) 
     })
     
