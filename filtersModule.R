@@ -190,15 +190,15 @@ getPASSVars_filters <- function(input, output, session, filters_settings, varian
                               group_vars = group_vars,
                               vars_operation = grp_vars_op,
                               vars_definition = filters_settings$DEFINITIONS)
-    message("### - ", group_name, "EXPRESSION")
-    cat(as.character(filter_expr$pass))
+    #message("### - ", group_name, "EXPRESSION")
+    #cat(as.character(filter_expr$pass))
     if (group_name == "comphet") {
       comphet_expr <- filter_expr$pass #If comphet store the expression instead of returning vars
     } else {
       PASS_group[[group_name]] <- as.data.frame(variants_df %>% filter(!!filter_expr$pass))$rec_id
       FILTER_group[[group_name]] <- as.data.frame(variants_df %>% filter(!!filter_expr$filter))$rec_id
-      message("PASS VARS ", length(PASS_group[[group_name]]))
-      message("FILTER VARS ", length(FILTER_group[[group_name]]))
+      #message("PASS VARS ", length(PASS_group[[group_name]]))
+      #message("FILTER VARS ", length(FILTER_group[[group_name]]))
     }
   }
   
