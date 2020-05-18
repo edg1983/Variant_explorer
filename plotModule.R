@@ -91,7 +91,7 @@ plotFixedUI <- function(id,plotly=FALSE) {
 ### UI with user-selectable variables for axes ###
 ##################################################
 
-plotSelectedUI <- function(id,variables,set_limits=FALSE,plotly=FALSE) {
+plotSelectedUI <- function(id,variables,set_limits=NULL,plotly=FALSE) {
   ns <- NS(id)
 
   col_size <- 12/length(variables)
@@ -110,7 +110,7 @@ plotSelectedUI <- function(id,variables,set_limits=FALSE,plotly=FALSE) {
   }
   commands_output <- tagList(fluidRow(commands_output))
   
-  if (set_limits != FALSE) {
+  if (!is.null(set_limits)) {
     for (axes in set_limits) {
       sliders_output <- tagList(sliders_output,
         column(4, 

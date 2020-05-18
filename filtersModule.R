@@ -166,7 +166,7 @@ observeFilters <- function(input, output, session, filters_settings, variants_df
   }
 }
 
-#Make quo expression combining all filters for variants and return PASS variants ids
+#Make expression combining all filters for variants and return PASS variants ids
 getPASSVars_filters <- function(input, output, session, filters_settings, variants_df, comphet_df) {
   #Make list of vars operations from config
   vars_operation <- list()
@@ -178,6 +178,7 @@ getPASSVars_filters <- function(input, output, session, filters_settings, varian
   
   #Apply filters for each group
   PASS_group <- list()
+  FILTER_group  <- list()
   comphet_expr <- NULL
   for (group_name in names(filters_settings$GROUPS)) {
     group_definition <- filters_settings$GROUPS[[group_name]]$definition
@@ -187,32 +188,37 @@ getPASSVars_filters <- function(input, output, session, filters_settings, varian
                               group_name = group_name,
                               group_definition = group_definition,
                               group_vars = group_vars,
-                              vars_operation = grp_vars_op)
+                              vars_operation = grp_vars_op,
+                              vars_definition = filters_settings$DEFINITIONS)
+    message("### - ", group_name, "EXPRESSION")
+    cat(as.character(filter_expr$pass))
     if (group_name == "comphet") {
-      comphet_expr <- filter_expr
+      comphet_expr <- filter_expr$pass #If comphet store the expression instead of returning vars
     } else {
-      PASS_group[[group_name]] <- as.data.frame(variants_df %>% filter(!!filter_expr))$rec_id
-      #message("FILTER EXPR ", group_name)
-      #cat(as.character(filter_expr))
-      #message("VARS PASS ", group_name, " ", length(PASS_group[[group_name]]))
-      #message(paste(PASS_group[[group_name]], collapse=";"))
+      PASS_group[[group_name]] <- as.data.frame(variants_df %>% filter(!!filter_expr$pass))$rec_id
+      FILTER_group[[group_name]] <- as.data.frame(variants_df %>% filter(!!filter_expr$filter))$rec_id
+      message("PASS VARS ", length(PASS_group[[group_name]]))
+      message("FILTER VARS ", length(FILTER_group[[group_name]]))
     }
   }
   
   #SINGLE VARIANTS
   #Variants passing all filters
+  
   if ("global" %in% names(PASS_group)) {
     global_pass <- PASS_group[["global"]]
-    #message("PASS VARS IN GLOBAL VARIABLE ", length(global_pass))
-    PASS_group["global"] <- NULL
-    pass_vars_ids <- unique(unlist(PASS_group)) #Merge vars for each group
-    #message("PASS VARS AFTER UNLIST ", length(pass_vars_ids))
-    pass_vars_ids <- intersectLists(pass_vars_ids, global_pass) #Intersect with vars passing global filter
-    #message("PASS VARS AFTER INTERSECT ", length(pass_vars_ids))
+    FILTER_group["global"] <- NULL
+    filtered_vars_groups <- unique(unlist(FILTER_group)) #Merge filtered vars for each group but global
+    pass_vars_ids <- setdiff(global_pass, filtered_vars_groups)
   } else {
-    pass_vars_ids <- unique(unlist(PASS_group)) #Merge vars for each group
+    filtered_vars_groups <- unique(unlist(FILTER_group)) #Merge filtered vars for each group but global
+    pass_vars_ids <- setdiff(variants_df$rec_id, filtered_vars_groups)
   }
-  #message("FINAL LIST PASS VARS FROM MODULE ", length(pass_vars_ids))
+  #  pass_vars_ids <- unique(unlist(PASS_group)) #Merge vars for each group
+  #  pass_vars_ids <- intersectLists(pass_vars_ids, global_pass) #Intersect with vars passing global filter
+  #} else {
+  #  pass_vars_ids <- unique(unlist(PASS_group)) #Merge vars for each group
+  #}
   pass_vars <- as.data.frame(variants_df %>% filter(rec_id %in% pass_vars_ids))
   
   #COMPHET VARS
@@ -230,11 +236,12 @@ getPASSVars_filters <- function(input, output, session, filters_settings, varian
   #both vars in the combo passed the general variants filters (pass_comphet)
   #at least one var in the combo pass the comphet consequence filter (comphet_required_vars)
   pass_comphet <- pass_comphet %>% filter( v1 %in% comphet_required_vars$rec_id | v2 %in% comphet_required_vars$rec_id)
-  #message("FINAL LIST PASS COMPHET FROM MODULE ", length(pass_comphet$rec_id))
+  #message("PASS COMPHET ", length(pass_comphet$rec_id))
+  
   return(list(vars=pass_vars$rec_id, comphet=pass_comphet$rec_id))
 }
 
-#Make quo expression combining all filters for genes and return PASS gene symbols
+#Make expression combining all filters for genes and return PASS gene symbols
 getPASSGenes_filters <- function(input, output, session, filters_settings, genes_scores) {
   #Make list of vars operations from config
   vars_operation <- list()
@@ -246,6 +253,7 @@ getPASSGenes_filters <- function(input, output, session, filters_settings, genes
   
   #Apply filters for each group
   PASS_group <- list()
+  FILTER_group <- list()
   for (group_name in names(filters_settings$GROUPS)) {
     group_definition <- filters_settings$GROUPS[[group_name]]$definition
     group_vars <- unlist(filters_settings$GROUPS[[group_name]]$associated_values)
@@ -254,18 +262,21 @@ getPASSGenes_filters <- function(input, output, session, filters_settings, genes
                               group_name = group_name,
                               group_definition = group_definition,
                               group_vars = group_vars,
-                              vars_operation = grp_vars_op)
-      PASS_group[[group_name]] <- as.data.frame(genes_scores %>% filter(!!filter_expr))$gene
+                              vars_operation = grp_vars_op,
+                              vars_definition = filters_settings$DEFINITIONS)
+      PASS_group[[group_name]] <- as.data.frame(genes_scores %>% filter(!!filter_expr$pass))$gene
+      FILTER_group[[group_name]] <- as.data.frame(genes_scores %>% filter(!!filter_expr$filter))$gene
   }
   
   #Genes passing all filters
   if ("global" %in% names(PASS_group)) {
     global_pass <- PASS_group[["global"]]
-    PASS_group["global"] <- NULL
-    pass_genes_ids <- unique(unlist(PASS_group)) #Merge vars for each group
-    pass_genes_ids <- intersectLists(pass_genes_ids, global_pass) #Intersect with vars passing global filter
+    FILTER_group["global"] <- NULL
+    filtered_genes_groups <- unique(unlist(FILTER_group)) #Merge filtered genes for each group but global
+    pass_genes_ids <- setdiff(global_pass, filtered_genes_groups) #Intersect with genes passing global filter
   } else {
-    pass_genes_ids <- unique(unlist(PASS_group)) #Merge vars for each group
+    filtered_genes_groups <- unique(unlist(FILTER_group)) #Merge filtered genes for each group but global
+    pass_genes_ids <- setdiff(genes_scores$gene, filtered_genes_groups)
   }
   
   #Genes passing all filters
@@ -303,4 +314,55 @@ loadSettings_filters <- function(input, output, session, filters_settings, filte
                filters_settings = filters_settings,
                filters_json = filters_json)
   }
+}
+
+#Return number of PASS and non PASS variants for each group filters
+getPASScounts_filters <- function(input, output, session, filters_settings, variants_df, comphet_df) {
+  #Make list of vars operations from config
+  vars_operation <- list()
+  for (t in names(filters_settings$DEFINITIONS)) {
+    for (v in names(filters_settings$DEFINITIONS[[t]])) {
+      vars_operation[[v]] <- filters_settings$DEFINITIONS[[t]][[v]][[2]]
+    }
+  }
+  
+  #Apply filters for each group
+  PASS_count <- list()
+  tot_count <- list()
+  comphet_expr <- NULL
+  for (group_name in names(filters_settings$GROUPS)) {
+    group_definition <- filters_settings$GROUPS[[group_name]]$definition
+    group_vars <- unlist(filters_settings$GROUPS[[group_name]]$associated_values)
+    grp_vars_op <- vars_operation[group_vars]
+    filter_expr <- callModule(getFilterExpression, group_name,
+                              group_name = group_name,
+                              group_definition = group_definition,
+                              group_vars = group_vars,
+                              vars_operation = grp_vars_op,
+                              vars_definition = filters_settings$DEFINITIONS)
+    if (group_name == "comphet") {
+      comphet_expr <- filter_expr #If comphet store the expression instead of returning vars
+    } else if (group_name == "global") {
+      tot_count[[group_name]] <- length(variants_df$rec_id)
+      PASS_count[[group_name]] <- length(as.data.frame(variants_df %>% filter(!!filter_expr))$rec_id)
+    } else {
+      group_def <- list()
+      group_def$field <- group_definition[[1]]
+      group_def$values <- group_definition[[2]]
+      groupid_expr <- expr(!!as.name(group_def$field) %in% !!group_def$values)
+      tot_count[[group_name]] <- length(as.data.frame(variants_df %>% filter(!!groupid_expr))$rec_id)
+      PASS_count[[group_name]] <- length(as.data.frame(variants_df %>% filter(!!filter_expr))$rec_id)
+    }
+  }
+  if (!is.null(comphet_expr)) {
+    comphet_required_vars <- as.data.frame(variants_df %>%
+                                             filter(!!comphet_expr) )
+  } else {
+    comphet_required_vars <- variants_df
+  }
+  pass_comphet <- comphet_df %>% filter( v1 %in% comphet_required_vars$rec_id | v2 %in% comphet_required_vars$rec_id)
+  tot_count[["comphet"]] <- length(comphet_df$rec_id)
+  PASS_count[["comphet"]] <- length(pass_comphet$rec_id)
+  
+  return(list(PASS=PASS_count,tot=tot_count))
 }

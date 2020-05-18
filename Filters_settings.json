@@ -117,12 +117,12 @@
           "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
       },
       "intronic": {
-        "definition": ["consequence", ["intronic_variant"]],
+        "definition": ["consequence", ["intron_variant"]],
         "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
       },
       "regulatory": {
-          "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant"]],
-          "associated_values": ["ReMM_score", "DANN_score", "LinSight", "PhyloP100", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
+          "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],
+          "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
       }
     },
     "PRESETS": {
@@ -132,25 +132,25 @@
           "strict": {
             "logic": "AND",
             "values": {
-                "CADD_PhredScore": 25,
-                "DANN_score": 0.9,
-                "REVEL_score": 0.6,
+                "CADD_PhredScore": 20,
+                "DANN_score": 0.8,
+                "REVEL_score": 0.8,
                 "MCAP_score": 0.025
             }
           },
           "balanced": {
             "logic": "AND",
             "values": {
-                "CADD_PhredScore": 20,
-                "DANN_score": 0.5,
-                "REVEL_score": 0.4
+                "CADD_PhredScore": 10,
+                "DANN_score": 0.3,
+                "REVEL_score": 0.3
             }
           },
           "permissive": {
-            "logic": "AND",
+            "logic": "OR",
             "values": {
-                "CADD_PhredScore": 10,
-                "DANN_score": 0.3,
+                "CADD_PhredScore": 5,
+                "DANN_score": 0.2,
                 "REVEL_score": 0.2
             }
           }
@@ -160,14 +160,14 @@
         "default": "moderate",  
         "configuration": {
           "strict": {
-              "logic": "AND",
+              "logic": "OR",
               "values": {
                   "SpliceAI_SNP_SpliceAI_max": 0.6,
-                  "SpliceAI_INDEL_SpliceAI_max": 0.25
+                  "SpliceAI_INDEL_SpliceAI_max": 0.3
               }
           },
           "moderate": {
-              "logic": "AND",
+              "logic": "OR",
               "values": {
                   "SpliceAI_SNP_SpliceAI_max": 0.2,
                   "SpliceAI_INDEL_SpliceAI_max": 0.2
@@ -210,10 +210,10 @@
                   "max_pop_af": 0.001,
                   "LowComplexity": true,
                   "SegDup": true,
-                  "CADD_PhredScore": 20
+                  "CADD_PhredScore": 10
               }
           },
-          "coding rare": {
+          "protein-altering rare": {
               "logic": "AND",
               "values": {
                   "consequence": [
@@ -224,8 +224,7 @@
                     "missense_variant"
                   ],
                   "cohort_af": 0.1,
-                  "max_pop_af": 0.01,
-                  "CADD_PhredScore": 10
+                  "max_pop_af": 0.01
               }
           },
           "balanced": {
@@ -238,11 +237,11 @@
                     "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
                     "stop_gained", "stop_lost", "start_lost",
                     "missense_variant", "synonymous_variant",
-                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
+                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant", "intron_variant"
                   ],
                   "cohort_af": 0.1,
                   "max_pop_af": 0.01,
-                  "CADD_PhredScore": 10
+                  "LowComplexity": true
               }
           },
           "rare all": {
@@ -258,8 +257,7 @@
                     "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant", "intron_variant"
                   ],
                   "cohort_af": 0.1,
-                  "max_pop_af": 0.01,
-                  "CADD_PhredScore": 10
+                  "max_pop_af": 0.01
               }
           }
         }
@@ -267,27 +265,36 @@
       "regulatory": {
         "default": "balanced",  
         "configuration": {
-          "strict": {
+          "max strict": {
               "logic": "AND",
               "values": {
                   "ReMM_score": 0.8,
                   "LinSight": 0.8,
-                  "NCBoost_score": 0.4,
+                  "NCBoost_score": 0.6,
                   "LoF_tolerance": 0.5,
                   "reg_type": "reg_db",
+                  "TFBS": true
+              }
+          },
+          "strict": {
+              "logic": "AND",
+              "values": {
+                  "ReMM_score": 0.7,
+                  "LinSight": 0.7,
+                  "NCBoost_score": 0.5,
                   "TFBS": true
               }
           },
           "balanced": {
               "logic": "AND",
               "values": {
-                  "ReMM_score": 0.5,
+                  "ReMM_score": 0.4,
                   "LinSight": 0.4,
                   "NCBoost_score": 0.4
               }
           },
           "permissive": {
-              "logic": "OR",
+              "logic": "AND",
               "values": {
                   "ReMM_score": 0.2,
                   "LinSight": 0.2,
@@ -297,7 +304,7 @@
         }
       },
       "comphet": {
-        "default": "coding",
+        "default": "all but introns",
         "configuration": {
           "LoF": {
             "logic": "AND",

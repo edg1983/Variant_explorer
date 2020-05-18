@@ -104,30 +104,53 @@ updateValues <- function(session, preset_value, preset_config, group_vars, vars_
   }
 }
 
-makeGroupExpression <- function(logic, filters_operations, filters_values) {
+makeGroupExpression <- function(logic, filters_operations, filters_values, vars_type) {
   filters_expr <- NULL
-  for (var_name in names(filters_values)) {
-    #Make the expression
-    myexpr <- makeExpression(var_name, filters_operations[[var_name]], filters_values[[var_name]])
-    if (grepl("_SNP", var_name)) {
-      myexpr <- expr((!!as.name("var_type") == "SNV" & !!myexpr))
-    } else if(grepl("_INDEL", var_name)) {
-      myexpr <- expr((!!as.name("var_type") == "INDEL" & !!myexpr))  
-    }
+  
+  #For each variant type the expression is built with the desired logic
+  #The resulting variant type expressions are then merged with AND
+  for (var_type in names(vars_type)) {
+    vars_in_type <- intersect(names(filters_values), names(vars_type[[var_type]]))
+    type_expr <- NULL
+    for (var_name in vars_in_type) {
+      #Make the expression
+      myexpr <- makeExpression(var_name, filters_operations[[var_name]], filters_values[[var_name]])
+      
+      #Check is the expression returned NULL
+      #This manage unchecked boxes for which we don't want to add any expression
+      if (!is.null(myexpr)) {
+        
+        #If the var name contains the special tag _SNP / _INDEL then expr is valid only on SNP/INDEL
+        if (grepl("_SNP", var_name)) {
+          myexpr <- expr((!!as.name("var_type") == "SNV" & !!myexpr))
+        } else if(grepl("_INDEL", var_name)) {
+          myexpr <- expr((!!as.name("var_type") == "INDEL" & !!myexpr))  
+        }
 
-    #Merge expressions using the provided logic
-    if (logic == "AND") {
+        #Merge expressions using the provided logic
+        if (logic == "AND") {
+          if (is.null(type_expr)) {
+            type_expr <- myexpr
+          } else {
+            type_expr <- expr(!!type_expr & !!myexpr)
+          }      
+        } else {
+          if (is.null(type_expr)) {
+            type_expr <- myexpr
+          } else {
+            type_expr <- expr(!!type_expr | !!myexpr)
+          }  
+        }
+      }
+    }
+    #Evaluate if the expression for the variant type is not NULL
+    #This avoid generate NULL expression when all checkboxes are false
+    if(!is.null(type_expr)){
       if (is.null(filters_expr)) {
-        filters_expr <- myexpr
+        filters_expr <- type_expr
       } else {
-        filters_expr <- expr(!!filters_expr & !!myexpr)
-      }      
-    } else {
-      if (is.null(filters_expr)) {
-        filters_expr <- myexpr
-      } else {
-        filters_expr <- expr(!!filters_expr | !!myexpr)
-      }  
+        filters_expr <- expr(!!filters_expr & !!type_expr)
+      }
     }
   }
   return(filters_expr)
@@ -169,7 +192,7 @@ evaluateCheckBox <- function(var, operator="include", value) {
   if (value == TRUE) {
     myexpr <- expr(!!(as.name(var)) == !!(as.numeric(true_value)))
   } else {
-    myexpr  = expr(!!(as.name(var)) %in% !!false_value)
+    myexpr  = NULL
   }
   return(myexpr)
 }
@@ -332,7 +355,7 @@ observeInputs <- function(input, output, session, filters_settings, na_values, v
 }
 
 #Make quo expression combining all filters for the group
-getFilterExpression <- function(input, output, session, group_name, group_definition, group_vars, vars_operation) {
+getFilterExpression <- function(input, output, session, group_name, group_definition, group_vars, vars_operation, vars_definition) {
   ns <- session$ns
   
   #Build a group_def variable with the group definition
@@ -350,27 +373,31 @@ getFilterExpression <- function(input, output, session, group_name, group_defini
     #global is a special group indicating filters that will be applied to all vars
     group_expr<- makeGroupExpression(logic = input$LOGIC,
                                      filters_operations = vars_operation,
-                                     filters_values = filters_values)
+                                     filters_values = filters_values,
+                                     vars_type = vars_definition)
+    pass_expr <- group_expr
+    filter_expr <- expr(!(!!group_expr))
   } else if (group_name == "comphet") {
     #comphet is a special group that will generate a separate expression returned for comphet
     group_expr<- makeGroupExpression(logic = input$LOGIC,
                                      filters_operations = vars_operation,
-                                     filters_values = filters_values)
+                                     filters_values = filters_values,
+                                     vars_type = vars_definition)
+    pass_expr <- group_expr
+    filter_expr <- expr(!(!!group_expr))
   } else {
     #for group filters a group_expr and a filter_expr are combined to evaluate vars only in the selected group
     groupid_expr <- expr(!!as.name(group_def$field) %in% !!group_def$values)
     groupfilters_expr <- makeGroupExpression(logic = input$LOGIC,
                                              filters_operations = vars_operation,
-                                             filters_values = filters_values)
+                                             filters_values = filters_values,
+                                             vars_type = vars_definition)
     
-    group_expr <- expr(!!groupid_expr & (!!groupfilters_expr))
+    pass_expr <- expr(!!groupid_expr & (!!groupfilters_expr))
+    filter_expr <- expr(!!groupid_expr & !(!!groupfilters_expr))
   }
   
-  #message("Quo expr ", group_name)
-  #message(group_expr)
-  #message("Quo comphet: ", final_expr$comphet)
-  
-  return(group_expr)
+  return(list(pass=pass_expr, filter=filter_expr))
 }
 
 #Return a data frame with the filters values

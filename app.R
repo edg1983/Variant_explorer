@@ -108,63 +108,63 @@ decrypt_datafile = function(inf, pwd) {
 }
 
 makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_file, BAM_path=BAM_dir, SV_file=SV_VCF) {
-header<- paste('<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
-      paste0('<Session genome="hg38" hasGeneTrack="true" hasSequenceTrack="true" locus="', region, '">'),
-      '<Resources>', sep="\n")
-resources_affected <- paste('<Resource path="', BAM_path, '/', affected_samples, '.bam"/>', collapse="\n", sep="")
-resources_unaffected <- paste('<Resource path="', BAM_path, '/', unaffected_samples, '.bam"/>', collapse="\n", sep="")
-resource_vcf <- paste0('<Resource path="', VCF_file, '"/>')
-resource_sv <- paste0('<Resource path="', SV_VCF, '"/>')
-
-VCF_panel <- paste('<Panel name="VCF_panel">',
-    paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', VCF_file, '" name="Family VCF platypus" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
-    '</Panel>',
-    sep="\n")
-
-SV_panel <- paste('<Panel name="SV_panel">',
-                   paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', SV_file, '" name="SV VCF" visible="true"/>'),
-                   '</Panel>',
-                   sep="\n")
-
-samples_panels <- NULL
-for (sample in affected_samples) {
-    panel <- paste(paste0('<Panel name="', sample,'_panel">'),
-                paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
-                paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
-                paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - affected" visible="true"/>'),
-                '</Panel>',
-                sep="\n")
-    samples_panels <- c(samples_panels, panel)
-}
-for (sample in unaffected_samples) {
-    panel <- paste(paste0('<Panel name="', sample,'_panel">'),
-                   paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
-                   paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
-                   paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - unaffected" visible="true"/>'),
-                   '</Panel>',
-                   sep="\n")
-    samples_panels <- c(samples_panels, panel)
-}
-samples_panels <- paste(samples_panels, collapse="\n")
-
-close <- paste('<Panel height="61" name="FeaturePanel" width="1235">',
-    '<Track clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" visible="true"/>',
-    '<Track clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;426.0;255,255,255;0,0,178" fontSize="10" height="35" id="hg38_genes" name="Gene" visible="true"/>',
-    '</Panel>',
-    '</Session>', 
-    sep="\n")
-
-xml_text <- paste(header, 
-                  resources_affected,
-                  resources_unaffected,
-                  resource_vcf, 
-                  resource_sv, 
-                  '</Resources>', 
-                  VCF_panel, 
-                  SV_panel, 
-                  samples_panels,
-                  close,
+  header<- paste('<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+        paste0('<Session genome="hg38" hasGeneTrack="true" hasSequenceTrack="true" locus="', region, '">'),
+        '<Resources>', sep="\n")
+  resources_affected <- paste('<Resource path="', BAM_path, '/', affected_samples, '.bam"/>', collapse="\n", sep="")
+  resources_unaffected <- paste('<Resource path="', BAM_path, '/', unaffected_samples, '.bam"/>', collapse="\n", sep="")
+  resource_vcf <- paste0('<Resource path="', VCF_file, '"/>')
+  resource_sv <- paste0('<Resource path="', SV_VCF, '"/>')
+  
+  VCF_panel <- paste('<Panel name="VCF_panel">',
+      paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', VCF_file, '" name="Family VCF platypus" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
+      '</Panel>',
+      sep="\n")
+  
+  SV_panel <- paste('<Panel name="SV_panel">',
+                     paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', SV_file, '" name="SV VCF" visible="true"/>'),
+                     '</Panel>',
+                     sep="\n")
+  
+  samples_panels <- NULL
+  for (sample in affected_samples) {
+      panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                  paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                  paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
+                  paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - affected" visible="true"/>'),
+                  '</Panel>',
                   sep="\n")
+      samples_panels <- c(samples_panels, panel)
+  }
+  for (sample in unaffected_samples) {
+      panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                     paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                     paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
+                     paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - unaffected" visible="true"/>'),
+                     '</Panel>',
+                     sep="\n")
+      samples_panels <- c(samples_panels, panel)
+  }
+  samples_panels <- paste(samples_panels, collapse="\n")
+  
+  close <- paste('<Panel height="61" name="FeaturePanel" width="1235">',
+      '<Track clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" visible="true"/>',
+      '<Track clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;426.0;255,255,255;0,0,178" fontSize="10" height="35" id="hg38_genes" name="Gene" visible="true"/>',
+      '</Panel>',
+      '</Session>', 
+      sep="\n")
+  
+  xml_text <- paste(header, 
+                    resources_affected,
+                    resources_unaffected,
+                    resource_vcf, 
+                    resource_sv, 
+                    '</Resources>', 
+                    VCF_panel, 
+                    SV_panel, 
+                    samples_panels,
+                    close,
+                    sep="\n")
 }
 
 #############################
@@ -296,6 +296,30 @@ small_vars <- app_settings$var_groups$var_type_groups$small_vars
 ##Set segregation columns names
 segregation_cols <- unlist(app_settings$segregation_cols, use.names = T)
 
+##Set 3-letter to 1-letter aa codes
+aa_codes <- list(
+  Ala= "A",
+  Arg= "R",
+  Asn= "N",
+  Asp= "D",
+  Cys= "C",
+  Glu= "E",
+  Gln= "Q",
+  Gly= "G",
+  His= "H",
+  Ile= "I",
+  Leu= "L",
+  Lys= "K",
+  Met= "M",
+  Phe= "F",
+  Pro= "P",
+  Ser= "S",
+  Thr= "T",
+  Trp= "W",
+  Tyr= "Y",
+  Val= "V"
+)
+
 ##Set reactive objects
 RV <- reactiveValues(
         notifications = list(),
@@ -336,7 +360,8 @@ ui <- dashboardPage(
         #drop-down list of cases
         selectInput("CaseCode", h3("Case code:"), choices = sort(unique(samplesID))),
         #h3("Password:"),
-        textInput("pwd","Password:",placeholder = "Enter decryption password"),
+        passwordInput("pwd","Password:"),
+        #textInput("pwd","Password:",placeholder = "Enter decryption password"),
         actionButton("decrypt_button",label = "Load data"),
         
         #Custom genomic regions
@@ -414,7 +439,7 @@ ui <- dashboardPage(
                   column(6, 
                          textAreaInput("custom_genes_txt", "Gene list:", placeholder = "Official gene symbols one per line", rows = 10, resize = "vertical"),
                          verbatimTextOutput("custom_genes_list_length"),
-                         actionButton("custom_genes_load_txt", "Load list") 
+                         actionButton("custom_genes_load_txt", "Add genes") 
                          ),
                   column(6, 
                          fileInput(inputId = "custom_genes_file",label = "Gene list file:", multiple=FALSE, accept="text/plain", placeholder = "gene list txt file"),
@@ -425,7 +450,7 @@ ui <- dashboardPage(
               box(title = "Load from PanelApp", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
                 fluidRow(
                   column(3, selectInput("panelapp_confidence", "Min confidence level:", choices = c("green" = 3, "amber" = 2), selected = "green",multiple = FALSE)),
-                  column(3, actionButton("panelapp_genes_load", "Load panelapp genes")),
+                  column(3, actionButton("panelapp_genes_load", "Add panelapp genes")),
                   column(3, actionButton("panelapp_reset", "Reset selection")),
                   column(3, verbatimTextOutput("panelapp_n_genes"))
                 ),
@@ -434,7 +459,7 @@ ui <- dashboardPage(
               ),
               box(title = "Load from ClinVar", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
                   fluidRow(
-                    column(3, actionButton("clinvar_genes_load", "Load clinvar genes")),
+                    column(3, actionButton("clinvar_genes_load", "Add clinvar genes")),
                     column(3, actionButton("clinvar_select_all", "Select all")),
                     column(3, actionButton("clinvar_reset", "Reset selection")),
                     column(3, verbatimTextOutput("clinvar_n_genes"))
@@ -444,7 +469,7 @@ ui <- dashboardPage(
               ),
               box(title = "Load from gene lists", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
                   fluidRow(
-                    column(4, actionButton("genelists_genes_load", "Load gene list genes")),
+                    column(4, actionButton("genelists_genes_load", "Add gene list genes")),
                     column(4, actionButton("genelists_reset", "Reset selection")),
                     column(4, verbatimTextOutput("genelists_n_genes"))
                   ),
@@ -453,13 +478,30 @@ ui <- dashboardPage(
               ),
               box(title = "Load from HPO terms", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
                   fluidRow(
-                    column(3, actionButton("hpo_genes_load", "Load HPO genes")),
+                    column(3, actionButton("hpo_genes_load", "Add HPO genes")),
                     column(3, actionButton("hpo_select_all", "Select all")),
                     column(3, actionButton("hpo_reset", "Reset selection")),
                     column(3, verbatimTextOutput("hpo_n_genes"))
                   ),
                   hr(),
                   DT::dataTableOutput("hpo_selection_table")
+              ),
+              box(title = "Load from HPO profile", width = 12, status = "primary", solidHeader = T, collapsed = T, collapsible = T,
+                  fluidRow(
+                    column(3, actionButton("hpo_profile_load", "Add genes HPO profile")),
+                    column(3, actionButton("hpo_profile_reset", "Reset")),
+                    column(3, verbatimTextOutput("hpo_profile_n_genes"))
+                  ),
+                  hr(),
+                  fluidRow(
+                    column(6,
+                         textAreaInput("hpo_profile_txt", "HPO IDs:", placeholder = "HPO IDs one per line", rows = 10, resize = "vertical"),
+                         uiOutput("hpo_n_min"),
+                         column(6, actionButton("hpo_profile_set", "Load terms from patient profile")),
+                         column(6, actionButton("hpo_profile_get", "Get genes for this profile"))
+                         ),
+                    column(6, DT::dataTableOutput("hpo_profile_table"))
+                  )
               )
             ),
             tabItem(tabName = "filters_overview_tab", 
@@ -514,16 +556,23 @@ ui <- dashboardPage(
             ),
             tabItem(tabName = "filter_explorer",
                     h3("Summary of filters effect"),
-                    fluidRow(column(6,withSpinner(plotlyOutput("summary_variants_filters", width = "100%"))), column(6,withSpinner(plotlyOutput("summary_genes_filters", width = "100%")))),
+                    fluidRow(
+                      column(4,withSpinner(plotOutput("summary_variants_filters", width = "100%"))), 
+                      column(4,withSpinner(plotOutput("summary_genes_filters", width = "100%"))),
+                      column(4,withSpinner(plotOutput("variants_filters_plot", width = "100%")))
+                    ),
+                    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=plot_axes[["variants_bar_options"]]), plotly=FALSE)),    
                     
-                    h3("Genes filter evaluation"),
+                    box(title = "Genes filters scatter", id = "gene_filters_scatter_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE, width = 12,
                     withSpinner(plotSelectedUI("genes_scatter", variables=list("x"=plot_axes[["genes_axes_options"]],"y"=plot_axes[["genes_axes_options"]]), plotly=TRUE)),
-                    br(),
+                    ),
                     
-                    h3("Variants filter evaluation"),
+                    box(title = "Variants filters scatter", id = "gene_filters_scatter_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE, width = 12,
                     withSpinner(plotSelectedUI("variants_scatter", variables=list("x"=plot_axes[["variants_axes_options"]],"y"=plot_axes[["variants_axes_options"]]), set_limits=c("x","y"), plotly=FALSE)),
-                    br(),
-                    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=plot_axes[["variants_bar_options"]]), plotly=FALSE))    
+                    )
+                    
             ),
             tabItem(tabName = "filter_results_genes",
                     fluidRow(
@@ -580,12 +629,15 @@ ui <- dashboardPage(
                     DT::dataTableOutput("variantsTable"),
                     h3("Filtered compound hets for the selected gene"),
                     DT::dataTableOutput("comphetTable"),
-                    fluidRow(br()),
+                    hr(),
                     fluidRow(
                         column(4, downloadObjUI("get_igv_session", label = "Download IGV session")),
                         column(4, textOutput("igv_region"))
                     ),
-                    fluidRow(hr()),
+                    br(),
+                    fluidRow(column(4, uiOutput("go_to_venus"))),
+                    
+                    hr(),
                     box(title = "PanelApp and ClinVar", id = "panelapp_clinvar_details", status = "info", solidHeader = TRUE, width = 12,
                         collapsible = TRUE, collapsed = TRUE,
                         h3("PanelApp panels"),
@@ -665,7 +717,9 @@ server <- function(input, output, session) {
         }
         if (inherits(RV$data, "list")) {
             RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
-            RV$data$segregation_df$sup_dnm <- 0
+            RV$data$variants_df$VENUS_link <- "N/A"
+            
+            #RV$data$segregation_df$sup_dnm <- 0
             RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
             RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
@@ -788,35 +842,37 @@ server <- function(input, output, session) {
             gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
     })
     
-    #TODO - FIX SUMM TABLES TO READ FROM NEW FILTERS DF
     filters_summ_genes <- reactive ({
         tot_genes <- nrow(genes_scores())
-        
-        PASS_counts <- c(
-            genes_scores() %>% filter(pLI_gnomad >= input$pLI_filter) %>% nrow(),
-            genes_scores() %>% filter(GDI_phred <= input$GDI_filter) %>% nrow(),
-            genes_scores() %>% filter(RVIS <= input$RVIS_filter) %>% nrow(),
-            genes_scores() %>% filter(EDS >= input$EDS_filter) %>% nrow() )
-    
+        PASS_count <- length(RV$genes_pass_filters)
         filters_summ_genes <- data.frame(
-            Filter=c("pLI gnomAD", "GDI phred", "RVIS", "EDS"), 
-            PASS=PASS_counts, 
-            FILTERED=(tot_genes-PASS_counts) )
-        filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)   
+            Filter=c("Genes filters"), 
+            PASS=PASS_count/tot_genes, 
+            FILTERED=(tot_genes-PASS_count)/tot_genes)
+        filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
+        filters_summ_genes$Count <- as.numeric(filters_summ_genes$Count)
+        filters_summ_genes
     })
     
     filters_summ_vars <- reactive ({
         tot_vars <- RV$data$variants_df %>% select(var_id) %>% distinct() %>% nrow()
+        comphet_seg_vars <- RV$data$comphet_df %>% filter(
+          rec_id %in% RV$vars_pass_segregation) %>% 
+          gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
         PASS_counts <- c(
-            variants_df() %>% filter(d_score >= input$d_score_filter) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(max_pop_af <= input$MaxPopAF_filter) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(consequence %in% RV$accepted_consequence) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(cohort_af <= input$CohortAF_filter) %>% select(var_id) %>% distinct() %>% nrow()
+            variants_df() %>% filter(rec_id %in% RV$vars_pass_filters$vars) %>% select(var_id) %>% distinct() %>% nrow(),
+            variants_df() %>% filter(rec_id %in% RV$vars_pass_GQ) %>% select(var_id) %>% distinct() %>% nrow(),
+            variants_df() %>% filter(rec_id %in% c(RV$vars_pass_segregation, comphet_seg_vars$VarID)) %>% select(var_id) %>% distinct() %>% nrow(),
+            variants_df() %>% filter(rec_id %in% RV$vars_pass_ROH) %>% select(var_id) %>% distinct() %>% nrow(),
+            variants_df() %>% filter(rec_id %in% RV$vars_pass_BED) %>% select(var_id) %>% distinct() %>% nrow()
         )
-        filters_summ_vars <- data.frame(Filter=c("d score","MaxPop AF","consequence","cohort AF"),
-            PASS=PASS_counts, 
-            FILTERED=(tot_vars-PASS_counts))
+        filters_summ_vars <- data.frame(Filter=c("variants","GQ","segregation","ROH","custom BED"),
+            PASS=PASS_counts/tot_vars, 
+            FILTERED=(tot_vars-PASS_counts)/tot_vars)
+        
         filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
+        filters_summ_vars$Count <- as.numeric(filters_summ_vars$Count)
+        filters_summ_vars
     })
     
     PanelApp_panels_df <- reactive ({
@@ -1097,6 +1153,57 @@ server <- function(input, output, session) {
       genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
     })
     
+    ### HPO PROFILE SELECTION ###
+    observeEvent(input$hpo_profile_load,{
+      shiny::req(nrow(hpo_profile_genes()) > 0)
+      hpo_profile_df <- data.frame(gene=hpo_profile_genes()$gene, source="HPO_profile", stringsAsFactors = F)
+      RV$custom_genes <- rbind(RV$custom_genes, hpo_profile_df) %>% distinct()
+    })
+    
+    observeEvent(input$hpo_profile_reset, {
+      updateTextAreaInput(session, "hpo_profile_txt", value = "")
+    })
+    
+    output$hpo_profile_n_genes <- renderText({
+      paste0(nrow(hpo_profile_genes()), " genes to be imported")  
+    })
+    
+    observeEvent(input$hpo_profile_set, {
+      req(inherits(RV$data, "list"))
+      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == input$CaseCode])
+      updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
+    })
+    
+    observeEvent(input$hpo_profile_get, {
+      genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
+      hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"] 
+    })
+    
+    output$hpo_n_min <- renderUI({
+      n_hpos <- length(hpo_terms_in_profile())
+      selectInput("hpo_n_min_select", "Select genes associated to at least N HPOs:", choices = seq(0,n_hpos), selected = 1, multiple = FALSE)  
+    }) 
+    
+    hpo_terms_in_profile <- reactive({
+      unlist(strsplit(input$hpo_profile_txt, "\n"))  
+    })
+    
+    hpo_profile_genes <- reactive({
+      HPO_genes %>% 
+        filter(HPO_id %in% hpo_terms_in_profile()) %>% 
+        group_by(gene) %>% 
+        mutate(N_HPOs = n()) %>% 
+        select(gene, N_HPOs) %>%
+        filter(N_HPOs >= input$hpo_n_min_select) %>%
+        distinct()
+    })
+    
+    output$hpo_profile_table <- DT::renderDataTable(selection="none", {
+      req(nrow(hpo_profile_genes()) > 0)
+      hpo_profile_genes()
+    })
+    
+    
     ######################
     ### Filters Overview
     ######################
@@ -1112,7 +1219,7 @@ server <- function(input, output, session) {
       
       #GENE SCORES FILTER
       RV$genes_pass_filters <- callModule(getPASSGenes_filters, "genes_filters", filters_settings$GENES, RV$data$genes_scores)
-      message("PASS GENES ", length(RV$genes_pass_filters))
+      message("PASS GENES FILTERS ", length(RV$genes_pass_filters))
       
       #SEGREGATION FILTER
       RV$vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
@@ -1327,30 +1434,47 @@ server <- function(input, output, session) {
     ### Filter Explorer tab
     ########################
     
-    output$summary_variants_filters <- renderPlotly({
-        ggplotly(
-            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        )
+    output$summary_variants_filters <- renderPlot({
+        req(nrow(filters_summ_vars())>0)
+        #ggplotly(dynamicTicks = T,
+            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class,label=round(Count,2))) + geom_bar(stat="identity") + 
+              geom_label(data=filters_summ_vars() %>% filter(Class=="PASS")) + 
+              labs(y="% variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        #)
     })
     
-    output$summary_genes_filters <- renderPlotly({
-        ggplotly(
-            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class)) + geom_bar(stat="identity") + labs(y="N genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        )
+    output$summary_genes_filters <- renderPlot({
+        req(nrow(filters_summ_genes())>0)
+        #ggplotly(dynamicTicks = T,
+            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class, label=round(Count,3))) + geom_bar(stat="identity") + 
+              geom_label(data=filters_summ_genes() %>% filter(Class=="PASS")) +
+              labs(y="% genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
+        #)
     })
     
-    #output$genes_scatter <- renderPlotly({
-    #    ggplotly(
-    #        ggplot(genes_scores(), aes_string(x=input$genes_X_axis, y=input$genes_Y_axis, color="Class", label="gene")) + geom_point(size=1) 
-    #    )
-    #})
+    output$variants_filters_plot <- renderPlot({
+      req(inherits(RV$data,"list"))
+      counts <- callModule(getPASScounts_filters,"variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
+      print(str(counts))
+      counts_df <- NULL
+      for (n in names(counts$tot)) {
+        counts_df <- rbind(counts_df, c(n,counts$PASS[[n]],counts$tot[[n]]))
+      }
+      counts_df <- as.data.frame(counts_df, stringsAsFactors=F)
+      counts_df$V2 <- as.numeric(counts_df$V2)
+      counts_df$V3 <- as.numeric(counts_df$V3)
+      counts_df$pct <- counts_df$V2/counts_df$V3
+      ggplot(counts_df, aes(x=V1, y=pct, label=round(pct,3))) + geom_bar(stat="identity") + geom_label() + 
+        labs(y="% variants", x="filter group", title="Variants filter groups") + 
+        theme(axis.text.x=element_text(angle=45, hjust = 1))
+    })
     
     callModule(plotModule, "genes_scatter", plot_data = genes_scores(), missingValues = c(99,-99), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))
     callModule(plotModule, "variants_scatter", plot_data = variants_df(), missingValues = c(99,-99), plotType = "bigdata", variables = list("color"="Class", "size" = 1))
     callModule(plotModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
     
     ########################
-    ### Filter Results tab
+    ### Results GENES tab
     ########################
     
     output$GADO_rank <- renderPlotly({
@@ -1419,7 +1543,7 @@ server <- function(input, output, session) {
     zip_archive = paste0(input$CaseCode, ".results.zip") )
     
     ########################
-    ### Variants Results tab
+    ### Results VARIANTS tab
     ########################
     
     variants_pass_df <- reactive ({
@@ -1436,12 +1560,12 @@ server <- function(input, output, session) {
         as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))   
     })
     
-    output$vars_results_table <- DT::renderDataTable(selection="single", 
+    output$vars_results_table <- DT::renderDataTable(selection="single",
                                             options = list(
                                                 scrollX = TRUE,
                                                 pageLength = 25,
                                                 lengthMenu = c(25, 50, 100, 200)), 
-                        {
+                         {
                             variants_pass_df()
                         })
     
@@ -1530,15 +1654,30 @@ server <- function(input, output, session) {
     ### Gene detail tab
     ####################
     
-    #genedetail_tab <- reactive ({
-    #    candidate_genes_df()
-    #})
-    
     gene_name <- reactive ({
         symbol = candidate_genes_df()[input$genesTable_rows_selected, "gene"]
         updateSelectInput(session = session, inputId = "chr_coverage",selected = genes_bed$V1[genes_bed$V4 == symbol])
         RV$selected_gene <- symbol
         candidate_genes_df()[input$genesTable_rows_selected, "gene"]
+    })
+    
+    venus_link <- reactive({
+      aa_changes <- unique(c(gene_comphet_vars_df()$aa_change[input$comphetTable_rows_selected], gene_vars_df()$aa_change[input$variantsTable_rows_selected]))
+      links <- list()
+      for (aa_change in aa_changes)
+        if (!is.na(aa_change)) {
+          aa_change <- unlist(strsplit(aa_change,","))[1]
+          id <- aa_change
+          transcript_id <- unlist(strsplit(aa_change,":"))[1]
+          aa_change <- unlist(strsplit(aa_change,":"))[2]
+          aa_change <- gsub("p\\.","",aa_change)
+          aa <- str_extract_all(aa_change, "[A-Za-z]{3}")[[1]]
+          pos <- str_extract(aa_change, "\\d+")
+          aa_change <- paste0(aa_codes[[aa[1]]],pos,aa_codes[[aa[2]]])
+          url_link <- paste0("https://michelanglo.sgc.ox.ac.uk/venus_transcript?enst=",transcript_id, "&mutation=", aa_change, "&redirect")
+          links[[id]] <- url_link
+        }
+      return(links)
     })
     
     output$Gene_symbol <- renderText({
@@ -1611,14 +1750,16 @@ server <- function(input, output, session) {
     })
     
     output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
-        panelID <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "panel_idx"]
-        shiny::validate(need(length(panelID)>0, "No PanelApp panels for this gene"))
+      req(gene_name() != "" & !is.null(gene_name()))  
+      gene_df <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), c("entity_name","panel_idx","confidence_level")]
+        shiny::validate(need(nrow(gene_df)>0, "No PanelApp panels for this gene"))
         
-        conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
-        df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
-        df$gene <- gene_name()
-        df$confidence_level <- conf_level
-        df[,c("gene","confidence_level","id","name","disease_group","version","relevant_disorders")]
+        #conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
+        #df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
+        df <- merge(gene_df, PanelApp_panels_df(), by.x="panel_idx", by.y="id")
+        #df$gene <- gene_name()
+        #df$confidence_level <- conf_level
+        df[,c("entity_name","confidence_level","panel_idx","name","disease_group","version","relevant_disorders")]
     })
     
     output$clinvar_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
@@ -1627,7 +1768,7 @@ server <- function(input, output, session) {
     
     output$genelists_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
         listID <- geneLists_genes[geneLists_genes$entity_name == gene_name(), "genelist_idx"]
-        geneLists_df()[geneLists_df()$id == listID,]
+        geneLists_df()[geneLists_df()$id %in% listID,]
     })
     
     output$hpo_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
@@ -1665,6 +1806,23 @@ server <- function(input, output, session) {
     
     callModule(downloadObj, id="get_igv_session", output_prefix= IGV_session()$outfile, output_data=IGV_session()$session_xml, col_names=FALSE)
 
+    output$go_to_venus <- renderUI ({
+      req(length(venus_link())>0)
+      message(str(venus_link()))
+      mybutton <- list()
+      for (i in 1:length(venus_link())) {
+        mybutton[[paste0("venus_",i)]] <- actionButton(paste0("venus_",i), 
+                                              paste0("VENUS prediction for ", names(venus_link())[i]), 
+                                              onclick =paste0("window.open('", venus_link()[[i]], "', '_blank')"))
+      }
+      col_dimension <- ceiling(12 / length(venus_link()))
+      buttons_row <- NULL
+      for (n in names(mybutton)) {
+        buttons_row <- tagList(buttons_row,tagList(column(col_dimension, mybutton[[n]], align="center")))
+      }
+      fluidRow(buttons_row)
+    })
+    
     output$igv_region <- renderText({
         paste0("Generated session: ", IGV_session()$outfile)
     })
