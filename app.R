@@ -60,7 +60,7 @@ source("filtersModule.R")
 #################
 ### Constants ###
 #################
-APP_VERSION <- "1.1.0"
+APP_VERSION <- "1.1.1"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -1506,8 +1506,9 @@ server <- function(input, output, session) {
         as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% select(-Class))
     })
     
-    output$genesTable <- DT::renderDataTable(selection="single", {
-        candidate_genes_df()
+    output$genesTable <- DT::renderDataTable({
+      na_values <- unique(unlist(app_settings$fill_na$fill_na_genes))
+      datatable(candidate_genes_df(), selection="single") %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
     })
     
     genesTable_proxy <- DT::dataTableProxy("genesTable")
@@ -1516,8 +1517,9 @@ server <- function(input, output, session) {
         candidate_genes_df() %>% filter(gene %in% RV$custom_genes$gene)
     })
     
-    output$customGenesTable <- DT::renderDataTable(selection="single", {
-        customGenesTable_df()
+    output$customGenesTable <- DT::renderDataTable({
+      na_values <- unique(unlist(app_settings$fill_na$fill_na_genes))
+      datatable(customGenesTable_df(), selection="single") %>% formatStyle(names(customGenesTable_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
     })
     
     observeEvent(input$customGenesTable_rows_selected, {
@@ -1560,23 +1562,22 @@ server <- function(input, output, session) {
         as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))   
     })
     
-    output$vars_results_table <- DT::renderDataTable(selection="single",
-                                            options = list(
-                                                scrollX = TRUE,
-                                                pageLength = 25,
-                                                lengthMenu = c(25, 50, 100, 200)), 
-                         {
-                            variants_pass_df()
-                        })
+    output$vars_results_table <- DT::renderDataTable({
+       na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+       na_values <- na_values[na_values != 0]
+       datatable(variants_pass_df(), 
+                 selection="single",
+                 options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
+         formatStyle(names(variants_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+    })
     
-    output$comphet_results_table <- DT::renderDataTable(selection="single",
-                                               options = list(
-                                                   scrollX = TRUE,
-                                                   pageLength = 20,
-                                                   lengthMenu = c(20, 50, 100, 200)), 
-                            {
-                                comphet_pass_df()  
-                            })
+    output$comphet_results_table <- DT::renderDataTable({
+      na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+      datatable(comphet_pass_df(), 
+                selection="single",
+                options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>% 
+        formatStyle(names(comphet_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+    })
     
     observeEvent(input$comphet_results_table_rows_selected, {
         gene_name <- comphet_pass_df()[input$comphet_results_table_rows_selected, "gene.x"]
@@ -1738,15 +1739,25 @@ server <- function(input, output, session) {
     
     output$variantsTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
         #shiny::validate(need(gene_name != "", 'No gene selected'))
-        
-        as.data.frame(gene_vars_df())
+        na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+        na_values <- na_values[na_values != 0]
+        datatable(gene_vars_df(), 
+                selection="multiple",
+                options = list(scrollX = TRUE)) %>%
+        formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+        #as.data.frame(gene_vars_df())
     })
     
     output$comphetTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
         #shiny::validate(need(gene_name != "", 'No gene selected'))
         shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
-
-        as.data.frame(gene_comphet_vars_df())
+        na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+        na_values <- na_values[na_values != 0]
+        datatable(gene_comphet_vars_df(), 
+                selection="multiple",
+                options = list(scrollX = TRUE)) %>%
+        formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+        #as.data.frame(gene_comphet_vars_df())
     })
     
     output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {

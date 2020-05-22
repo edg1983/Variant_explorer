@@ -9,11 +9,11 @@ operations <- c("equal" = "==", "greater than" = ">=", "less than" = "<=")
 #When NOT_ALLOWED is provided as value the filter is set to == 0 for the corresponding column
 selectFilter <- function(var,operator,value) {
   switch(operator,
-         "==" = { myexpr <- quo((!!(as.name(var))) == !!(as.numeric(value))) },
-         ">" = { myexpr <- quo((!!(as.name(var))) > !!(as.numeric(value))) },
-         "<" = { myexpr <- quo((!!(as.name(var))) < !!(as.numeric(value))) },
-         ">=" = { myexpr <- quo((!!(as.name(var))) >= !!(as.numeric(value))) },
-         "<=" = { myexpr <- quo((!!(as.name(var))) <= !!(as.numeric(value))) }
+         "==" = { myexpr <- expr(!!as.name(var) == !!as.numeric(value)) },
+         ">" = { myexpr <- expr(!!as.name(var) > !!as.numeric(value)) },
+         "<" = { myexpr <- expr(!!as.name(var) < !!as.numeric(value)) },
+         ">=" = { myexpr <- expr(!!as.name(var) >= !!as.numeric(value)) },
+         "<=" = { myexpr <- expr(!!as.name(var) <= !!as.numeric(value)) }
   )
 
   return(myexpr)
@@ -66,23 +66,23 @@ segregationModule <- function(input, output, session, segregation_df, cols_names
   seg_vars_list <- NULL
   
   #First evalute comphet (comphet must have all het and hom cols equal to zero)
-  het_expr <- quo(!!selectFilter(cols_names["het_affected"], "==", "0") &
+  het_expr <- expr(!!selectFilter(cols_names["het_affected"], "==", "0") &
                     !!selectFilter(cols_names["het_unaffected"], "==", "0"))
-  hom_expr <- quo(!!selectFilter(cols_names["hom_affected"], "==", "0") &
+  hom_expr <- expr(!!selectFilter(cols_names["hom_affected"], "==", "0") &
                     !!selectFilter(cols_names["hom_unaffected"], "==", "0"))
   comphet_expr <- selectFilter(cols_names["comphet_affected"], input$comphet_affected_op, input$comphet_affected)
-  segregation_expr <- quo(!!het_expr & !!hom_expr & !!comphet_expr)
+  segregation_expr <- expr(!!het_expr & !!hom_expr & !!comphet_expr)
   seg_vars <- as.data.frame(segregation_df %>% filter(!!segregation_expr))
   seg_vars_list <- c(seg_vars_list,seg_vars$rec_id)
   
   #Then evaluate het and hom calls with AND logic (comphet col must be zero)
-  het_expr <- quo(!!selectFilter(cols_names["het_affected"], input$het_affected_op, input$het_affected) &
+  het_expr <- expr(!!selectFilter(cols_names["het_affected"], input$het_affected_op, input$het_affected) &
                     !!selectFilter(cols_names["het_unaffected"], input$het_unaffected_op, input$het_unaffected))
-  hom_expr <- quo(!!selectFilter(cols_names["hom_affected"], input$hom_affected_op, input$hom_affected) &
+  hom_expr <- expr(!!selectFilter(cols_names["hom_affected"], input$hom_affected_op, input$hom_affected) &
                     !!selectFilter(cols_names["hom_unaffected"], input$hom_unaffected_op, input$hom_unaffected))
   dnm_expr <- selectFilter(cols_names["dnm_affected"], input$dnm_affected_op, input$dnm_affected)
   comphet_expr <- selectFilter(cols_names["comphet_affected"], "==", "0")
-  segregation_expr <- quo(!!het_expr & !!hom_expr & !!comphet_expr & !!dnm_expr)
+  segregation_expr <- expr(!!het_expr & !!hom_expr & !!comphet_expr & !!dnm_expr)
   seg_vars <- as.data.frame(segregation_df %>% filter(!!segregation_expr))
   seg_vars_list <- c(seg_vars_list,seg_vars$rec_id)
   
