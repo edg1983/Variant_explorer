@@ -139,4 +139,6 @@ CaseID	Disease	HPO	Created_by
 065DSA001	Diffuse Skeletal Angiomatosis	HP:0002833,HP:0001028,HP:0100764	Edoardo
 066GCD001	Genetic Cholestatic Disease and Biliary Fibrosis	HP:0001080,HP:0006571,HP:0002611	Deirdre
 066NNC001	Neonatal Cholestasis with mild biliary changes and splenomegaly	HP:0001396,HP:0001744	Deirdre
+066NNC002	Neonatal Cholestasis	HP:0001406,HP:0000989,HP:0030984	Carme
 066NNH001	Neonatal Haemochromatosis	HP:0001394,HP:0001395,HP:0001404,HP:0001643,HP:0012465	Deirdre
+066PIC001	Progressive familial intrahepatic cholestasis	HP:0003510,HP:0001508,HP:0001394,HP:0002630,HP:0001744,HP:0002014,HP:0004322	Carme

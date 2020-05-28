@@ -259,6 +259,7 @@ GADO_file <- gzfile(getResource("GADO_distribution.tsv.gz"))
 gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors = F)
 
 ##Load HPO data
+message("Load HPO profiles")
 HPO_obo <- get_OBO(paste0(HPO_dir, "/hp.obo"))
 HPO_obo <- as.data.frame(HPO_obo$name)
 HPO_obo$HPO_id <- rownames(HPO_obo)
@@ -917,12 +918,12 @@ server <- function(input, output, session) {
     
     output$Disease <- renderText({
       shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-      disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == input$CaseCode])
+      disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == RV$data$pedigree])
     })
 
     output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
       shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == input$CaseCode])
+      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
       HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
     })
 
@@ -1170,7 +1171,7 @@ server <- function(input, output, session) {
     
     observeEvent(input$hpo_profile_set, {
       req(inherits(RV$data, "list"))
-      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == input$CaseCode])
+      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
       updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
     })
     
