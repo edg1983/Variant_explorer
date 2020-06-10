@@ -14,7 +14,7 @@ loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
   #message("Loading ", dataF)
   if ( endsWith(dataF, ".gz") ) {
     dat_file = paste0('zgrep -v "', skipchar, '" ', dataF)
-    dat = fread(dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F,)
+    dat = fread(cmd=dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F,)
   } else {
     dat = fread(dataF, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
   }
@@ -40,6 +40,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args)<2) {
   stop("Usage as follow:
        Prepare_data.R output_dir config_file.tsv/project_dir
+       Prepare_data.R output_dir project_dir var2reg_idx_file
        You can provide either a project folder OR a config file.
        If project folder is provided the script expects data to be distributed in standard sub-folders
        config_file is a tab-separated file containing the following columns:
@@ -54,8 +55,14 @@ if (file_test("-d", args[2])) {
   from_config = FALSE
   project_dir = args[2]
   
-  message("No config file provided. Reading from standard folder")
+  message("No config file provided. Reading from project standard folders")
   message("Output folder: ", output_dir)
+  if (file_test("-f", paste0(project_dir,"/var2reg/",args[3]))) {
+    var2
+    message("var2reg index file: ", paste0(project_dir,"/var2reg/",args[3])) 
+  } else {
+    stop("Provided var2reg idx file not found in var2reg folder")
+  }
   
 } else if (file_test("-f", args[2])) {
   config <- read.table(args[2], sep="\t", header=T, stringsAsFactors = F)
@@ -77,7 +84,7 @@ if (from_config==TRUE) {
   roh_suffix <- "_ROH_full"
   ExpHunter_dir <- paste0(project_dir,"/Expansion_hunter")
 
-  idx_file <- paste0(var2reg_dir, "/cohort_deepvariant.v2r.idx.tsv.gz")
+  idx_file <- paste0(var2reg_dir, "/", args[3])
   idx_df <- loadData(idx_file)
   message("Loaded var2reg idx file containing ", nrow(idx_df), " dataset")
   
@@ -271,7 +278,10 @@ if (from_config==TRUE) {
       newlist$ped <- NA
     })
       
-    #Save encrypted object
+    #Load known vars data
+    newlist$known_vars <- loadData(newlist$known_variant_file)
+    
+    #Save data object
     save_results <- saveData(newlist,outf=out_file)
     if (save_results == 1) {
       saved_files = saved_files + 1
