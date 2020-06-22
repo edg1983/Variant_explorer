@@ -237,7 +237,7 @@
                     "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
                     "stop_gained", "stop_lost", "start_lost",
                     "missense_variant", "synonymous_variant",
-                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant", "intron_variant"
+                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
                   ],
                   "cohort_af": 0.1,
                   "max_pop_af": 0.01,
@@ -263,42 +263,42 @@
         }
       },
       "regulatory": {
-        "default": "balanced",  
+        "default": "FDR 50%",  
         "configuration": {
           "max strict": {
               "logic": "AND",
               "values": {
-                  "ReMM_score": 0.8,
-                  "LinSight": 0.8,
-                  "NCBoost_score": 0.6,
+                  "ReMM_score": 0.95,
+                  "LinSight": 0.9,
+                  "NCBoost_score": 0.4,
                   "LoF_tolerance": 0.5,
                   "reg_type": "reg_db",
                   "TFBS": true
               }
           },
-          "strict": {
-              "logic": "AND",
+          "max accuracy": {
+              "logic": "OR",
               "values": {
-                  "ReMM_score": 0.7,
-                  "LinSight": 0.7,
-                  "NCBoost_score": 0.5,
+                  "ReMM_score": 0.95,
+                  "LinSight": 0.9,
+                  "NCBoost_score": 0.4,
                   "TFBS": true
               }
           },
-          "balanced": {
-              "logic": "AND",
+          "FDR 50%": {
+              "logic": "OR",
               "values": {
-                  "ReMM_score": 0.4,
-                  "LinSight": 0.4,
-                  "NCBoost_score": 0.4
+                  "ReMM_score": 0.9,
+                  "LinSight": 0.8,
+                  "NCBoost_score": 0.25
               }
           },
-          "permissive": {
-              "logic": "AND",
+          "TPR 90%": {
+              "logic": "OR",
               "values": {
                   "ReMM_score": 0.2,
-                  "LinSight": 0.2,
-                  "NCBoost_score": 0.2
+                  "LinSight": 0.06,
+                  "NCBoost_score": 0.06
               }
           }
         }

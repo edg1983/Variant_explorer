@@ -37,10 +37,10 @@ saveData = function(myobj, outf) {
 
 args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args)<2) {
+if (length(args)<3) {
   stop("Usage as follow:
-       Prepare_data.R output_dir config_file.tsv/project_dir
-       Prepare_data.R output_dir project_dir var2reg_idx_file
+       Prepare_data.R output_dir config_file.tsv releaseID
+       Prepare_data.R output_dir project_dir var2reg_idx_file releaseID
        You can provide either a project folder OR a config file.
        If project folder is provided the script expects data to be distributed in standard sub-folders
        config_file is a tab-separated file containing the following columns:
@@ -54,17 +54,18 @@ output_dir <- args[1]
 if (file_test("-d", args[2])) {
   from_config = FALSE
   project_dir = args[2]
+  releaseID <- args[4]
   
   message("No config file provided. Reading from project standard folders")
   message("Output folder: ", output_dir)
   if (file_test("-f", paste0(project_dir,"/var2reg/",args[3]))) {
-    var2
     message("var2reg index file: ", paste0(project_dir,"/var2reg/",args[3])) 
   } else {
     stop("Provided var2reg idx file not found in var2reg folder")
   }
   
 } else if (file_test("-f", args[2])) {
+  releaseID <- args[3]
   config <- read.table(args[2], sep="\t", header=T, stringsAsFactors = F)
   from_config = TRUE
   
@@ -99,6 +100,7 @@ if (from_config==TRUE) {
   for (n in 1:nrow(idx_df)) {
     #convert idx df to list
     newlist <- as.list(idx_df[n,])
+    newlist$releaseID <- releaseID
     message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
     
     #Set out file and skip if already present
@@ -280,6 +282,9 @@ if (from_config==TRUE) {
       
     #Load known vars data
     newlist$known_vars <- loadData(newlist$known_variant_file)
+    newlist$known_vars <- newlist$known_vars %>% separate_rows(known_ids, sep=",")
+    newlist$known_clinvar <- newlist$known_vars[grep("CV[0-9]+",newlist$known_vars$known_ids,perl = T),]
+    newlist$known_cosmic <- newlist$known_vars[grep("COSV[0-9]+",newlist$known_vars$known_ids,perl = T),]
     
     #Save data object
     save_results <- saveData(newlist,outf=out_file)

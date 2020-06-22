@@ -9,16 +9,13 @@
 # data frames are saved only if nrow > 0
 
 # Examples #
-# 1. single file tsv output 
+# 1. single file output 
 # callModule(downloadObj, id="download", output_prefix="myprefix.tsv", output_data=data.frame)
 # ==> myprefix.tsv
-# 2. single file tsv, zip archive output 
+# 2. single file, zip archive output 
 # callModule(downloadObj, id="download", output_prefix="myprefix.tsv", output_data=data.frame, zip_archive="myarchive.zip")
 # ==> myarchive.zip [myprefix.tsv]
-# 3. multiple tsv files
-# callModule(downloadObj, id="download", output_prefix="myprefix", output_data=list("file1.tsv" = data.frame1, "file2.tsv" = data.frame2)) 
-# ==> myprefix.file1.tsv, myprefix.file2.tsv
-# 4. multiple tsv files compressed in zip archive
+# 4. multiple files compressed in zip archive
 # callModule(downloadObj, id="download", output_prefix="myprefix", output_data=list("file1.tsv" = data.frame1, "file2.tsv" = data.frame2), zip_archive="myarchive.zip")
 # ==> myarchive.zip [myprefix.file1.tsv, myprefix.file2.tsv]
 
@@ -60,7 +57,7 @@ downloadObj <- function(input, output, session, output_prefix, output_data, sep=
       #  (output_prefix != "" & !is.null(output_prefix)) & 
       #    (inherits(output_data, "list") | inherits(output_data,"data.frame")), FALSE))
       if (is.null(zip_archive)) {
-          saveData(output_data, file=file, sep=sep, col_names = col_names)
+        saveData(output_data, file=file, sep=sep, col_names = col_names)
       } else {
         tmp_prefix <- paste0(tempdir(), "/", output_prefix)
         if (inherits(output_data, "list") == TRUE) {
