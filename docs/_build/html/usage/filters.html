@@ -92,7 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="filters_explorer.html">Filters explorer panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="filters_results.html">Filters results panel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gene_details.html">Gene details panel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="JIGV.html">Use the JIGV script</a></li>
+<li class="toctree-l1"><a class="reference internal" href="IGV_session.html">IGV session file</a></li>
 </ul>
 
             
@@ -179,59 +179,15 @@ Annotated for gene consequence as
 <h2>Variants filters<a class="headerlink" href="#variants-filters" title="Permalink to this headline">¶</a></h2>
 <p>Variants filters are applied separately for specific variant group, so that each group of filters act only on the relevant variants.
 Variants group are defined as follows:</p>
-<ol class="arabic">
+<ol class="arabic simple">
 <li><dl class="simple">
 <dt>splicing</dt><dd><p>Variants in splicing site or splicing region (10 bp from exon-intron junctions)</p>
 </dd>
 </dl>
 </li>
 <li><p>missense</p></li>
-<li><dl>
+<li><dl class="simple">
 <dt>regulatory regions</dt><dd><p>Any variant located in one of the annotated regulatory regions (enhancer, promoter, silencer, insulator)</p>
-<blockquote>
-<div><dl>
-<dt>pass_vars &lt;- as.data.frame(vars_in_regions %&gt;%</dt><dd><dl>
-<dt>filter(! (</dt><dd><p>d_score &lt; input$d_score_filter |
-consequence %nin% RV$accepted_consequence |
-max_pop_af &gt; input$MaxPopAF_filter |
-cohort_af &gt; input$CohortAF_filter |
-SegDup %nin% var_reg_anno$SegDup |
-LowComplexity %nin% var_reg_anno$LowComplexity |
-TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
-(reg_type == “splicing” &amp;</p>
-<blockquote>
-<div><dl class="simple">
-<dt>(SpliceAI_SNP_SpliceAI_max &lt; input$spliceAI_filter &amp;</dt><dd><p>SpliceAI_INDEL_SpliceAI_max &lt; input$spliceAI_filter) ) |</p>
-</dd>
-</dl>
-</div></blockquote>
-<dl>
-<dt>(consequence == “missense_variant” &amp;</dt><dd><dl class="simple">
-<dt>(CADD_PhredScore &lt; input$CADD_filter &amp;</dt><dd><p>REVEL_score &lt; input$REVEL_filter &amp;
-MCAP_score &lt; input$MCAP_filter &amp;
-DANN_score &lt; input$DANN_filter)) |</p>
-</dd>
-</dl>
-</dd>
-<dt>(consequence %in% reg_vars &amp;</dt><dd><dl class="simple">
-<dt>(ReMM_score &lt; input$ReMM_filter |</dt><dd><p>LinSight &lt; input$LinSight_filter |
-PhyloP100 &lt; input$PhyloP100_filter |
-LoF_tolerance &gt; input$LoFtolerance_filter) &amp;</p>
-</dd>
-</dl>
-<p>rec_id %nin% accepted_reg_recid &amp;
-reg_type %nin% RV$accepted_connected_gene &amp;
-TFBS %nin% NC_reg_anno$TFBS &amp;
-DNase %nin% NC_reg_anno$DNase &amp;
-UCNE %nin% NC_reg_anno$UCNE)</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>)))</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd>
 </dl>
 </li>

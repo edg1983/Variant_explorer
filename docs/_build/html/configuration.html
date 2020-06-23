@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration &mdash; Variant Explorer v1.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview panel" href="usage/overview.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Variant Explorer
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#app-configuration">App_configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-sections">Configuration sections:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#filters-configuration">Filters configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/overview.html">Overview panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/filters.html">Filters panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/filters_explorer.html">Filters explorer panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/filters_results.html">Filters results panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/gene_details.html">Gene details panel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/IGV_session.html">IGV session file</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Variant Explorer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Variant Explorer is fully configurable editing the 2 configuration files present in the app folder.</p>
+<ol class="arabic simple">
+<li><p><strong>App_configuration.json</strong>: configure app options for plotting and some expected columns</p></li>
+<li><p><strong>Filters_settings.json</strong>: configure filters and presets</p></li>
+</ol>
+<p>However, some columns are always expected in the input data:</p>
+<ul class="simple">
+<li><p>rec_id: unique ID of the specific line</p></li>
+<li><p>var_id: unique ID of the variant</p></li>
+<li><p>consequence: consequence of the variant</p></li>
+<li><p>var_type: variant type (like SNV, INDEL, etc)</p></li>
+<li><p>chrom,pos,ref,alt: genomic coordinates, ref and alt alleles</p></li>
+<li><p>gene: affected gene</p></li>
+<li><p>GT_sampleID: genotype for each sample</p></li>
+<li><p>GQ_sampleID: GQ for each sample</p></li>
+</ul>
+<div class="section" id="app-configuration">
+<h2>App_configuration<a class="headerlink" href="#app-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The app configuration is a standard json file organized as follows</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;var_groups&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;consequence_groups&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;group1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;consequence1&quot;</span><span class="p">,</span><span class="s2">&quot;consequence2&quot;</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;var_type_groups&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;group1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;var_type1&quot;</span><span class="p">,</span><span class="s2">&quot;var_type2&quot;</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">},</span>
+<span class="nt">&quot;segregation_cols&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;het_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;het_aff&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;het_unaffected&quot;</span><span class="p">:</span> <span class="s2">&quot;het_unaff&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;hom_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;hom_aff&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;hom_unaffected&quot;</span><span class="p">:</span> <span class="s2">&quot;hom_unaff&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;comphet_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;comphet_aff&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;dnm_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;sup_dnm&quot;</span>
+<span class="p">},</span>
+<span class="nt">&quot;plot_axes&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;genes_axes_options&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;label1&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label2&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name2&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;variants_axes_options&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;label1&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label2&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name2&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;variants_bar_options&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;label1&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label2&quot;</span><span class="p">:</span> <span class="s2">&quot;col_name2&quot;</span>
+    <span class="p">}</span>
+<span class="p">},</span>
+<span class="nt">&quot;fill_na&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;fill_na_vars&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;col_name1&quot;</span><span class="p">:</span> <span class="s2">&quot;replace value1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;col_name2&quot;</span><span class="p">:</span> <span class="s2">&quot;replace value2&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;fill_na_genes&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;col_name1&quot;</span><span class="p">:</span> <span class="s2">&quot;replace value1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;col_name2&quot;</span><span class="p">:</span> <span class="s2">&quot;replace value2&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="configuration-sections">
+<h3>Configuration sections:<a class="headerlink" href="#configuration-sections" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl>
+<dt>“var_groups”:</dt><dd><dl class="simple">
+<dt>“consequence_groups”:</dt><dd><p>a series of lists defining variants groups based on variant consequence
+<code class="docutils literal notranslate"><span class="pre">&quot;lof_vars&quot;:</span> <span class="pre">[&quot;frameshift&quot;,</span> <span class="pre">&quot;exonic_sv&quot;,&quot;stop</span> <span class="pre">lost&quot;,&quot;stop</span> <span class="pre">gain&quot;,&quot;start</span> <span class="pre">loss&quot;,&quot;splice_acceptor_variant&quot;,&quot;splice_donor_variant&quot;]</span></code></p>
+</dd>
+<dt>“var_type_groups”:</dt><dd><p>a series of lists defining variants groups based on variant type
+<code class="docutils literal notranslate"><span class="pre">&quot;sv_vars&quot;:</span> <span class="pre">[&quot;DEL&quot;,&quot;DUP&quot;,&quot;INV&quot;,&quot;DEL:ME&quot;]</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt>“segregation_cols”:</dt><dd><p>definition of the columns containing counts of affected/unaffected carriers for each genotype</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;het_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;het_aff&quot;</span><span class="p">,</span>
+<span class="nt">&quot;het_unaffected&quot;</span><span class="p">:</span> <span class="s2">&quot;het_unaff&quot;</span><span class="p">,</span>
+<span class="nt">&quot;hom_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;hom_aff&quot;</span><span class="p">,</span>
+<span class="nt">&quot;hom_unaffected&quot;</span><span class="p">:</span> <span class="s2">&quot;hom_unaff&quot;</span><span class="p">,</span>
+<span class="nt">&quot;comphet_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;comphet_aff&quot;</span><span class="p">,</span>
+<span class="nt">&quot;dnm_affected&quot;</span><span class="p">:</span> <span class="s2">&quot;sup_dnm&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>“plot_axes”:</dt><dd><p>This section define the columns used to generate overview and filters plots for genes and variants</p>
+<dl>
+<dt>“genes_axes_options”:</dt><dd><p>Columns used in the genes filters scatter-plots, in the formate label: column_name.
+The labels are shown in a drop-down box to configure the corresponding plot
+Example:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;GADO Zscore&quot;</span><span class="p">:</span> <span class="s2">&quot;gado_zscore&quot;</span><span class="p">,</span>
+<span class="nt">&quot;Exomiser Pheno score&quot;</span><span class="p">:</span> <span class="s2">&quot;exomiser_gene_pheno_score&quot;</span><span class="p">,</span>
+<span class="nt">&quot;gnomAD pLI&quot;</span><span class="p">:</span> <span class="s2">&quot;pLI_gnomad&quot;</span><span class="p">,</span>
+<span class="nt">&quot;GDI phred&quot;</span><span class="p">:</span> <span class="s2">&quot;GDI_phred&quot;</span><span class="p">,</span>
+<span class="nt">&quot;RVIS intolerance&quot;</span><span class="p">:</span> <span class="s2">&quot;RVIS&quot;</span><span class="p">,</span>
+<span class="nt">&quot;EDS reg space score&quot;</span><span class="p">:</span> <span class="s2">&quot;EDS&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>“variants_axes_options”:</dt><dd><p>Columns used in the variants filters scatter-plots, in the formate label: column_name.
+The labels are shown in a drop-down box to configure the corresponding plot
+Example:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;Maximum population AF&quot;</span><span class="p">:</span> <span class="s2">&quot;max_pop_af&quot;</span><span class="p">,</span>
+<span class="nt">&quot;CADD phred&quot;</span><span class="p">:</span> <span class="s2">&quot;CADD_PhredScore&quot;</span><span class="p">,</span>
+<span class="nt">&quot;DANN score&quot;</span><span class="p">:</span> <span class="s2">&quot;DANN_score&quot;</span><span class="p">,</span>
+<span class="nt">&quot;ReMM score&quot;</span><span class="p">:</span> <span class="s2">&quot;ReMM_score&quot;</span><span class="p">,</span>
+<span class="nt">&quot;SpliceAI score&quot;</span><span class="p">:</span> <span class="s2">&quot;SpliceAI_SNP_SpliceAI_max&quot;</span><span class="p">,</span>
+<span class="nt">&quot;REVEL score&quot;</span><span class="p">:</span> <span class="s2">&quot;REVEL_score&quot;</span><span class="p">,</span>
+<span class="nt">&quot;MCAP score&quot;</span><span class="p">:</span> <span class="s2">&quot;MCAP_score&quot;</span><span class="p">,</span>
+<span class="nt">&quot;LinSight score&quot;</span><span class="p">:</span> <span class="s2">&quot;LinSight&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>“variants_bar_options”:</dt><dd><p>Columns used in the variants filters bar plots, in the formate label: column_name.
+The labels are shown in a drop-down box to configure the corresponding plot
+Example:</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;Region type&quot;</span><span class="p">:</span> <span class="s2">&quot;reg_type&quot;</span><span class="p">,</span>
+<span class="nt">&quot;Variant consequence&quot;</span><span class="p">:</span> <span class="s2">&quot;consequence&quot;</span><span class="p">,</span>
+<span class="nt">&quot;Variant type&quot;</span><span class="p">:</span> <span class="s2">&quot;var_type&quot;</span><span class="p">,</span>
+<span class="nt">&quot;PanelApp&quot;</span><span class="p">:</span> <span class="s2">&quot;PanelApp&quot;</span><span class="p">,</span>
+<span class="nt">&quot;Chromosome&quot;</span><span class="p">:</span> <span class="s2">&quot;chr&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>“fill_na”:</dt><dd><p>This section define how to fill NA values for gene and variants scores.
+For each column it is possible to assign a specific value to replace NAs</p>
+<dl>
+<dt>“fill_na_vars”:</dt><dd><p>NA replacement values for variants table, in the format col_name: replace_value
+Example</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;max_pop_af&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="nt">&quot;cohort_af&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="nt">&quot;DANN_score&quot;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+<span class="nt">&quot;CADD_PhredScore&quot;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+<span class="nt">&quot;PhyloP100&quot;</span><span class="p">:</span> <span class="mi">-99</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt>“fill_na_genes”:</dt><dd><p>NA replacement values for genes table, in the format col_name: replace_value
+Example</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;GDI_phred&quot;</span><span class="p">:</span> <span class="mi">-99</span><span class="p">,</span>
+<span class="nt">&quot;RVIS&quot;</span><span class="p">:</span> <span class="mi">-99</span><span class="p">,</span>
+<span class="nt">&quot;pLI_gnomad&quot;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span>
+<span class="nt">&quot;EDS&quot;</span><span class="p">:</span> <span class="mi">99</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="filters-configuration">
+<h2>Filters configuration<a class="headerlink" href="#filters-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The app configuration is a standard json file organized as follows</p>
+<div class="highlight-JSON notranslate"><div class="highlight"><pre><span></span>&quot;GENES&quot;: {
+    &quot;DEFINITIONS&quot;: {
+        &quot;numeric_fields&quot;: {
+            &quot;col_name1&quot;: [&quot;label1&quot;, &quot;&gt;=&quot;, &quot;default_value&quot;],
+            &quot;col_name2&quot;: [&quot;label2&quot;, &quot;&lt;&quot;, &quot;default_value&quot;]
+        }
+    },
+    &quot;GROUPS&quot;: {
+        &quot;global&quot;: {
+            &quot;associated_values&quot;: [&quot;col_name1&quot;, &quot;col_name2&quot;]
+        }
+    },
+    &quot;PRESETS&quot;: {
+        &quot;global&quot;: {
+            &quot;default&quot;: &quot;preset1&quot;,
+            &quot;configuration&quot;: {
+                &quot;preset1&quot;: {
+                    &quot;logic&quot;: &quot;OR&quot;,
+                    &quot;values&quot; : {
+                        &quot;column1&quot;: value1,
+                        &quot;column2&quot;: value1
+                    }
+                },
+                &quot;preset2&quot;: {
+                    &quot;logic&quot;: &quot;OR&quot;,
+                    &quot;values&quot; : {
+                        &quot;column1&quot;: value2,
+                        &quot;column2&quot;: value2
+                    }
+                }
+            }
+        }
+    }
+},
+&quot;VARIANTS&quot;: {
+    &quot;DEFINITIONS&quot;: {
+        &quot;numeric_fields&quot;: {
+            &quot;col_name1&quot;: [&quot;label1&quot;, &quot;&gt;=&quot;, &quot;default_value&quot;],
+            &quot;col_name2&quot;: [&quot;label2&quot;, &quot;&lt;&quot;, &quot;default_value&quot;]
+        },
+        &quot;factors_fields&quot;: {
+            &quot;col_name1&quot;: [&quot;label1&quot;, &quot;%in%&quot;, &quot;default_value&quot;],
+            &quot;col_name2&quot;: [&quot;label2&quot;, &quot;grep&quot;, &quot;default_value&quot;]
+        },
+        &quot;binary_fields&quot;: {
+            &quot;col_name1&quot;: [&quot;label1&quot;, &quot;include&quot;, &quot;default_true/false&quot;],
+            &quot;col_name2&quot;: [&quot;label2&quot;, &quot;exclude&quot;, &quot;default_true/false&quot;]
+        }
+    },
+    &quot;FACTORSMAP&quot;: {
+        &quot;col_name1&quot;: {
+            &quot;label1&quot;: &quot;factor1&quot;,
+            &quot;label2&quot;: &quot;factor2&quot;,
+        },
+        &quot;reg_type&quot;: {
+            &quot;Closest gene&quot;:  &quot;closest_gene&quot;,
+            &quot;From database&quot;: &quot;reg_db&quot;
+        }
+    },
+    &quot;GROUPS&quot;: {
+        &quot;global&quot;: {
+            &quot;associated_values&quot;: [&quot;col_name1&quot;,&quot;col_name2&quot;]
+        },
+        &quot;group1&quot;: {
+            &quot;definition&quot;: [&quot;consequence&quot;, [&quot;value1&quot;,&quot;value2&quot;]],
+            &quot;associated_values&quot;: [&quot;col_name1&quot;,&quot;col_name2&quot;]
+        }
+    },
+    &quot;PRESETS&quot;: {
+    &quot;global&quot;: {
+        &quot;default&quot;: &quot;strict&quot;,
+        &quot;configuration&quot;: {
+            &quot;strict&quot;: {
+                &quot;logic&quot;: &quot;AND&quot;,
+                &quot;values&quot;: {
+                    &quot;column1&quot;: value1,
+                    &quot;column2&quot;: value1
+                }
+            },
+            &quot;balanced&quot;: {
+                &quot;logic&quot;: &quot;AND&quot;,
+                &quot;values&quot;: {
+                    &quot;column1&quot;: value2,
+                    &quot;column2&quot;: value2
+                }
+            }
+        }
+    },
+    &quot;group1&quot;: {
+        &quot;default&quot;: &quot;balanced&quot;,
+        &quot;configuration&quot;: {
+            &quot;strict&quot;: {
+                &quot;logic&quot;: &quot;AND&quot;,
+                &quot;values&quot;: {
+                    &quot;column1&quot;: value1,
+                    &quot;column2&quot;: value1
+                }
+            },
+            &quot;balanced&quot;: {
+                &quot;logic&quot;: &quot;AND&quot;,
+                &quot;values&quot;: {
+                    &quot;column1&quot;: value2,
+                    &quot;column2&quot;: value2
+                }
+            }
+        }
+    }
+},
+&quot;TOOLTIPS&quot;: {
+    &quot;col_name1&quot;: &quot;tooltip_text_1&quot;,
+    &quot;col_name2&quot;: &quot;tooltip_text_2&quot;
+}
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="usage/overview.html" class="btn btn-neutral float-right" title="Overview panel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Edoardo Giacopuzzi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

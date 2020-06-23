@@ -11,6 +11,7 @@ Welcome to Variant Explorer's documentation!
     :caption: Contents:
     
     installation
+    configuration
     usage/overview
     usage/filters
     usage/filters_explorer

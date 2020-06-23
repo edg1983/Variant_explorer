@@ -33,35 +33,3 @@ Variants group are defined as follows:
 2. missense
 3. regulatory regions 
      Any variant located in one of the annotated regulatory regions (enhancer, promoter, silencer, insulator)
-
-
-
-
-            pass_vars <- as.data.frame(vars_in_regions %>% 
-                filter(! (
-                    d_score < input$d_score_filter | 
-                    consequence %nin% RV$accepted_consequence |
-                    max_pop_af > input$MaxPopAF_filter |
-                    cohort_af > input$CohortAF_filter |
-                    SegDup %nin% var_reg_anno$SegDup |
-                    LowComplexity %nin% var_reg_anno$LowComplexity |
-                    TopVariableGenes %nin% var_reg_anno$TopVariableGenes |
-                    (reg_type == "splicing" & 
-                         (SpliceAI_SNP_SpliceAI_max < input$spliceAI_filter & 
-                              SpliceAI_INDEL_SpliceAI_max < input$spliceAI_filter) ) |
-                    (consequence == "missense_variant" &
-                         (CADD_PhredScore < input$CADD_filter & 
-                              REVEL_score < input$REVEL_filter &
-                              MCAP_score < input$MCAP_filter &
-                              DANN_score < input$DANN_filter)) |
-                    (consequence %in% reg_vars &
-                         (ReMM_score < input$ReMM_filter |
-                              LinSight < input$LinSight_filter |
-                              PhyloP100 < input$PhyloP100_filter |
-                              LoF_tolerance > input$LoFtolerance_filter) &
-                         rec_id %nin% accepted_reg_recid &
-                         reg_type %nin% RV$accepted_connected_gene &
-                         TFBS %nin% NC_reg_anno$TFBS &
-                         DNase %nin% NC_reg_anno$DNase &
-                         UCNE %nin% NC_reg_anno$UCNE)
-                )))

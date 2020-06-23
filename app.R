@@ -2,7 +2,7 @@
 # Author: Edoardo Giacopuzzi
 # Explore and filter annotated variants from V2
 
-# Input are encrypted RData objects created with Prepare_data.R
+# Input are encrypted RData objects created with Prepare_Rdata_object.R 
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
 
 ##########################################
@@ -774,9 +774,9 @@ server <- function(input, output, session) {
             RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
             #RV$data$variants_df$VENUS_link <- "N/A"
             
-            RV$data$known_vars <- RV$data$known_vars %>% separate_rows(known_ids, sep=",")
-            RV$data$known_clinvar <- RV$data$known_vars[grep("CV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
-            RV$data$known_cosmic <- RV$data$known_vars[grep("COSV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
+            #RV$data$known_vars <- RV$data$known_vars %>% separate_rows(known_ids, sep=",")
+            #RV$data$known_clinvar <- RV$data$known_vars[grep("CV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
+            #RV$data$known_cosmic <- RV$data$known_vars[grep("COSV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
 
             #RV$data$segregation_df$sup_dnm <- 0
             RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0

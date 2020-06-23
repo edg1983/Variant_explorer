@@ -23,7 +23,7 @@ Download and install the following programs if you don’t have them already
 2. `Rtools v3.5 <https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe>`_
     When prompted for installation path use a folder name without blank spaces
     Check the option “Add Rtools to PATH” when asked
-3. `R studio v1.2 <https://download1.rstudio.org/desktop/windows/RStudio-1.2.5033.exe>`_
+3. `R studio v1.2 win <https://download1.rstudio.org/desktop/windows/RStudio-1.2.5033.exe>`_
 
 MacOS system
 ------------
@@ -33,7 +33,7 @@ Download and install the following programs if you don’t have them already
 1. R v3.6.3
     `Normal version <https://cran.rstudio.com/bin/macosx/R-3.6.3.nn.pkg>`_ or
     `Catalina version <https://cran.rstudio.com/bin/macosx/R-3.6.3.pkg>`_
-2. `R studio v1.2 <https://download1.rstudio.org/desktop/macos/RStudio-1.2.5033.dmg>`_
+2. `R studio v1.2 mac <https://download1.rstudio.org/desktop/macos/RStudio-1.2.5033.dmg>`_
 
 Linux system
 ------------
@@ -60,4 +60,4 @@ Run the app for the first time
     Answer yes if prompted to install new shiny packages or compile from source.
 
 The first time you run the app, it will install all the additional packages needed, so it could require some time.
-Then the installation is done, the app will start automatically
+When the installation is done, the app will start automatically
