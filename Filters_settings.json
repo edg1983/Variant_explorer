@@ -1,381 +1,383 @@
-{
-  "GENES": {
-    "DEFINITIONS": {
-      "numeric_fields": { 
-          "pLI_gnomad": ["Min gnomAD pLI", ">=", 0],
-          "RVIS": ["Max RVIS intolerance", "<=", "max"],
-          "GDI_phred": ["Max Gene Damage Index", "<=", "max"],
-          "EDS": ["Min EDS score", ">=", 0]
-      }
-    },
-    "GROUPS": {
-      "global": {
-        "associated_values": ["pLI_gnomad", "GDI_phred", "RVIS", "EDS"]    
-      }
-    },
-    "PRESETS": {
-      "global": {
-        "default": "no filter",  
-        "configuration": {
-          "no filter": {
-            "logic": "OR",
-            "values" : {
-              "pLI_gnomad": 0,
-              "EDS": 0
-            }
-          },
-          "intolerant": {
-            "logic": "AND",
-            "values": {
-              "pLI_gnomad": 0.8,
-              "GDI_phred": 10,
-              "RVIS": 0
-            }
-          },
-          "highly intolerant": {
-            "logic": "AND",
-            "values": {
-              "pLI_gnomad": 0.9,
-              "GDI_phred": 13.84,
-              "RVIS": -0.4
+  {
+    "GENES": {
+      "DEFINITIONS": {
+        "numeric_fields": { 
+            "pLI_gnomad": ["Min gnomAD pLI", ">=", 0],
+            "RVIS": ["Max RVIS intolerance", "<=", "max"],
+            "GDI_phred": ["Max Gene Damage Index", "<=", "max"],
+            "EDS": ["Min EDS score", ">=", 0]
+        }
+      },
+      "GROUPS": {
+        "global": {
+          "associated_values": ["pLI_gnomad", "GDI_phred", "RVIS", "EDS"]    
+        }
+      },
+      "PRESETS": {
+        "global": {
+          "default": "no filter",  
+          "configuration": {
+            "no filter": {
+              "logic": "OR",
+              "values" : {
+                "pLI_gnomad": 0,
+                "EDS": 0
+              }
+            },
+            "intolerant": {
+              "logic": "AND",
+              "values": {
+                "pLI_gnomad": 0.8,
+                "GDI_phred": 10,
+                "RVIS": 0
+              }
+            },
+            "highly intolerant": {
+              "logic": "AND",
+              "values": {
+                "pLI_gnomad": 0.9,
+                "GDI_phred": 13.84,
+                "RVIS": -0.4
+              }
             }
           }
         }
       }
-    }
-  },
-  "VARIANTS": {
-    "DEFINITIONS": {
-      "numeric_fields": { 
-          "d_score": ["Min var2reg d-score",">=", 0],
-          "max_pop_af": ["Max population AF", "<=" , "max"],
-          "cohort_af": ["Max cohort AF", "<=", "max"],
-          "CADD_PhredScore": ["Min CADD Phred",">=", 0],
-          "DANN_score": ["Min DANN score",">=", 0],
-          "CCR_pct": ["Conserved Coding Region pct",">=", 0],
-          "LinSight": ["Min LinSight score",">=", 0],
-          "ReMM_score": ["Min ReMM score",">=", 0],
-          "PhyloP100": ["Min PhyloP100", ">=", "min"],
-          "LoF_tolerance": ["Max LoF tolerance", "<=", 1],
-          "REVEL_score": ["Min REVEL score",">=", 0],
-          "MCAP_score": ["Min MCAP score", ">=", 0],
-          "SpliceAI_SNP_SpliceAI_max": ["Min SpliceAI score SNP",">=", 0],
-          "SpliceAI_INDEL_SpliceAI_max": ["Min SpliceAI score INDEL",">=", 0],
-          "NCBoost_score": ["Min NCBoost score",">=", 0]
-      },
-      "factors_fields": {
-        "consequence": ["Consequence", "%in%", "ALL"],
-        "var_type": ["Variant type", "%in%", "ALL"],
-        "reg_type": ["Gene association", "%in%", "ALL"],
-        "db_source": ["Data source", "grep", "SPLIT ,"]
-      },
-      "binary_fields": {
-          "LowMappability": ["exclude low mappability regions", "exclude", false],
-          "LowComplexity": ["exclude low complexity regions", "exclude", false],
-          "SegDup": ["exclude segmental Duplication", "exclude", false],
-          "TFBS": ["include TF binding site", "include", false],
-          "DNase": ["include DNase peak", "include", false],
-          "UCNE": ["include ultra-conserved element", "include", false]
-      }
     },
-    "FACTORSMAP": {
-      "db_source": {
-          "ENCODE cCREs": "BENGI", 
-          "FOCS": "FOCS", 
-          "HACER": "HACER", 
-          "FANTOM5": "FANTOM5", 
-          "Ensembl Regulatory": "EnsemblRegBuild",
-          "RefSeq Regulatory": "RefSeqRegBuild",
-          "VISTA enhancers": "VISTA",
-          "EPD6 promoters": "EPD6",
-          "ENCODE HMM profile": "ENCODE-HMM",
-          "DeepLearning DECRES": "DECRES",
-          "SegWey Encyclopedia": "SegWey",
-          "CRISPRi-FlowFISH": "FulcoEtAl2019",
-          "CRISPR-Perturb": "GasperiniEtAl2019",
-          "Hi-C screening": "JungEtAl2019",
-          "Databases": ["ENCODE cCREs", "Ensembl Regulatory", "FANTOM5", "FOCS", "HACER", "RefSeq Regulatory", "VISTA enhancers", "EPD6 promoters"],
-          "Computational": ["ENCODE HMM profile", "DeepLearning DECRES", "SegWey Encyclopedia"],
-          "Experimental": ["CRISPRi-FlowFISH", "CRISPR-Perturb", "Hi-C screening"]
+    "VARIANTS": {
+      "DEFINITIONS": {
+        "numeric_fields": { 
+            "d_score": ["Min var2reg d-score",">=", 0],
+            "max_pop_af": ["Max population AF", "<=" , "max"],
+            "cohort_af": ["Max cohort AF", "<=", "max"],
+            "CADD_PhredScore": ["Min CADD Phred",">=", 0],
+            "DANN_score": ["Min DANN score",">=", 0],
+            "CCR_pct": ["Conserved Coding Region pct",">=", 0],
+            "LinSight": ["Min LinSight score",">=", 0],
+            "ReMM_score": ["Min ReMM score",">=", 0],
+            "PhyloP100": ["Min PhyloP100", ">=", "min"],
+            "LoF_tolerance": ["Max LoF tolerance", "<=", 1],
+            "REVEL_score": ["Min REVEL score",">=", 0],
+            "MCAP_score": ["Min MCAP score", ">=", 0],
+            "SpliceAI_SNP_SpliceAI_max": ["Min SpliceAI score SNP",">=", 0],
+            "SpliceAI_INDEL_SpliceAI_max": ["Min SpliceAI score INDEL",">=", 0],
+            "NCBoost_score": ["Min NCBoost score",">=", 0],
+            "cohort_hom" : ["Max N hom","<=", "max"],
+            "cohort_het" : ["Max N het","<=", "max"]
+        },
+        "factors_fields": {
+          "consequence": ["Consequence", "%in%", "ALL"],
+          "var_type": ["Variant type", "%in%", "ALL"],
+          "reg_type": ["Gene association", "%in%", "ALL"],
+          "db_source": ["Data source", "grep", "SPLIT ,"]
+        },
+        "binary_fields": {
+            "LowMappability": ["exclude low mappability regions", "exclude", false],
+            "LowComplexity": ["exclude low complexity regions", "exclude", false],
+            "SegDup": ["exclude segmental Duplication", "exclude", false],
+            "TFBS": ["include TF binding site", "include", false],
+            "DNase": ["include DNase peak", "include", false],
+            "UCNE": ["include ultra-conserved element", "include", false]
+        }
       },
-      "reg_type": {
-        "Closest gene":  "closest_gene", 
-        "From database": "reg_db"
-      }
-    },
-    "GROUPS": {
-      "global": {
-           "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "d_score", "LowMappability", "LowComplexity", "SegDup", "CADD_PhredScore"]
+      "FACTORSMAP": {
+        "db_source": {
+            "ENCODE cCREs": "BENGI", 
+            "FOCS": "FOCS", 
+            "HACER": "HACER", 
+            "FANTOM5": "FANTOM5", 
+            "Ensembl Regulatory": "EnsemblRegBuild",
+            "RefSeq Regulatory": "RefSeqRegBuild",
+            "VISTA enhancers": "VISTA",
+            "EPD6 promoters": "EPD6",
+            "ENCODE HMM profile": "ENCODE-HMM",
+            "DeepLearning DECRES": "DECRES",
+            "SegWey Encyclopedia": "SegWey",
+            "CRISPRi-FlowFISH": "FulcoEtAl2019",
+            "CRISPR-Perturb": "GasperiniEtAl2019",
+            "Hi-C screening": "JungEtAl2019",
+            "Databases": ["ENCODE cCREs", "Ensembl Regulatory", "FANTOM5", "FOCS", "HACER", "RefSeq Regulatory", "VISTA enhancers", "EPD6 promoters"],
+            "Computational": ["ENCODE HMM profile", "DeepLearning DECRES", "SegWey Encyclopedia"],
+            "Experimental": ["CRISPRi-FlowFISH", "CRISPR-Perturb", "Hi-C screening"]
+        },
+        "reg_type": {
+          "Closest gene":  "closest_gene", 
+          "From database": "reg_db"
+        }
       },
-      "comphet": {"associated_values": ["consequence"] },
-      "missense": {
-          "definition": ["consequence", ["missense_variant"]],
-          "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
-      },
-      "splice": {
-          "definition": ["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+      "GROUPS": {
+        "global": {
+             "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "d_score", "LowMappability", "LowComplexity", "SegDup", "CADD_PhredScore", "cohort_het", "cohort_hom"]
+        },
+        "comphet": {"associated_values": ["consequence"] },
+        "missense": {
+            "definition": ["consequence", ["missense_variant"]],
+            "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
+        },
+        "splice": {
+            "definition": ["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+            "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
+        },
+        "intronic": {
+          "definition": ["consequence", ["intron_variant"]],
           "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
-      },
-      "intronic": {
-        "definition": ["consequence", ["intron_variant"]],
-        "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
-      },
-      "regulatory": {
-          "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],
-          "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
-      }
-    },
-    "PRESETS": {
-      "missense": {
-        "default": "balanced",
-        "configuration": {
-          "strict": {
-            "logic": "AND",
-            "values": {
-                "CADD_PhredScore": 20,
-                "DANN_score": 0.8,
-                "REVEL_score": 0.8,
-                "MCAP_score": 0.025
-            }
-          },
-          "balanced": {
-            "logic": "AND",
-            "values": {
-                "CADD_PhredScore": 10,
-                "DANN_score": 0.3,
-                "REVEL_score": 0.3
-            }
-          },
-          "permissive": {
-            "logic": "OR",
-            "values": {
-                "CADD_PhredScore": 5,
-                "DANN_score": 0.2,
-                "REVEL_score": 0.2
-            }
-          }
+        },
+        "regulatory": {
+            "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],
+            "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
         }
       },
-      "splice": {
-        "default": "moderate",  
-        "configuration": {
-          "strict": {
+      "PRESETS": {
+        "missense": {
+          "default": "balanced",
+          "configuration": {
+            "strict": {
+              "logic": "AND",
+              "values": {
+                  "CADD_PhredScore": 20,
+                  "DANN_score": 0.8,
+                  "REVEL_score": 0.8,
+                  "MCAP_score": 0.025
+              }
+            },
+            "balanced": {
+              "logic": "AND",
+              "values": {
+                  "CADD_PhredScore": 10,
+                  "DANN_score": 0.3,
+                  "REVEL_score": 0.3
+              }
+            },
+            "permissive": {
               "logic": "OR",
               "values": {
-                  "SpliceAI_SNP_SpliceAI_max": 0.6,
+                  "CADD_PhredScore": 5,
+                  "DANN_score": 0.2,
+                  "REVEL_score": 0.2
+              }
+            }
+          }
+        },
+        "splice": {
+          "default": "moderate",  
+          "configuration": {
+            "strict": {
+                "logic": "OR",
+                "values": {
+                    "SpliceAI_SNP_SpliceAI_max": 0.6,
+                    "SpliceAI_INDEL_SpliceAI_max": 0.3
+                }
+            },
+            "moderate": {
+                "logic": "OR",
+                "values": {
+                    "SpliceAI_SNP_SpliceAI_max": 0.2,
+                    "SpliceAI_INDEL_SpliceAI_max": 0.2
+                }
+            }
+          }
+        },
+        "intronic": {
+          "default": "strict",
+          "configuration": {
+            "strict": {
+              "logic": "OR",
+              "values": {
+                  "SpliceAI_SNP_SpliceAI_max": 0.8,
                   "SpliceAI_INDEL_SpliceAI_max": 0.3
               }
-          },
-          "moderate": {
+            },
+            "moderate": {
               "logic": "OR",
               "values": {
-                  "SpliceAI_SNP_SpliceAI_max": 0.2,
+                  "SpliceAI_SNP_SpliceAI_max": 0.4,
                   "SpliceAI_INDEL_SpliceAI_max": 0.2
               }
-          }
-        }
-      },
-      "intronic": {
-        "default": "strict",
-        "configuration": {
-          "strict": {
-            "logic": "OR",
-            "values": {
-                "SpliceAI_SNP_SpliceAI_max": 0.8,
-                "SpliceAI_INDEL_SpliceAI_max": 0.3
-            }
-          },
-          "moderate": {
-            "logic": "OR",
-            "values": {
-                "SpliceAI_SNP_SpliceAI_max": 0.4,
-                "SpliceAI_INDEL_SpliceAI_max": 0.2
             }
           }
-        }
-      },
-      "global": {
-        "default": "balanced",  
-        "configuration": {
-          "LoF strict": {
-              "logic": "AND",
-              "values": {
-                  "consequence": [
-                    "exonic_sv",
-                    "frameshift_variant",
-                    "splice_acceptor_variant", "splice_donor_variant",
-                    "stop_gained", "stop_lost", "start_lost"
-                  ],
-                  "cohort_af": 0.05,
-                  "max_pop_af": 0.001,
-                  "LowComplexity": true,
-                  "SegDup": true,
-                  "CADD_PhredScore": 10
-              }
-          },
-          "protein-altering rare": {
-              "logic": "AND",
-              "values": {
-                  "consequence": [
-                    "exonic_sv",
-                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
-                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
-                    "stop_gained", "stop_lost", "start_lost",
-                    "missense_variant"
-                  ],
-                  "cohort_af": 0.1,
-                  "max_pop_af": 0.01
-              }
-          },
-          "balanced": {
-              "logic": "AND",
-              "values": {
-                  "consequence": [
-                    "exonic_sv", "utr_sv",
-                    "3_prime_UTR_variant", "5_prime_UTR_variant",
-                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
-                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
-                    "stop_gained", "stop_lost", "start_lost",
-                    "missense_variant", "synonymous_variant",
-                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
-                  ],
-                  "cohort_af": 0.1,
-                  "max_pop_af": 0.01,
-                  "LowComplexity": true
-              }
-          },
-          "rare all": {
-              "logic": "AND",
-              "values": {
-                  "consequence": [
-                    "exonic_sv", "utr_sv", "intronic_sv",
-                    "3_prime_UTR_variant", "5_prime_UTR_variant",
-                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
-                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
-                    "stop_gained", "stop_lost", "start_lost",
-                    "missense_variant", "synonymous_variant",
-                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant", "intron_variant"
-                  ],
-                  "cohort_af": 0.1,
-                  "max_pop_af": 0.01
-              }
+        },
+        "global": {
+          "default": "balanced",  
+          "configuration": {
+            "LoF strict": {
+                "logic": "AND",
+                "values": {
+                    "consequence": [
+                      "exonic_sv",
+                      "frameshift_variant",
+                      "splice_acceptor_variant", "splice_donor_variant",
+                      "stop_gained", "stop_lost", "start_lost"
+                    ],
+                    "cohort_af": 0.05,
+                    "max_pop_af": 0.001,
+                    "LowComplexity": true,
+                    "SegDup": true,
+                    "CADD_PhredScore": 10
+                }
+            },
+            "protein-altering rare": {
+                "logic": "AND",
+                "values": {
+                    "consequence": [
+                      "exonic_sv",
+                      "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                      "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                      "stop_gained", "stop_lost", "start_lost",
+                      "missense_variant"
+                    ],
+                    "cohort_af": 0.1,
+                    "max_pop_af": 0.01
+                }
+            },
+            "balanced": {
+                "logic": "AND",
+                "values": {
+                    "consequence": [
+                      "exonic_sv", "utr_sv",
+                      "3_prime_UTR_variant", "5_prime_UTR_variant",
+                      "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                      "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                      "stop_gained", "stop_lost", "start_lost",
+                      "missense_variant", "synonymous_variant",
+                      "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
+                    ],
+                    "cohort_af": 0.1,
+                    "max_pop_af": 0.01,
+                    "LowComplexity": true
+                }
+            },
+            "rare all": {
+                "logic": "AND",
+                "values": {
+                    "consequence": [
+                      "exonic_sv", "utr_sv", "intronic_sv",
+                      "3_prime_UTR_variant", "5_prime_UTR_variant",
+                      "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                      "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                      "stop_gained", "stop_lost", "start_lost",
+                      "missense_variant", "synonymous_variant",
+                      "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant", "intron_variant"
+                    ],
+                    "cohort_af": 0.1,
+                    "max_pop_af": 0.01
+                }
+            }
           }
-        }
-      },
-      "regulatory": {
-        "default": "FDR 50%",  
-        "configuration": {
-          "max strict": {
+        },
+        "regulatory": {
+          "default": "FDR 50%",  
+          "configuration": {
+            "max strict": {
+                "logic": "AND",
+                "values": {
+                    "ReMM_score": 0.95,
+                    "LinSight": 0.9,
+                    "NCBoost_score": 0.4,
+                    "LoF_tolerance": 0.5,
+                    "reg_type": "reg_db",
+                    "TFBS": true
+                }
+            },
+            "max accuracy": {
+                "logic": "OR",
+                "values": {
+                    "ReMM_score": 0.95,
+                    "LinSight": 0.9,
+                    "NCBoost_score": 0.4,
+                    "TFBS": true
+                }
+            },
+            "FDR 50%": {
+                "logic": "OR",
+                "values": {
+                    "ReMM_score": 0.9,
+                    "LinSight": 0.8,
+                    "NCBoost_score": 0.25
+                }
+            },
+            "TPR 90%": {
+                "logic": "OR",
+                "values": {
+                    "ReMM_score": 0.2,
+                    "LinSight": 0.06,
+                    "NCBoost_score": 0.06
+                }
+            }
+          }
+        },
+        "comphet": {
+          "default": "all but introns",
+          "configuration": {
+            "LoF": {
               "logic": "AND",
               "values": {
-                  "ReMM_score": 0.95,
-                  "LinSight": 0.9,
-                  "NCBoost_score": 0.4,
-                  "LoF_tolerance": 0.5,
-                  "reg_type": "reg_db",
-                  "TFBS": true
+                  "consequence": [
+                      "exonic_sv",
+                      "frameshift_variant",
+                      "splice_acceptor_variant", "splice_donor_variant",
+                      "stop_gained", "stop_lost", "start_lost"
+                    ]
               }
-          },
-          "max accuracy": {
+            },
+            "coding": {
               "logic": "OR",
               "values": {
-                  "ReMM_score": 0.95,
-                  "LinSight": 0.9,
-                  "NCBoost_score": 0.4,
-                  "TFBS": true
+                  "consequence": [
+                      "exonic_sv",
+                      "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                      "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                      "stop_gained", "stop_lost", "start_lost",
+                      "missense_variant"
+                    ]
               }
-          },
-          "FDR 50%": {
+            },
+            "all but introns": {
               "logic": "OR",
               "values": {
-                  "ReMM_score": 0.9,
-                  "LinSight": 0.8,
-                  "NCBoost_score": 0.25
+                  "consequence": [
+                      "exonic_sv", "utr_sv",
+                      "3_prime_UTR_variant", "5_prime_UTR_variant",
+                      "frameshift_variant", "inframe_insertion", "inframe_deletion",
+                      "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
+                      "stop_gained", "stop_lost", "start_lost",
+                      "missense_variant", "synonymous_variant",
+                      "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
+                    ]
               }
-          },
-          "TPR 90%": {
-              "logic": "OR",
-              "values": {
-                  "ReMM_score": 0.2,
-                  "LinSight": 0.06,
-                  "NCBoost_score": 0.06
-              }
-          }
-        }
-      },
-      "comphet": {
-        "default": "all but introns",
-        "configuration": {
-          "LoF": {
-            "logic": "AND",
-            "values": {
-                "consequence": [
-                    "exonic_sv",
-                    "frameshift_variant",
-                    "splice_acceptor_variant", "splice_donor_variant",
-                    "stop_gained", "stop_lost", "start_lost"
-                  ]
-            }
-          },
-          "coding": {
-            "logic": "OR",
-            "values": {
-                "consequence": [
-                    "exonic_sv",
-                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
-                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
-                    "stop_gained", "stop_lost", "start_lost",
-                    "missense_variant"
-                  ]
-            }
-          },
-          "all but introns": {
-            "logic": "OR",
-            "values": {
-                "consequence": [
-                    "exonic_sv", "utr_sv",
-                    "3_prime_UTR_variant", "5_prime_UTR_variant",
-                    "frameshift_variant", "inframe_insertion", "inframe_deletion",
-                    "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant",
-                    "stop_gained", "stop_lost", "start_lost",
-                    "missense_variant", "synonymous_variant",
-                    "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
-                  ]
             }
           }
         }
       }
+    },
+    "TOOLTIPS": {
+      "d_score": "Var2reg score computed based on variant consequence",
+      "max_pop_af": "Maximum AF across external populations (like 1000G, gnomAD, WGS500)",
+      "cohort_af": "Allele frequency across the analyzed cohort. High freq usually suggest a technical artifact",
+      "CADD_PhredScore": "CADD phred-scaled score. Usual threshold for deleterious is ~20",
+      "DANN_score": "Modified version of CADD using deep-neural network. Range is 0-1",
+      "CCR_pct": "Percentile in the distribution of conserved coding regions. Region above 90th percentile are highly intolerant to mutation and good candidate for dnm prioritization",
+      "LinSight": "LinSight genome-wide score. Showed good performances for non-coding variants selection",
+      "ReMM_score": "ReMM (Regulatory Mendelian Mutations) score. Machine learning based approach to score non-coding variants associated to diseases. Used also by Exomiser",
+      "PhyloP100": "PhyloP100 conservation scores. Negative values means accelereted evolution, Positive values means negative selection, that is more conserved bases",
+      "LoF_tolerance": "Probability of a regulatory regions to be tolerant to mutations. Range 0-1 with 0.5 considered cutoff for tolerance and 0.05 considered for highly intolerant regions",
+      "REVEL_score": "REVEL is a ML meta-predictor for missense variants which combines previous predictors scores and new features to reach better classification of variants.",
+      "MCAP_score": "M-CAP score has been developed to identify rare pathogenic missense mutations with low false positive rate. Suggested threashold is 0.025",
+      "SpliceAI_SNP_SpliceAI_max": "SNV version of the SpliceAI machine learning prediction of splicing effect. Express the probability of a mutation to alter splicing (create / abolish a splicing site)",
+      "SpliceAI_INDEL_SpliceAI_max": "INDEL version of the SpliceAI machine learning prediction of splicing effect. Express the probability of a mutation to alter splicing (create / abolish a splicing site)",
+      "NCBoost_score": "Machine learning score specifically trained on non-coding disease casuing variants assocaited to rare diseases",
+      "pLI_gnomad": "pLI score as provided by gnomAD. Express the probability of a gene to be intolerant to protein altering variants. Usually genes above 0.9 are considered highly intolerant",
+      "RVIS": "Residue Variant Intolerance Scores. Low values identifies genes intolerant to variants. Low scores are associated with essential genes and haploinsufficient genes. Distribution centered on zero.",
+      "GDI_phred": "Gene Damage Index. Express a phred scale probability of a gene to be tolerant to functional impairment. High values indicate a gene tolerant to mutations. Suggested threashold is 13.8",
+      "EDS": "Estimation of gene intolerance to variation based on the extension of the associated regulatory space. The assumption is that essential genes has a larger regulatory space. Performance are similar to pLI for standard genes, but improved for small genes, where gene length prevents proper calculation of the pLI score",
+      "consequence": "Variant consequence according to SO definitions",
+      "var_type": "Variant type (like SNV, INDEL, DEL, DUP...)",
+      "reg_type": "Type of gene-region association. Closest gene means that the gene is associated by proximity within 25kb",
+      "db_source": "Source of data for the regulatory region",
+      "LowMappability": "Regions difficult to map in the reference genome",
+      "LowComplexity": "Low complexity genomic regions that often result in incorrect genotypes",
+      "SegDup": "Segmental duplications",
+      "TFBS": "Transcription Factors Binding Sites from ENCODE ChIP-seq experiments",
+      "DNase": "DNase sensitivity peaks from ENCODE data. They usually identify transcriptional active regions and TF binding domains",
+      "UCNE": "Ultra-conserved non coding elements"
     }
-  },
-  "TOOLTIPS": {
-    "d_score": "Var2reg score computed based on variant consequence",
-    "max_pop_af": "Maximum AF across external populations (like 1000G, gnomAD, WGS500)",
-    "cohort_af": "Allele frequency across the analyzed cohort. High freq usually suggest a technical artifact",
-    "CADD_PhredScore": "CADD phred-scaled score. Usual threshold for deleterious is ~20",
-    "DANN_score": "Modified version of CADD using deep-neural network. Range is 0-1",
-    "CCR_pct": "Percentile in the distribution of conserved coding regions. Region above 90th percentile are highly intolerant to mutation and good candidate for dnm prioritization",
-    "LinSight": "LinSight genome-wide score. Showed good performances for non-coding variants selection",
-    "ReMM_score": "ReMM (Regulatory Mendelian Mutations) score. Machine learning based approach to score non-coding variants associated to diseases. Used also by Exomiser",
-    "PhyloP100": "PhyloP100 conservation scores. Negative values means accelereted evolution, Positive values means negative selection, that is more conserved bases",
-    "LoF_tolerance": "Probability of a regulatory regions to be tolerant to mutations. Range 0-1 with 0.5 considered cutoff for tolerance and 0.05 considered for highly intolerant regions",
-    "REVEL_score": "REVEL is a ML meta-predictor for missense variants which combines previous predictors scores and new features to reach better classification of variants.",
-    "MCAP_score": "M-CAP score has been developed to identify rare pathogenic missense mutations with low false positive rate. Suggested threashold is 0.025",
-    "SpliceAI_SNP_SpliceAI_max": "SNV version of the SpliceAI machine learning prediction of splicing effect. Express the probability of a mutation to alter splicing (create / abolish a splicing site)",
-    "SpliceAI_INDEL_SpliceAI_max": "INDEL version of the SpliceAI machine learning prediction of splicing effect. Express the probability of a mutation to alter splicing (create / abolish a splicing site)",
-    "NCBoost_score": "Machine learning score specifically trained on non-coding disease casuing variants assocaited to rare diseases",
-    "pLI_gnomad": "pLI score as provided by gnomAD. Express the probability of a gene to be intolerant to protein altering variants. Usually genes above 0.9 are considered highly intolerant",
-    "RVIS": "Residue Variant Intolerance Scores. Low values identifies genes intolerant to variants. Low scores are associated with essential genes and haploinsufficient genes. Distribution centered on zero.",
-    "GDI_phred": "Gene Damage Index. Express a phred scale probability of a gene to be tolerant to functional impairment. High values indicate a gene tolerant to mutations. Suggested threashold is 13.8",
-    "EDS": "Estimation of gene intolerance to variation based on the extension of the associated regulatory space. The assumption is that essential genes has a larger regulatory space. Performance are similar to pLI for standard genes, but improved for small genes, where gene length prevents proper calculation of the pLI score",
-    "consequence": "Variant consequence according to SO definitions",
-    "var_type": "Variant type (like SNV, INDEL, DEL, DUP...)",
-    "reg_type": "Type of gene-region association. Closest gene means that the gene is associated by proximity within 25kb",
-    "db_source": "Source of data for the regulatory region",
-    "LowMappability": "Regions difficult to map in the reference genome",
-    "LowComplexity": "Low complexity genomic regions that often result in incorrect genotypes",
-    "SegDup": "Segmental duplications",
-    "TFBS": "Transcription Factors Binding Sites from ENCODE ChIP-seq experiments",
-    "DNase": "DNase sensitivity peaks from ENCODE data. They usually identify transcriptional active regions and TF binding domains",
-    "UCNE": "Ultra-conserved non coding elements"
   }
-}

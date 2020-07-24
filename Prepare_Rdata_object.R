@@ -9,6 +9,8 @@ library(dplyr)
 library(tidyr)
 library(data.table)
 
+VERSION <- "20200724"
+
 # load (gziped) data file
 loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
   #message("Loading ", dataF)
@@ -121,6 +123,7 @@ if (from_config==TRUE) {
     #load variants data
     variants_df <- loadData(paste0(newlist$variant_file))
     variants_df$Class <- "PASS"
+    variants_df$internal_id <- paste(variants_df$chr,variants_df$start,variants_df$end,variants_df$ref,variants_df$alt, sep="_")
     variants_ranges <- GRanges(seqnames = variants_df$chr, ranges = IRanges(variants_df$start, end=variants_df$end),ID=variants_df$rec_id)
     newlist$variants_df <- variants_df
     newlist$variants_ranges <- variants_ranges
@@ -171,7 +174,7 @@ if (from_config==TRUE) {
       seg_df1 <- NULL
     }
     seg_df2 <- as.data.frame(
-      newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff,sup_dnm) %>%
+        newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff,sup_dnm) %>%
         mutate(comphet_aff = 0) )
     newlist$segregation_df <- rbind(seg_df1, seg_df2)
     
@@ -283,6 +286,7 @@ if (from_config==TRUE) {
     #Load known vars data
     newlist$known_vars <- loadData(newlist$known_variant_file)
     newlist$known_vars <- newlist$known_vars %>% separate_rows(known_ids, sep=",")
+    newlist$known_vars$internal_id <- paste(newlist$known_vars$chr,newlist$known_vars$start,newlist$known_vars$end,newlist$known_vars$ref,newlist$known_vars$alt, sep="_")
     newlist$known_clinvar <- newlist$known_vars[grep("CV[0-9]+",newlist$known_vars$known_ids,perl = T),]
     newlist$known_cosmic <- newlist$known_vars[grep("COSV[0-9]+",newlist$known_vars$known_ids,perl = T),]
     

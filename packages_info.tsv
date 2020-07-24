@@ -1,0 +1,93 @@
+pkg_name	pkg_group	license	repository	URL	git_url	maintainer
+cyphr	PRIMARY	MIT + file LICENSE	CRAN	https://github.com/ropensci/cyphr, https://docs.ropensci.org/cyphr	NA	Rich FitzJohn <rich.fitzjohn@gmail.com>
+shiny	PRIMARY	GPL-3 | file LICENSE	CRAN	http://shiny.rstudio.com	NA	Winston Chang <winston@rstudio.com>
+shinyBS	PRIMARY	GPL-3	CRAN	https://ebailey78.github.io/shinyBS	NA	Eric Bailey <ebailey@idem.in.gov>
+stringr	PRIMARY	GPL-2 | file LICENSE	CRAN	http://stringr.tidyverse.org, https://github.com/tidyverse/stringr	NA	Hadley Wickham <hadley@rstudio.com>
+DT	PRIMARY	GPL-3 | file LICENSE	CRAN	https://github.com/rstudio/DT	NA	Yihui Xie <xie@yihui.name>
+dplyr	PRIMARY	MIT + file LICENSE	CRAN	http://dplyr.tidyverse.org, https://github.com/tidyverse/dplyr	NA	Hadley Wickham <hadley@rstudio.com>
+plotly	PRIMARY	MIT + file LICENSE	CRAN	https://plotly-r.com, https://github.com/ropensci/plotly	NA	Carson Sievert <cpsievert1@gmail.com>
+kinship2	PRIMARY	GPL (>= 2)	CRAN	https://cran.r-project.org/package=kinship2	NA	Jason Sinnwell <sinnwell.jason@mayo.edu>
+tidyr	PRIMARY	MIT + file LICENSE	CRAN	https://tidyr.tidyverse.org, https://github.com/tidyverse/tidyr	NA	Hadley Wickham <hadley@rstudio.com>
+shinydashboard	PRIMARY	GPL (>= 2) | file LICENSE	CRAN	http://rstudio.github.io/shinydashboard/	NA	Winston Chang <winston@rstudio.com>
+gridExtra	PRIMARY	GPL (>= 2)	CRAN	NA	NA	Baptiste Auguie <baptiste.auguie@gmail.com>
+ggplot2	PRIMARY	GPL-2 | file LICENSE	CRAN	http://ggplot2.tidyverse.org, https://github.com/tidyverse/ggplot2	NA	Hadley Wickham <hadley@rstudio.com>
+jsonlite	PRIMARY	MIT + file LICENSE	CRAN	https://arxiv.org/abs/1403.2805 (paper), https://jeroen.cran.dev/jsonlite (docs)	NA	Jeroen Ooms <jeroen@berkeley.edu>
+ontologyIndex	PRIMARY	GPL (>= 2)	CRAN	NA	NA	Daniel Greene <dg333@cam.ac.uk>
+GenomicRanges	PRIMARY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/GenomicRanges	Bioconductor Package Maintainer <maintainer@bioconductor.org>
+BiocManager	PRIMARY	Artistic-2.0	CRAN	NA	NA	Marcel Ramos <marcel.ramos@roswellpark.org>
+devtools	PRIMARY	GPL (>= 2)	CRAN	https://devtools.r-lib.org/, https://github.com/r-lib/devtools	NA	Jim Hester <jim.hester@rstudio.com>
+shinycssloaders	PRIMARY	GPL-3	GitHub	https://github.com/daattali/shinycssloaders	NA	Dean Attali <daattali@gmail.com>
+scattermore	PRIMARY	GPL (>= 3)	GitHub	https://github.com/exaexa/scattermore	NA	Mirek Kratochvil <exa.exa@gmail.com>
+getPass	DEPENDENCY	BSD 2-clause License + file LICENSE	CRAN	https://github.com/wrathematics/getPass	NA	Drew Schmidt <wrathematics@gmail.com>
+openssl	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/jeroen/openssl#readme	NA	Jeroen Ooms <jeroen@berkeley.edu>
+sodium	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/jeroen/sodium#readme (devel), https://download.libsodium.org/doc/ (upstream)	NA	Jeroen Ooms <jeroen@berkeley.edu>
+methods	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+utils	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+grDevices	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+httpuv	DEPENDENCY	GPL (>= 2) | file LICENSE	CRAN	https://github.com/rstudio/httpuv	NA	Joe Cheng <joe@rstudio.com>
+mime	DEPENDENCY	GPL	CRAN	https://github.com/yihui/mime	NA	Yihui Xie <xie@yihui.name>
+xtable	DEPENDENCY	GPL (>= 2)	CRAN	http://xtable.r-forge.r-project.org/	NA	David Scott <d.scott@auckland.ac.nz>
+digest	DEPENDENCY	GPL (>= 2)	CRAN	http://dirk.eddelbuettel.com/code/digest.html	NA	Dirk Eddelbuettel <edd@debian.org>
+htmltools	DEPENDENCY	GPL (>= 2)	CRAN	https://github.com/rstudio/htmltools	NA	Joe Cheng <joe@rstudio.com>
+R6	DEPENDENCY	MIT + file LICENSE	CRAN	https://r6.r-lib.org, https://github.com/r-lib/R6/	NA	Winston Chang <winston@stdout.org>
+later	DEPENDENCY	GPL (>= 2)	CRAN	https://github.com/r-lib/later	NA	Joe Cheng <joe@rstudio.com>
+promises	DEPENDENCY	MIT + file LICENSE	CRAN	https://rstudio.github.io/promises, https://github.com/rstudio/promises	NA	Joe Cheng <joe@rstudio.com>
+tools	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+rlang	DEPENDENCY	GPL-3	CRAN	http://rlang.r-lib.org, https://github.com/r-lib/rlang	NA	Lionel Henry <lionel@rstudio.com>
+fastmap	DEPENDENCY	MIT + file LICENSE	CRAN	https://r-lib.github.io/fastmap/, https://github.com/r-lib/fastmap	NA	Winston Chang <winston@rstudio.com>
+sourcetools	DEPENDENCY	MIT + file LICENSE	CRAN	NA	NA	Kevin Ushey <kevinushey@gmail.com>
+crayon	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-lib/crayon#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+glue	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/tidyverse/glue, https://glue.tidyverse.org/	NA	Jim Hester <james.f.hester@gmail.com>
+magrittr	DEPENDENCY	MIT + file LICENSE	CRAN	NA	NA	Stefan Milton Bache <stefan@stefanbache.dk>
+stringi	DEPENDENCY	file LICENSE	CRAN	http://www.gagolewski.com/software/stringi/, http://site.icu-project.org/ http://www.unicode.org/ 	NA	Marek Gagolewski <marek@gagolewski.com>
+htmlwidgets	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/ramnathv/htmlwidgets	NA	Joe Cheng <joe@rstudio.com>
+crosstalk	DEPENDENCY	MIT + file LICENSE	CRAN	https://rstudio.github.io/crosstalk/	NA	Joe Cheng <joe@rstudio.com>
+ellipsis	DEPENDENCY	GPL-3	CRAN	https://ellipsis.r-lib.org, https://github.com/r-lib/ellipsis	NA	Hadley Wickham <hadley@rstudio.com>
+assertthat	DEPENDENCY	GPL-3	CRAN	NA	NA	Hadley Wickham <hadley@rstudio.com>
+pkgconfig	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-lib/pkgconfig#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+Rcpp	DEPENDENCY	GPL (>= 2)	CRAN	http://www.rcpp.org, http://dirk.eddelbuettel.com/code/rcpp.html, https://github.com/RcppCore/Rcpp	NA	Dirk Eddelbuettel <edd@debian.org>
+tibble	DEPENDENCY	MIT + file LICENSE	CRAN	https://tibble.tidyverse.org/, https://github.com/tidyverse/tibble	NA	Kirill Müller <krlmlr+r@mailbox.org>
+tidyselect	DEPENDENCY	GPL-3	CRAN	https://tidyselect.r-lib.org, https://github.com/r-lib/tidyselect	NA	Lionel Henry <lionel@rstudio.com>
+scales	DEPENDENCY	MIT + file LICENSE	CRAN	https://scales.r-lib.org, https://github.com/r-lib/scales	NA	Hadley Wickham <hadley@rstudio.com>
+httr	DEPENDENCY	MIT + file LICENSE	CRAN	https://httr.r-lib.org/, https://github.com/r-lib/httr	NA	Hadley Wickham <hadley@rstudio.com>
+base64enc	DEPENDENCY	GPL-2 | GPL-3	CRAN	http://www.rforge.net/base64enc	NA	Simon Urbanek <Simon.Urbanek@r-project.org>
+hexbin	DEPENDENCY	GPL-2	CRAN	http://github.com/edzer/hexbin	NA	Edzer Pebesma <edzer.pebesma@uni-muenster.de>
+RColorBrewer	DEPENDENCY	Apache License 2.0	CRAN	NA	NA	Erich Neuwirth <erich.neuwirth@univie.ac.at>
+lazyeval	DEPENDENCY	GPL-3	CRAN	NA	NA	Hadley Wickham <hadley@rstudio.com>
+purrr	DEPENDENCY	GPL-3 | file LICENSE	CRAN	http://purrr.tidyverse.org, https://github.com/tidyverse/purrr	NA	Lionel Henry <lionel@rstudio.com>
+data.table	DEPENDENCY	MPL-2.0 | file LICENSE	CRAN	http://r-datatable.com, https://Rdatatable.gitlab.io/data.table, https://github.com/Rdatatable/data.table	NA	Matt Dowle <mattjdowle@gmail.com>
+viridisLite	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/sjmgarnier/viridisLite	NA	Simon Garnier <garnier@njit.edu>
+Matrix	DEPENDENCY	GPL (>= 2) | file LICENCE	CRAN	http://Matrix.R-forge.R-project.org/	NA	Martin Maechler <mmaechler+Matrix@gmail.com>
+quadprog	DEPENDENCY	GPL (>= 2)	CRAN	NA	NA	Berwin A. Turlach <Berwin.Turlach@gmail.com>
+graphics	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+stats	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+vctrs	DEPENDENCY	GPL-3	CRAN	https://github.com/r-lib/vctrs	NA	Hadley Wickham <hadley@rstudio.com>
+lifecycle	DEPENDENCY	GPL-3	CRAN	https://lifecycle.r-lib.org/, https://github.com/r-lib/lifecycle	NA	Lionel Henry <lionel@rstudio.com>
+gtable	DEPENDENCY	GPL-2	CRAN	https://github.com/r-lib/gtable	NA	Hadley Wickham <hadley@rstudio.com>
+grid	DEPENDENCY	Part of R 3.6.3	NA	NA	NA	R Core Team <R-core@r-project.org>
+isoband	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/wilkelab/isoband	NA	Claus O. Wilke <wilke@austin.utexas.edu>
+mgcv	DEPENDENCY	GPL (>= 2)	CRAN	NA	NA	Simon Wood <simon.wood@r-project.org>
+MASS	DEPENDENCY	GPL-2 | GPL-3	CRAN	http://www.stats.ox.ac.uk/pub/MASS4/	NA	Brian Ripley <ripley@stats.ox.ac.uk>
+withr	DEPENDENCY	GPL (>= 2)	CRAN	http://withr.r-lib.org, http://github.com/r-lib/withr#readme	NA	Jim Hester <james.f.hester@gmail.com>
+stats4	DEPENDENCY	Part of R 3.6.3	Bioconductor	NA	NA	R Core Team <R-core@r-project.org>
+BiocGenerics	DEPENDENCY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/BiocGenerics	Bioconductor Package Maintainer <maintainer@bioconductor.org>
+IRanges	DEPENDENCY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/IRanges	Bioconductor Package Maintainer <maintainer@bioconductor.org>
+GenomeInfoDb	DEPENDENCY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/GenomeInfoDb	Bioconductor Package Maintainer <maintainer@bioconductor.org>
+XVector	DEPENDENCY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/XVector	Hervé Pagès <hpages@fredhutch.org>
+S4Vectors	DEPENDENCY	Artistic-2.0	Bioconductor	NA	https://git.bioconductor.org/packages/S4Vectors	Bioconductor Package Maintainer <maintainer@bioconductor.org>
+usethis	DEPENDENCY	GPL-3	CRAN	https://usethis.r-lib.org, https://github.com/r-lib/usethis	NA	Jennifer Bryan <jenny@rstudio.com>
+callr	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-lib/callr#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+cli	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-lib/cli#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+covr	DEPENDENCY	GPL-3	CRAN	https://covr.r-lib.org, https://github.com/r-lib/covr	NA	Jim Hester <james.f.hester@gmail.com>
+desc	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-lib/desc#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+git2r	DEPENDENCY	GPL-2	CRAN	https://github.com/ropensci/git2r	NA	Stefan Widgren <stefan.widgren@gmail.com>
+memoise	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/hadley/memoise	NA	Jim Hester <jim.hester@rstudio.com>
+pkgbuild	DEPENDENCY	GPL-3	CRAN	https://github.com/r-lib/pkgbuild	NA	Jim Hester <jim.hester@rstudio.com>
+pkgload	DEPENDENCY	GPL-3	CRAN	https://github.com/r-lib/pkgload	NA	Jim Hester <james.hester@rstudio.com>
+rcmdcheck	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-Lib/rcmdcheck#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+remotes	DEPENDENCY	GPL (>= 2)	CRAN	https://remotes.r-lib.org, https://github.com/r-lib/remotes#readme	NA	Jim Hester <jim.hester@rstudio.com>
+roxygen2	DEPENDENCY	GPL (>= 2)	CRAN	https://roxygen2.r-lib.org/, https://github.com/r-lib/roxygen2	NA	Hadley Wickham <hadley@rstudio.com>
+rstudioapi	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/rstudio/rstudioapi	NA	Kevin Ushey <kevin@rstudio.com>
+rversions	DEPENDENCY	MIT + file LICENSE	CRAN	https://github.com/r-hub/rversions,	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+sessioninfo	DEPENDENCY	GPL-2	CRAN	https://github.com/r-lib/sessioninfo#readme	NA	Gábor Csárdi <csardi.gabor@gmail.com>
+testthat	DEPENDENCY	MIT + file LICENSE	CRAN	http://testthat.r-lib.org, https://github.com/r-lib/testthat	NA	Hadley Wickham <hadley@rstudio.com>

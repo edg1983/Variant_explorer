@@ -1,8 +1,8 @@
 # VARIANT EXPLORER
 # Author: Edoardo Giacopuzzi
-# Explore and filter annotated variants from V2
+# Explore and filter annotated variants from var2reg
 
-# Input are encrypted RData objects created with Prepare_Rdata_object.R 
+# Input are encrypted RData objects created with Prepare_Rdata_object.R     
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
 
 ##########################################
@@ -60,7 +60,7 @@ source("filtersModule.R")
 #################
 ### Constants ###
 #################
-APP_VERSION <- "1.2"
+APP_VERSION <- "1.2.1"
 resource_dir <- "Resources"
 PanelApp_dir <- paste0(resource_dir, "/PanelApp")
 GeneLists_dir <- paste0(resource_dir, "/geneLists")
@@ -360,6 +360,22 @@ RV <- reactiveValues(
                                         href="https://variant-explorer.readthedocs.io/en/latest/usage/IGV_session.html") )
     )
 
+##Put X scroll bar on top for data tables
+css <- HTML(
+  "#vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
+  transform:rotateX(180deg);
+  }
+  #vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }
+  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
+  transform:rotateX(180deg);
+  }
+  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }"
+)
+
 ##########################
 ### List RData objects ###
 ##########################
@@ -378,7 +394,6 @@ ui <- dashboardPage(
         dropdownMenuOutput("MessageMenu"),
         dropdownMenuOutput("NotificationMenu")
     ),
-
     dashboardSidebar(
         #drop-down list of cases
         selectInput("CaseCode", h3("Case code:"), choices = sort(unique(samplesID))),
@@ -415,9 +430,12 @@ ui <- dashboardPage(
         )
     ),
     dashboardBody(
+      tags$head(tags$style(css)),
         tabItems(
             tabItem(tabName = "overview",
-                    fluidRow(column(3, h4("Data release: ")), column(8, verbatimTextOutput("releaseID"))),
+                    fluidRow(
+                      column(2, h4("Case:")), column(2, verbatimTextOutput("activeCaseID")),
+                      column(3, h4("Data release:")), column(5, verbatimTextOutput("releaseID"))),
                     fluidRow(
                         box(title = "Pedigree", width=6, status = "primary", solidHeader = TRUE,
                             withSpinner(plotOutput("ped"))
@@ -964,6 +982,11 @@ server <- function(input, output, session) {
       }
     })
     
+    output$activeCaseID <- renderText({
+      req(inherits(RV$data, "list"))
+      return(RV$data$pedigree)
+    })
+    
     output$Total_affected <- renderText({
         paste0("\tTotal number of affected individuals in this pedigree: ", RV$data$n_affected)
     })
@@ -1337,6 +1360,7 @@ server <- function(input, output, session) {
       list(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df)
     })
     observeEvent( toListenFilters(), {
+      req(inherits(RV$data, "list"))
       variants_json <- callModule(getJSON_filters, "variants_filters", filters_settings$VARIANTS)
       segregation_json <- callModule(getJSON_segregation, "segregation")
       GQ_json <- callModule(getJSON_GQ, "GQ_filter")
@@ -1344,12 +1368,15 @@ server <- function(input, output, session) {
       ROH_json <- callModule(getJSON_regions, "ROH_filter")
       BED_json <- callModule(getJSON_regions, "bed_filter")
       
-      RV$filters_json <- list(VARIANTS = variants_json,
-                             SEGREGATION = segregation_json,
-                             GQ = GQ_json,
-                             GENES = genes_json,
-                             ROH = ROH_json,
-                             BED = BED_json)
+      RV$filters_json <- list(
+        APP_VERSION = APP_VERSION,
+        DATA_VERSION = RV$data$releaseID,
+        VARIANTS = variants_json,
+        SEGREGATION = segregation_json,
+        GQ = GQ_json,
+        GENES = genes_json,
+        ROH = ROH_json,
+        BED = BED_json)
 
       callModule(downloadObj, id="get_json_filters", output_prefix="Effective_filters.json", output_data=RV$filters_json)
     })
@@ -1435,12 +1462,12 @@ server <- function(input, output, session) {
       filtersVariantsUI("variants_filters", filters_settings$VARIANTS, RV$data$variants_df, app_settings$fill_na$fill_na_vars, filters_settings$TOOLTIPS)
     })
     
-    observeEvent(input$decrypt_button, {
-      callModule(observeFilters, "variants_filters", 
-                 filters_settings = filters_settings$VARIANTS, 
-                 variants_df = RV$data$variants_df, 
-                 na_values = app_settings$fill_na$fill_na_vars)
-    })
+      observeEvent(input$decrypt_button, {
+        callModule(observeFilters, "variants_filters", 
+                   filters_settings = filters_settings$VARIANTS, 
+                   variants_df = RV$data$variants_df, 
+                   na_values = app_settings$fill_na$fill_na_vars)
+      })
     #############################
     ### Segregation Filters tab
     #############################
@@ -1503,10 +1530,12 @@ server <- function(input, output, session) {
     output$ROH_filters_UI <- renderUI({ 
       shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))  
       shiny::validate(need(inherits(RV$data$ROH_ranges, "list"), "No ROH regions loaded"))
-      bedcontrolUI("ROH_filter", label = "ROH regions", ranges=RV$data$ROH_ranges, slider=TRUE, samples=TRUE)
+      bedcontrolUI("ROH_filter", label = "ROH regions", ranges=RV$data$ROH_ranges, slider=TRUE, samples=TRUE, selected_sample = RV$data$all_samples[1])
     })
-    callModule(configureSlider, "ROH_filter", ranges=RV$data$ROH_ranges, scale_value=1000)
-
+    observeEvent(RV$data, {
+      callModule(configureSlider, "ROH_filter", ranges=RV$data$ROH_ranges, scale_value=1000)  
+    })
+    
     ########################
     ### Filter Explorer tab
     ########################
@@ -1590,10 +1619,12 @@ server <- function(input, output, session) {
         datatable(candidate_genes_df(), selection="single") %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
       } else {
         datatable(candidate_genes_df(), selection="single") %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
-        formatStyle(  'gene',
+          formatStyle(  'gene',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_genes()$all, rep('yellow', length(saved_genes()$all)))) %>%
+          formatStyle(  'gene',
                       target = 'row',
-                      backgroundColor = styleEqual(unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree]), rep('yellow', length(unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree])))))
-        
+                      backgroundColor = styleEqual(saved_genes()$thisCase, rep('red', length(saved_genes()$thisCase))))
       }
         
     })
@@ -1614,7 +1645,10 @@ server <- function(input, output, session) {
           formatStyle(names(customGenesTable_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
           formatStyle(  'gene',
                         target = 'row',
-                        backgroundColor = styleEqual(unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree]), rep('yellow', length(unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree])))))
+                        backgroundColor = styleEqual(saved_genes()$all, rep('yellow', length(saved_genes()$all)))) %>%
+          formatStyle(  'gene',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_genes()$thisCase, rep('red', length(saved_genes()$thisCase))))
       }
     })
     
@@ -1632,18 +1666,28 @@ server <- function(input, output, session) {
       list(genes_scores(), variants_df(), comphet_df(), RV$custom_genes)
     })
     observeEvent(toListenResults(), {
-      callModule(downloadObj, id = "save_results",
-      output_prefix=input$CaseCode,
-      output_data = list(
+      if (nrow(RV$data$comphet_df) > 0) {
+        files_to_save = list(
           "genes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)),
           "customGenes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% filter(gene %in% RV$custom_genes) %>% select(-Class)),
           "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list)),
           "comphet.tsv" = as.data.frame(comphet_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list) %>% 
-                              gather(key="Variant",value = "varID", v1:v2) %>% 
-                              inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="rec_id")) %>%
-                              select(-Class.x,-Class.y)), 
+                                          gather(key="Variant",value = "varID", v1:v2) %>% 
+                                          inner_join(., variants_df()[variants_df()$Class == "PASS",], by=c("varID"="rec_id")) %>%
+                                          select(-Class.x,-Class.y)), 
           "applied_genelist.tsv" = as.data.frame(RV$custom_genes),
-          "applied_filters.json" = RV$filters_json),
+          "applied_filters.json" = RV$filters_json)
+      } else if (nrow(RV$data$comphet_df) == 0) {
+        files_to_save = list(
+          "genes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class)),
+          "customGenes.tsv" = as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% filter(gene %in% RV$custom_genes) %>% select(-Class)),
+          "variants.tsv" = as.data.frame(variants_df() %>% filter(Class == "PASS", gene %in% RV$filtered_genes_list)),
+          "applied_genelist.tsv" = as.data.frame(RV$custom_genes),
+          "applied_filters.json" = RV$filters_json) 
+      }
+      callModule(downloadObj, id = "save_results",
+      output_prefix=input$CaseCode,
+      output_data = files_to_save,
       zip_archive = paste0(input$CaseCode, ".results.zip") )
     })
     
@@ -1677,11 +1721,15 @@ server <- function(input, output, session) {
         datatable(variants_pass_df(), 
                  selection="multiple",
                  options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
-         formatStyle(names(variants_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
-         formatStyle(  'rec_id',
+           formatStyle(  'internal_id',
                        target = 'row',
-                       backgroundColor = styleEqual(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree], rep('yellow', length(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))))
-       }
+                       backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(unique(saved_vars()$all))))) %>%
+           formatStyle(  'rec_id',
+                         target = 'row',
+                         backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+           formatStyle(names(variants_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+           
+        }
     })
     
     output$comphet_results_table <- DT::renderDataTable({
@@ -1695,10 +1743,13 @@ server <- function(input, output, session) {
         datatable(comphet_pass_df(), 
                 selection="multiple",
                 options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>% 
-        formatStyle(names(comphet_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
-        formatStyle(  'rec_id',
-                      target = 'row',
-                      backgroundColor = styleEqual(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree], rep('yellow', length(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))))
+          formatStyle(  'internal_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
+          formatStyle(  'rec_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+          formatStyle(names(comphet_pass_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
       }
     })
     
@@ -1878,7 +1929,7 @@ server <- function(input, output, session) {
         as.data.frame(variants_df() %>% filter(Class == "PASS", gene == gene_name(), rec_id %nin% gene_comphet_vars_df()$varID)) 
     })
     
-    output$variantsTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
+    output$variantsTable <- DT::renderDataTable({
         #shiny::validate(need(gene_name != "", 'No gene selected'))
         na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
         na_values <- na_values[na_values != 0]
@@ -1891,14 +1942,17 @@ server <- function(input, output, session) {
           datatable(gene_vars_df(), 
                 selection="multiple",
                 options = list(scrollX = TRUE)) %>%
-          formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
-          formatStyle(  'rec_id',
-                        target = 'row',
-                        backgroundColor = styleEqual(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree], rep('yellow', length(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))))
+            formatStyle(  'internal_id',
+                          target = 'row',
+                          backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
+            formatStyle(  'rec_id',
+                          target = 'row',
+                          backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+            formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
         }
     })
     
-    output$comphetTable <- DT::renderDataTable(selection="multiple", options = list(scrollX = TRUE), {
+    output$comphetTable <- DT::renderDataTable({
         #shiny::validate(need(gene_name != "", 'No gene selected'))
         shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
         na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
@@ -1913,10 +1967,13 @@ server <- function(input, output, session) {
           datatable(gene_comphet_vars_df(), 
                 selection="multiple",
                 options = list(scrollX = TRUE)) %>%
-          formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
-          formatStyle(  'rec_id',
-                        target = 'row',
-                        backgroundColor = styleEqual(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree], rep('yellow', length(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))))
+            formatStyle(  'internal_id',
+                          target = 'row',
+                          backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
+            formatStyle(  'rec_id',
+                          target = 'row',
+                          backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+            formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
         }
     })
     
@@ -1926,7 +1983,23 @@ server <- function(input, output, session) {
       vars_to_save_2 <- gene_comphet_vars_df()[input$comphetTable_rows_selected,col_names]
       vars_to_save <- rbind(vars_to_save_1, vars_to_save_2)
       vars_to_save$caseID <- RV$data$pedigree
-      RV$saved_vars <- rbind(RV$saved_vars, vars_to_save) %>% distinct()  
+      
+      #Remove samples GQ and GT cols since they are different for each case
+      #GTs and samples order are collapsed and saved in new cols
+      GT_cols <- grep("GT_",colnames(vars_to_save))
+      GQ_cols <- grep("GQ_",colnames(vars_to_save))
+      #message("COLNAMES SAVED")
+      #message(colnames(RV$saved_vars), sep=",")
+      #message("COLNAMES VARS TO SAVE")
+      #message(colnames(vars_to_save), sep=",")
+      #message("GT COLS ", paste(GT_cols, collapse=","))
+      #message("DIM VARS_TO_SAVE ", dim(vars_to_save))
+      vars_to_save$GTs <- apply( as.data.frame(vars_to_save[ , GT_cols ]) , 1 , paste, collapse=",")
+      vars_to_save$samples_order <- paste(gsub("GT_","",colnames(vars_to_save)[GT_cols]), collapse=",")
+      vars_to_save <- vars_to_save %>% select(-GT_cols, -GQ_cols)
+      
+
+      RV$saved_vars <- rbind(RV$saved_vars, vars_to_save) %>% distinct()
     })
     
     output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
@@ -1980,11 +2053,12 @@ server <- function(input, output, session) {
         #                      paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
         #                      paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
         #                      SV_file, collapse=" ")
-
+        callModule(downloadObj, id="get_igv_session", output_prefix= out_file, output_data=igv_xml, col_names=FALSE)
+        
         list(outfile=out_file, session_xml=igv_xml)
     })
     
-    callModule(downloadObj, id="get_igv_session", output_prefix= IGV_session()$outfile, output_data=IGV_session()$session_xml, col_names=FALSE)
+    #callModule(downloadObj, id="get_igv_session", output_prefix= IGV_session()$outfile, output_data=IGV_session()$session_xml, col_names=FALSE)
 
     output$go_to_venus <- renderUI ({
       req(length(venus_link())>0)
@@ -2149,7 +2223,7 @@ server <- function(input, output, session) {
     ########################
     
     observeEvent(input$preferred_vars_remove, {
-      shiny::validate(need(input$preferred_vars_tab_rows_selected, "Select a gene"))
+      shiny::validate(need(input$preferred_vars_tab_rows_selected, "Select a variant"))
       RV$saved_vars <- RV$saved_vars[-input$preferred_vars_tab_rows_selected,]
       if(nrow(RV$saved_vars) == 0) {RV$saved_vars <- NULL}
     })
@@ -2177,6 +2251,7 @@ server <- function(input, output, session) {
     })
     
     output$preferred_vars_tab <- DT::renderDataTable({
+      req(RV$saved_vars)
       ok_cols <- c(vis_cols, "caseID",
                    colnames(RV$saved_vars)[grep("GT_",colnames(RV$saved_vars))])
       hide_cols <- setdiff(colnames(RV$saved_vars), ok_cols)
@@ -2193,6 +2268,25 @@ server <- function(input, output, session) {
           )
         )
       )
+    })
+    
+    saved_genes <- reactive ({
+      thisCase <- "HACKTHIS"
+      all <- "NOTHING_SAVED"
+      if(!is.null(RV$saved_vars)) {
+        thisCase <- c(thisCase, unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree]))
+        all <- unique(RV$saved_vars$gene)
+      }
+      return(list(thisCase=thisCase,all=all))
+    })
+    saved_vars <- reactive ({
+      thisCase <- "HACKTHIS"
+      all <- "NOTHING_SAVED"
+      if(!is.null(RV$saved_vars)) {
+        thisCase <- c(thisCase, unique(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))
+        all <- unique(RV$saved_vars$internal_id)
+      }
+      return(list(thisCase=thisCase,all=all))
     })
 }
 
