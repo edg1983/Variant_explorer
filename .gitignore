@@ -1,3 +1,5 @@
 encrypted_data/*.RData
 encrypted_data/*.enc
 encrypted_data/*.zip
+test/*
+

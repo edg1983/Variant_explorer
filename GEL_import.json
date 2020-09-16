@@ -1,0 +1,25 @@
+{
+  "BAM": {
+    "index_file": "test/bam_files.tsv",
+    "has_header": false,
+    "sampleID_col": "V1",
+    "file_col": "V2"
+  },
+  "EXPHUNTER": {
+    "index_file": "",
+    "has_header": false,
+    "sampleID_col": "V1",
+    "file_col": "V2"
+  },
+  "ROH": {
+    "index_file": "",
+    "has_header": false,
+    "sampleID_col": "V1",
+    "file_col": "V2",
+    "ROH_file_structure": {
+      "chr_col": "V1",
+      "start_col": "V2",
+      "stop_col": "V3"
+    }
+  }
+}

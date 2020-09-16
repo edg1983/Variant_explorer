@@ -8,7 +8,7 @@
 ##########################################
 ### Install needed packages if missing ###
 ##########################################
-list.of.packages <- c("cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
+list.of.packages <- c("data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -50,6 +50,7 @@ library(scattermore)
 library(shinycssloaders)
 library(ontologyIndex)
 library(stringr)
+library(data.table)
 source("plotModule.R")
 source("downloadModule.R")
 source("segregationModule.R")
@@ -106,6 +107,14 @@ decrypt_datafile = function(inf, pwd) {
         return(0)
     })
     return (d)
+}
+
+computeNormZ <- function(gene,score) {
+  if (gene %in% names(genes_dist)) {
+    return(genes_dist[[gene]](score))
+  } else {
+    return(NA)
+  }
 }
 
 #Retrieve clinical impact and disease from ClinVar
@@ -276,8 +285,12 @@ ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors
 
 ##Load GADO distribution
 message("Load HICF2 GADO distribution")
-GADO_file <- gzfile(getResource("GADO_distribution.tsv.gz"))
-gado_distribution <- read.table(GADO_file, sep="\t", header=T, stringsAsFactors = F)
+GADO_file <- getResource("GADO_distribution.tsv.gz")
+gado_distribution <- fread(cmd=paste0("zcat ",GADO_file), sep="\t", header=T)
+
+message("Compute cohort normalized GADO score")
+genes_dist <- gado_distribution %>% group_by(Hgnc) %>% group_map(~ ecdf(.x$Zscore))
+names(genes_dist) <- levels(as.factor(gado_distribution$Hgnc))
 
 ##Load HPO data
 message("Load HPO profiles")
@@ -799,6 +812,7 @@ server <- function(input, output, session) {
             #RV$data$segregation_df$sup_dnm <- 0
             RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
             RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
+            RV$data$genes_scores$cohort_norm_Z <- apply(RV$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
             RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                              breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                              labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
@@ -969,6 +983,17 @@ server <- function(input, output, session) {
     }) 
 
     
+    ##############################
+    ### Side bar reactive
+    ##############################
+    #Use in UI: menuItemOutput("recOpt") 
+    output$recOpt <- renderMenu({
+      if(input$radio == 2)
+        menuItem("Options", tabName = "recOpt", icon = icon("bell"),
+                 menuSubItem("No option",tabName="RO_00"),
+                 menuSubItem("Option 1",tabName="RO_01")
+        )
+    })
     ##################
     ### Overview Tab
     ##################

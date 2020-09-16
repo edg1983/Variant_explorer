@@ -1,25 +1,37 @@
-# Prepare pedigree data in a single object
+## DESCRIPTION ------------------
+# Cohort varan post-process script
+# Author: Edoardo Giacopuzzi
+
 # Pre-process var2reg results, ROH data and Expansion Hunter data
-# Save a single S3 object containing processed tables ready to be loaded into Variant Explorer app
+# Save a list as single S3 object ready to be loaded into Variant Explorer app
 
-library(jsonlite)
-library(GenomicRanges)
-library(kinship2)
-library(dplyr)
-library(tidyr)
-library(data.table)
 
-VERSION <- "20200724"
+## DECLARE VARS ------------
+libraries <- c("data.table","dplyr","GenomicRanges","jsonlite","kinship2", "optparse","tidyr")
+VERSION <- "v1.0"
+run_date <- format(Sys.time(),"%Y%m%d_%H%M%S")
+
+help_message <- "Usage as follow:
+       Prepare_data.R output_dir config_file.json releaseID
+       Prepare_data.R output_dir project_dir var2reg_idx_file releaseID
+       You can provide either a project folder OR a config file.
+       If project folder is provided the script expects data to be distributed in standard sub-folders
+       config_file is a tab-separated file containing the following columns:
+       - var2reg: var2reg idx file (var2reg files paths and sampleIDs are read from this)
+       - ROH: directory of ROH files, file names must match sample ID in var2reg idx (sampleID.txt)
+       - ExpansionHunter: directory of ExpHunter json files, file names must match sample ID in var2reg idx (sampleID.json)"
+
+## FUNCTIONS ---------------
 
 # load (gziped) data file
 loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
   #message("Loading ", dataF)
   if ( endsWith(dataF, ".gz") ) {
     dat_file = paste0('zgrep -v "', skipchar, '" ', dataF)
-    dat = fread(cmd=dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F,)
   } else {
-    dat = fread(dataF, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
+    dat_file = paste0('grep -v "', skipchar, '" ', dataF)
   }
+  dat = fread(cmd=dat_file, header=header, sep=sep, na.strings=c("na","NA","."), stringsAsFactors = F)
   if ( ! is.na(source)) {
     dat$source = source
   }
@@ -37,193 +49,332 @@ saveData = function(myobj, outf) {
   })
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-
-if (length(args)<3) {
-  stop("Usage as follow:
-       Prepare_data.R output_dir config_file.tsv releaseID
-       Prepare_data.R output_dir project_dir var2reg_idx_file releaseID
-       You can provide either a project folder OR a config file.
-       If project folder is provided the script expects data to be distributed in standard sub-folders
-       config_file is a tab-separated file containing the following columns:
-       - var2reg: var2reg idx file (var2reg files paths and sampleIDs are read from this)
-       - ROH: directory of ROH files, file names must match sample ID in var2reg idx (sampleID.txt)
-       - ExpansionHunter: directory of ExpHunter json files, file names must match sample ID in var2reg idx (sampleID.json)", 
-       call.=FALSE)
+# check if a lib is installed
+InstalledPackage <- function(package) {
+  available <- suppressMessages(suppressWarnings(
+    sapply(
+      package,
+      require,
+      quietly = TRUE,
+      character.only = TRUE,
+      warn.conflicts = FALSE
+    )
+  ))
+  missing <- package[!available]
+  if (length(missing) > 0)
+    return(FALSE)
+  return(TRUE)
 }
 
-output_dir <- args[1]
-if (file_test("-d", args[2])) {
-  from_config = FALSE
-  project_dir = args[2]
-  releaseID <- args[4]
+# load libraries 
+loadLibraries <- function(libs) {
+  for (l in libs) {
+    if (InstalledPackage(l)) {
+      suppressMessages(suppressWarnings(
+        sapply(
+          l,
+          library,
+          quietly = TRUE,
+          character.only = TRUE,
+          warn.conflicts = FALSE
+        )
+      ))
+    } else {
+      stop(l, " library is not installed", call. = FALSE)
+    }
+  }
+}
+
+# check file exists and print message
+checkFileExists <- function(files, mode="o", exit="warn") {
+  for (file in files) {
+    if (mode == "o") {
+      if (!file.exists(file)) {
+        if (exit == "warn") {
+          warning(file, " not found. Skipped!",call. = FALSE, immediate. = TRUE)
+          return(FALSE)
+        } else if (exit == "stop") {
+          stop(file, " not found",call. = FALSE)
+        }
+      } else {
+        return(TRUE)
+      }
+    } else if (mode == "w") {
+      if (file.exists(file)) {
+        if (exit == "rename") {
+          warning(file, " already present. Old file renamed to .", run_date, call. = FALSE, immediate. = TRUE)
+          file.rename(file, paste0(file,".",run_date))
+        } 
+      }
+    }
+  }
+}
+
+# load idx files from config and make them to list
+readFromConfig <- function(config, tag) {
+  outlist <- NULL
+  if (!is.null(config[[tag]]$index_file) & !config[[tag]]$index_file=="") {
+    if (checkFileExists(c(config[[tag]]$index_file),"o","warn")) {
+      df <- loadData(config[[tag]]$index_file, header = config[[tag]]$has_header)
+      outlist <- as.list(bam_list[[config[[tag]]$file_col]])
+      names(outlist) <- bam_list[[config[[tag]]$sampleID_col]]
+    } 
+  }
+  return(outlist)
+}
+
+## INITIALIZE --------------
+loadLibraries(libraries)
+
+option_list <- list(
+  make_option(c("-c","--config"), type = "character", default = NA,
+              help = "Config file (JSON)"),
+  make_option(c("-i","--index"), type = "character", default = NA,
+              help = "var2reg index file (.tsv.gz)"),
+  make_option(c("-d","--dataset_version"), type = "character", default = run_date,
+              help = "A name for this version of the dataset. Default to the current date"),
+  make_option(c("-o","--output"), type = "character", default = "processed_data",
+              help = "output folder where processed data is saved"),
+  make_option(c("-w","--overwrite"), action = "store_true",
+              help = "set this option to overwrite existing output files")
+)
+args <- parse_args(OptionParser(option_list = option_list))
+
+if (args$overwrite) { overwrite <- "overwrite" } else { overwrite <- "rename" }
+
+dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
+if (!file_test("-d", args$output)) { 
+  stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
+}
+checkFileExists(c(args$config, args$index),"o", "stop")
+
+message(
+"=======================================
+Cohort_VARAN POST PROCESSING ", VERSION, "\n",
+"----------------------------------------
+var2reg index: ", args$index, "\n",
+"Reading from config file: ", args$config, "\n",
+"Output folder: ", args$output, "\n",
+"Dataset version: ", args$dataset_version, "\n",
+"======================================="
+)
+
+config <- read_json(args$config)
+releaseID <- args$dataset_version
+output_dir <- args$output
+idx_file <- args$index 
+
+## READ DATA FROM CONFIG --------------
+bam_files <- readFromConfig(config,"BAM")
+roh_files <- readFromConfig(config,"ROH")
+exphunter_files <- readFromConfig(config,"EXPHUNTER")
+
+# TODO make segregation col names configurable
+
+## PROCESS DATA ----------------
+start_time <- Sys.time()
+idx_df <- loadData(idx_file)
+saved_files <- 0
+failed_files <- 0
+good_peds <- 0
+total <- nrow(idx_df)
+message("Loaded var2reg idx file containing ", total, " dataset")
+message("#### START PROCESSING ####")
+
+for (n in 1:nrow(idx_df)) {
+  message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
   
-  message("No config file provided. Reading from project standard folders")
-  message("Output folder: ", output_dir)
-  if (file_test("-f", paste0(project_dir,"/var2reg/",args[3]))) {
-    message("var2reg index file: ", paste0(project_dir,"/var2reg/",args[3])) 
+  #convert idx file line to list
+  newlist <- as.list(idx_df[n,])
+  newlist$releaseID <- releaseID
+  
+  #Set output filename
+  out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
+  checkFileExists(c(out_file),"w", overwrite)
+  
+  #Split samples IDs into vectors 
+  newlist$all_samples <- strsplit(newlist$all_samples, ",")[[1]]
+  newlist$affected_samples <- strsplit(newlist$affected_samples, ",")[[1]]
+  
+  #Check mandatory input files were present
+  checkFileExists(c(newlist$gado_file,
+                    newlist$gene_file,
+                    newlist$comphet_file,
+                    newlist$variant_file,
+                    newlist$pedigree_file,
+                    newlist$known_variant_file
+                    ),"o", "stop")
+  
+  #GADO data ----------
+  gado_score <- loadData(newlist$gado_file)
+  newlist$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
+  
+  #COMPHET data -------
+  comphet_df <- loadData(newlist$comphet_file)
+  #if (nrow(comphet_df) == 0) {next} #skip loading data if comphet empty
+  comphet_df$ID <- paste0("CompHet_", comphet_df$rec_id)
+  comphet_df$Class <- "PASS"
+  newlist$comphet_df <- comphet_df
+  
+  #VARIANTS data ------
+  variants_df <- loadData(newlist$variant_file)
+  variants_df$Class <- "PASS"
+  variants_df$internal_id <- paste(variants_df$chr,variants_df$start,variants_df$end,variants_df$ref,variants_df$alt, sep="_")
+  variants_ranges <- GRanges(seqnames = variants_df$chr, ranges = IRanges(variants_df$start, end=variants_df$end),ID=variants_df$rec_id)
+  newlist$variants_df <- variants_df
+  newlist$variants_ranges <- variants_ranges
+  
+  #retain only samples with genotypes
+  #it is possible that additional samples are present in the PED but not in the VCF
+  #we want samples IDs only for samples that are actually in the VCF
+  all_samples_GT <- paste("GT", newlist$all_samples, sep ="_")
+  
+  tot_vars <- nrow(newlist$variants_df)
+  samples_with_GT <- NULL 
+  for (sID in all_samples_GT) {
+    if (sum(is.na(newlist$variants_df[[sID]])) < tot_vars) {
+      samples_with_GT <- c(samples_with_GT, gsub("GT_","",sID))
+    }
+  }
+  newlist$all_samples <- samples_with_GT
+  newlist$affected_samples <- intersect(newlist$affected_samples, newlist$all_samples)
+  
+  newlist$unaffected_samples <- setdiff(newlist$all_samples, newlist$affected_samples)
+  newlist$n_affected <- length(newlist$affected_samples)
+  newlist$n_unaffected <- length(newlist$unaffected_samples)
+  
+  #These are values used by Variant Explorer for segregation filters
+  newlist$values_affected <- seq(0,newlist$n_affected)
+  newlist$values_unaffected <- seq(0, newlist$n_unaffected)
+
+  #fill hom_ / het_ columns with genotypes counts
+  #var2reg counts het / hom only if they are above quality threshold
+  #we want full counts for the app segregation filter instead, since GQ filter can be set separately
+  affected_cols <- which(colnames(newlist$variants_df) %in% paste("GT",newlist$affected_samples, sep="_"))
+  newlist$variants_df$het_aff <- rowSums(newlist$variants_df[,..affected_cols] == 1,na.rm = T)
+  newlist$variants_df$hom_aff <- rowSums(newlist$variants_df[,..affected_cols] == 2,na.rm = T)
+  if (length(newlist$unaffected_samples) > 0) {
+    unaffected_cols <- which(colnames(newlist$variants_df) %in% paste("GT",newlist$unaffected_samples, sep="_"))
+    newlist$variants_df$het_unaff <- rowSums(newlist$variants_df[,..unaffected_cols] == 1,na.rm = T)
+    newlist$variants_df$hom_unaff <- rowSums(newlist$variants_df[,..unaffected_cols] == 2,na.rm = T)
   } else {
-    stop("Provided var2reg idx file not found in var2reg folder")
+    newlist$variants_df$het_unaff <- 0
+    newlist$variants_df$hom_unaff <- 0
   }
   
-} else if (file_test("-f", args[2])) {
-  releaseID <- args[3]
-  config <- read.table(args[2], sep="\t", header=T, stringsAsFactors = F)
-  from_config = TRUE
+  #SEGREGATION data ------------
+  if (nrow(newlist$comphet_df) > 0) {
+    seg_df1 <- as.data.frame(
+      newlist$comphet_df %>% select(rec_id,num_aff) %>% 
+      mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0, sup_dnm=0) %>%
+      dplyr::rename(comphet_aff = num_aff) )
+  } else {
+    seg_df1 <- NULL
+  }
+  seg_df2 <- as.data.frame(
+      newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff,sup_dnm) %>%
+      mutate(comphet_aff = 0) )
+  newlist$segregation_df <- rbind(seg_df1, seg_df2)
   
-  message("Reading from config file ", args[2])
-  message("Output folder: ", output_dir)
-} else {
-  stop("Provided config file or project directory not found")
-}
-
-if (from_config==TRUE) {
-  message("Reading from config not implemented yet")
-
-} else {
+  #GENES data -------------------- 
+  #Genes scores are moved to a separate table (genes_scores)
+  genes_df <- loadData(paste0(newlist$gene_file))
+  genes_df$Class <- "PASS"
+  genes_scores <- as.data.frame(genes_df %>% 
+    select(gene,gado_zscore,exomiser_gene_pheno_score,pLI_exac,pLI_gnomad,GDI_phred,EDS,RVIS,Class) %>% 
+      distinct() %>% 
+      arrange(desc(gado_zscore)))
+  genes_df <- as.data.frame(genes_df %>% select(gene,inh_model,variants_n,variants,Class))
   
-  var2reg_dir <- paste0(project_dir,"/var2reg")
-  roh_dir <- paste0(project_dir,"/ROH")
-  roh_suffix <- "_ROH_full"
-  ExpHunter_dir <- paste0(project_dir,"/Expansion_hunter")
-
-  idx_file <- paste0(var2reg_dir, "/", args[3])
-  idx_df <- loadData(idx_file)
-  message("Loaded var2reg idx file containing ", nrow(idx_df), " dataset")
+  #if there are comphet, we copy the genes and vars to genes table to ensure all genes are represented
+  if (nrow(comphet_df) > 0) {
+    genes_with_comphet <- as.data.frame(
+      comphet_df %>% select(gene,rec_id) %>% group_by(gene) %>% 
+        mutate(variants=paste(rec_id,collapse = ","), variants_n=n(), inh_model="comphet", Class="PASS") %>% 
+        select(gene,variants,variants_n,inh_model,Class) %>% 
+        distinct() )
+  } else {
+    genes_with_comphet <- NULL
+  }
   
-  #samplesID <- gsub("V2\\.|\\.var2reg.vars.tsv.gz","",files)
+  genes_df <- rbind(genes_df, genes_with_comphet)
+  genes_df <- as.data.frame(genes_df %>% separate_rows(variants, sep=","))
+  newlist$genes_df <- genes_df
+  newlist$genes_scores <- genes_scores
   
-  message("Loading and preparing data")
-  saved_files <- 0
-  failed_files <- 0
-  good_peds <- 0
-  total <- nrow(idx_df)
-
-  for (n in 1:nrow(idx_df)) {
-    #convert idx df to list
-    newlist <- as.list(idx_df[n,])
-    newlist$releaseID <- releaseID
-    message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
-    
-    #Set out file and skip if already present
-    out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
-    if (file_test("-f", out_file)) {next}
-    
-    #load gado data
-    gado_score <- loadData(newlist$gado_file)
-    newlist$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
-    
-    #load comphet data
-    comphet_df <- loadData(paste0(newlist$comphet_file))
-    #if (nrow(comphet_df) == 0) {next} #skip loading data if comphet empty
-    comphet_df$ID <- paste0("CompHet_", comphet_df$rec_id)
-    comphet_df$Class <- "PASS"
-    newlist$comphet_df <- comphet_df
-    
-    #load variants data
-    variants_df <- loadData(paste0(newlist$variant_file))
-    variants_df$Class <- "PASS"
-    variants_df$internal_id <- paste(variants_df$chr,variants_df$start,variants_df$end,variants_df$ref,variants_df$alt, sep="_")
-    variants_ranges <- GRanges(seqnames = variants_df$chr, ranges = IRanges(variants_df$start, end=variants_df$end),ID=variants_df$rec_id)
-    newlist$variants_df <- variants_df
-    newlist$variants_ranges <- variants_ranges
-    
-    #split samples ids into vectors and retain only samples with genotypes
-    newlist$all_samples <- strsplit(newlist$all_samples, ",")[[1]]
-    newlist$affected_samples <- strsplit(newlist$affected_samples, ",")[[1]]
-    all_samples_GT <- paste("GT", newlist$all_samples, sep ="_")
-    
-    tot_vars <- nrow(newlist$variants_df)
-    samples_with_GT <- NULL 
-    for (sID in all_samples_GT) {
-      if (sum(is.na(newlist$variants_df[[sID]])) < tot_vars) {
-        samples_with_GT <- c(samples_with_GT, gsub("GT_","",sID))
-      }
-    }
-    newlist$all_samples <- samples_with_GT
-    newlist$affected_samples <- intersect(newlist$affected_samples, newlist$all_samples)
-    
-    newlist$unaffected_samples <- setdiff(newlist$all_samples, newlist$affected_samples)
-    newlist$n_affected <- length(newlist$affected_samples)
-    newlist$n_unaffected <- length(newlist$unaffected_samples)
-    
-    #Set some values for the app
-    newlist$values_affected <- seq(0,newlist$n_affected)
-    newlist$values_unaffected <- seq(0, newlist$n_unaffected)
-    
-    #TEMP HACK - fill hom_ / het_ columns with genotypes counts
-    affected_cols <- which(colnames(newlist$variants_df) %in% paste("GT",newlist$affected_samples, sep="_"))
-    newlist$variants_df$het_aff <- rowSums(newlist$variants_df[,..affected_cols] == 1,na.rm = T)
-    newlist$variants_df$hom_aff <- rowSums(newlist$variants_df[,..affected_cols] == 2,na.rm = T)
-    if (length(newlist$unaffected_samples) > 0) {
-      unaffected_cols <- which(colnames(newlist$variants_df) %in% paste("GT",newlist$unaffected_samples, sep="_"))
-      newlist$variants_df$het_unaff <- rowSums(newlist$variants_df[,..unaffected_cols] == 1,na.rm = T)
-      newlist$variants_df$hom_unaff <- rowSums(newlist$variants_df[,..unaffected_cols] == 2,na.rm = T)
-    } else {
-      newlist$variants_df$het_unaff <- 0
-      newlist$variants_df$hom_unaff <- 0
-    }
-    
-    #Create segregation df
-    if (nrow(newlist$comphet_df) > 0) {
-      seg_df1 <- as.data.frame(
-        newlist$comphet_df %>% select(rec_id,num_aff) %>% 
-        mutate(hom_aff=0, hom_unaff=0, het_aff=0, het_unaff=0, sup_dnm=0) %>%
-        dplyr::rename(comphet_aff = num_aff) )
-    } else {
-      seg_df1 <- NULL
-    }
-    seg_df2 <- as.data.frame(
-        newlist$variants_df %>% select(rec_id,hom_aff,hom_unaff,het_aff,het_unaff,sup_dnm) %>%
-        mutate(comphet_aff = 0) )
-    newlist$segregation_df <- rbind(seg_df1, seg_df2)
-    
-    #Load genes table. Gene scores are moved to a separate table
-    #Missing scores are set to zero
-    genes_df <- loadData(paste0(newlist$gene_file))
-    genes_df$Class <- "PASS"
-    genes_scores <- as.data.frame(genes_df %>% 
-      select(gene,gado_zscore,exomiser_gene_pheno_score,pLI_exac,pLI_gnomad,GDI_phred,EDS,RVIS,Class) %>% 
-        distinct() %>% 
-        arrange(desc(gado_zscore)))
-    genes_df <- as.data.frame(genes_df %>% select(gene,inh_model,variants_n,variants,Class))
-    
-    if (nrow(comphet_df) > 0) {
-      genes_with_comphet <- as.data.frame(
-        comphet_df %>% select(gene,rec_id) %>% group_by(gene) %>% 
-          mutate(variants=paste(rec_id,collapse = ","), variants_n=n(), inh_model="comphet", Class="PASS") %>% 
-          select(gene,variants,variants_n,inh_model,Class) %>% 
-          distinct() )
-    } else {
-      genes_with_comphet <- NULL
-    }
-    
-    genes_df <- rbind(genes_df, genes_with_comphet)
-    genes_df <- as.data.frame(genes_df %>% separate_rows(variants, sep=","))
-    newlist$genes_df <- genes_df
-    newlist$genes_scores <- genes_scores
-    
-    #Load Expansion Hunter jsons and ROH data
-    newlist$ROH_data <- NULL
-    newlist$ROH_ranges <- list()
-    newlist$ExpHunter <- list()
+  #PED files ---------------
+  #Read PED into kinship2 format, singleton cannot be displayed
+  ped_df <- loadData(newlist$pedigree_file, header=F)
+  ped_df$V5[ped_df$V5==1] <- "male"
+  ped_df$V5[ped_df$V5==2] <- "female"
+  ped_df$V5[ped_df$V5==0] <- "unknown"
+  ped_df$V6[ped_df$V6 == 0] <- 1
+  
+  #Load ped file and auto fix, if failed the ped cannot be displayed
+  tryCatch({
+    fixed_ped <- with(ped_df, fixParents(id=V2, dadid = V3, momid=V4, sex=V5, missid=0))
+    fixed_ped <- merge(fixed_ped, ped_df[,c("V2","V6")], by.x="id", by.y="V2", all.x=T)
+    fixed_ped$V6[is.na(fixed_ped$V6)] <- 1
+    newlist$ped <- with(fixed_ped, pedigree(id=id, dadid = dadid, momid = momid, sex = sex, affected = V6, missid = 0))
+    good_peds <- good_peds + 1
+  }, error=function(cond) {
+    newlist$ped <- NA
+  })
+  
+  #KNOWN VARS data ----------------
+  newlist$known_vars <- loadData(newlist$known_variant_file)
+  newlist$known_vars <- newlist$known_vars %>% separate_rows(known_ids, sep=",")
+  newlist$known_vars$internal_id <- paste(newlist$known_vars$chr,newlist$known_vars$start,newlist$known_vars$end,newlist$known_vars$ref,newlist$known_vars$alt, sep="_")
+  newlist$known_clinvar <- newlist$known_vars[grep("CV[0-9]+",newlist$known_vars$known_ids,perl = T),]
+  newlist$known_cosmic <- newlist$known_vars[grep("COSV[0-9]+",newlist$known_vars$known_ids,perl = T),]
+  
+  #ROH data --------------
+  newlist$ROH_data <- NULL
+  newlist$ROH_ranges <- list()
+  
+  if (inherits(roh_files, "list")) {
     for (s in newlist$all_samples) {
-      ROH_file <- paste0(roh_dir, "/",s,roh_suffix,".txt")
-      if (file_test("-f", ROH_file)) {
-        ROH_df <- loadData(ROH_file)
-        newlist$ROH_ranges[[s]] <- GRanges(
-          seqnames = ROH_df$Chromosome, 
-          ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
-          ID = paste0("ROH_", 1:nrow(ROH_df)),
-          value = ROH_df$End - ROH_df$Start)
-        
-        ROH_df$Sample <- s
-        newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
+      if (!is.null(roh_files[[s]])) {
+        ROH_file <- roh_files[[s]]
+        if (checkFileExists(ROH_file,"o","warn")) {
+          ROH_df <- loadData(ROH_file)
+          newlist$ROH_ranges[[s]] <- GRanges(
+            seqnames = ROH_df$Chromosome, 
+            ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
+            ID = paste0("ROH_", 1:nrow(ROH_df)),
+            value = ROH_df$End - ROH_df$Start)
+          
+          ROH_df$Sample <- s
+          newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
+        }
       }
-      
-      ExpHunter_file <- paste0(ExpHunter_dir, "/", s, ".json")
-      if (file_test("-f", ExpHunter_file)) {
-        newlist$ExpHunter[[s]] <- read_json(ExpHunter_file)
+    }
+    
+    #Prepare ROH intersection for affected samples
+    if (newlist$n_affected > 1) {
+      affected_withROH <- intersect(newlist$affected_samples, names(newlist$ROH_ranges))
+      intersect_ROH <- newlist$ROH_ranges[[affected_withROH[1]]]
+      if (!is.null(affected_withROH)) {
+        for (sID in affected_withROH[-1]) {
+          intersect_ROH <- GenomicRanges::intersect(intersect_ROH, newlist$ROH_ranges[[sID]])
+        }
+        newlist$ROH_ranges$AFFECTED_SHARED <- intersect_ROH
+        newlist$ROH_ranges$AFFECTED_SHARED$value <- width(newlist$ROH_ranges$AFFECTED_SHARED)
+        newlist$ROH_ranges$AFFECTED_SHARED$ID <- paste0("ROH_", 1:length(newlist$ROH_ranges$AFFECTED_SHARED))
+      }
+    }
+  }
+  
+  #EXPANSION HUNTER (jsons) --------------
+  newlist$ExpHunter <- NULL
+  
+  if (inherits(exphunter_files, "list")) {
+    for (s in newlist$all_samples) {
+      if (!is.null(exphunter_files[[s]])) {
+        ExpHunter_file <- exphunter_files[[s]]
+        if (checkFileExists(ExpHunter_file,"o","warn")) {
+          newlist$ExpHunter[[s]] <- read_json(ExpHunter_file)
+        }
       }
     }
     
@@ -253,52 +404,35 @@ if (from_config==TRUE) {
     exphunter$group <- "UNAFFECTED"
     exphunter$group[exphunter$sampleID %in% newlist$affected_samples] <- "AFFECTED"
     newlist$ExpHunter$PEDIGREE <- exphunter
-    
-    #Prepare ROH intersection for affected samples
-    if (newlist$n_affected > 1) {
-      affected_withROH <- intersect(newlist$affected_samples, names(newlist$ROH_ranges))
-      intersect_ROH <- newlist$ROH_ranges[[affected_withROH[1]]]
-      for (sID in affected_withROH[-1]) {
-        intersect_ROH <- GenomicRanges::intersect(intersect_ROH, newlist$ROH_ranges[[sID]])
-      }
-      newlist$ROH_ranges$AFFECTED_SHARED <- intersect_ROH
-      newlist$ROH_ranges$AFFECTED_SHARED$value <- width(newlist$ROH_ranges$AFFECTED_SHARED)
-      newlist$ROH_ranges$AFFECTED_SHARED$ID <- paste0("ROH_", 1:length(newlist$ROH_ranges$AFFECTED_SHARED))
-    }
-    
-    #Load ped file into kinship2 format
-    ped_df <- loadData(newlist$pedigree_file, header=F)
-    ped_df$V5[ped_df$V5==1] <- "male"
-    ped_df$V5[ped_df$V5==2] <- "female"
-    ped_df$V5[ped_df$V5==0] <- "unknown"
-    ped_df$V6[ped_df$V6 == 0] <- 1
-    
-    tryCatch({
-      fixed_ped <- with(ped_df, fixParents(id=V2, dadid = V3, momid=V4, sex=V5, missid=0))
-      fixed_ped <- merge(fixed_ped, ped_df[,c("V2","V6")], by.x="id", by.y="V2", all.x=T)
-      fixed_ped$V6[is.na(fixed_ped$V6)] <- 1
-      newlist$ped <- with(fixed_ped, pedigree(id=id, dadid = dadid, momid = momid, sex = sex, affected = V6, missid = 0))
-      good_peds <- good_peds + 1
-    }, error=function(cond) {
-      newlist$ped <- NA
-    })
-      
-    #Load known vars data
-    newlist$known_vars <- loadData(newlist$known_variant_file)
-    newlist$known_vars <- newlist$known_vars %>% separate_rows(known_ids, sep=",")
-    newlist$known_vars$internal_id <- paste(newlist$known_vars$chr,newlist$known_vars$start,newlist$known_vars$end,newlist$known_vars$ref,newlist$known_vars$alt, sep="_")
-    newlist$known_clinvar <- newlist$known_vars[grep("CV[0-9]+",newlist$known_vars$known_ids,perl = T),]
-    newlist$known_cosmic <- newlist$known_vars[grep("COSV[0-9]+",newlist$known_vars$known_ids,perl = T),]
-    
-    #Save data object
-    save_results <- saveData(newlist,outf=out_file)
-    if (save_results == 1) {
-      saved_files = saved_files + 1
-    } else {
-      failed_files = failed_files + 1
-    }
+  }
+
+  #BAM FILES locations --------------
+  newlist$BAM_files <- NULL
+  if(inherits(bam_files, "list")) {
+    newlist$BAM_files <- bam_files
   }
   
-  message("\nProcess completed\n",saved_files, " saved\n", failed_files, " failed\n", good_peds, " correct pedigree loaded")
+  #SAVE DATA --------------------
+  #Save the list containig processed data into an RDS object
+  save_results <- saveData(newlist,outf=out_file)
+  if (save_results == 1) {
+    saved_files = saved_files + 1
+  } else {
+    failed_files = failed_files + 1
+  }
 }
 
+## CLOSE MESSAGE ----------------------
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+elapsed_time <- paste0(round(elapsed_time,2), " ", units(elapsed_time))
+message(
+"\n=======================================
+FINISHED PROCESSING in ", elapsed_time, "\n",
+"----------------------------------------
+N input pedigree from index: ", total, "\n",
+"N saved: ", saved_files, "\n",
+"N failed: ", failed_files, "\n",
+"N with ped: ", good_peds, "\n",
+"======================================="
+)
