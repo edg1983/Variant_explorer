@@ -14,6 +14,9 @@ labkey_url <- "https://labkey-embassy.gel.zone/labkey/"
 gel_data_v <- "main-programme_v10_2020-09-03"
 run_date <- format(Sys.time(),"%Y%m%d_%H%M%S")
 
+roh_header_GEL <- FALSE
+roh_cols_GEL <- list(chrom = "V1", start = "V2", stop = "V3")
+
 ## FUNCTIONS ---------------
 
 # load (gziped) data file
@@ -199,7 +202,8 @@ if (args$use_labkey) {
     roh_df$file_path <- paste0(roh_df$file_path, "Variations/", roh_df$platekey, ".ROH.bed")
     roh_files <- makeNamedList(roh_df, "platekey", "file_path")
     
-    roh_cols <- list(chrom = "V1", start = "V2", stop = "V3")
+    roh_cols <- roh_cols_GEL
+    roh_header <- roh_header_GEL
   }
 }
 
@@ -212,7 +216,7 @@ if (!file_test("-d", args$output)) {
   stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
 }
 
-checkFileExists(args$index,"o", "stop")
+index_exists <- checkFileExists(args$index,"o", "stop")
 
 releaseID <- args$dataset_version
 output_dir <- args$output
@@ -233,6 +237,7 @@ if (!args$use_labkey) {
     config <- read_json(args$config)
     bam_files <- readFromConfig(config,"BAM")
     roh_files <- readFromConfig(config,"ROH")
+    roh_header <- config$ROH$ROH_file_structure$has_header
     exphunter_files <- readFromConfig(config,"EXPHUNTER")
     roh_cols <- list(
       chrom = config$ROH$ROH_file_structure$chr_col,
@@ -407,8 +412,11 @@ for (n in 1:nrow(idx_df)) {
     for (s in newlist$all_samples) {
       if (!is.null(roh_files[[s]])) {
         ROH_file <- roh_files[[s]]
+        message("ROH file is: ", ROH_file)
         if (checkFileExists(ROH_file,"o","warn")) {
-          ROH_df <- loadData(ROH_file)
+          message("ROH file exists")
+          ROH_df <- loadData(ROH_file,header = roh_header)
+          message(head(ROH_df))
           newlist$ROH_ranges[[s]] <- GRanges(
             seqnames = ROH_df[[roh_cols$chrom]], 
             ranges = IRanges(ROH_df[[roh_cols$start]], end=ROH_df[[roh_cols$stop]]), 

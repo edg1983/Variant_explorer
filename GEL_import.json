@@ -17,6 +17,7 @@
     "sampleID_col": "V1",
     "file_col": "V2",
     "ROH_file_structure": {
+      "has_header": false,
       "chr_col": "V1",
       "start_col": "V2",
       "stop_col": "V3"
