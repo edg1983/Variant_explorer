@@ -156,8 +156,8 @@ var2reg index: ", args$index, "\n",
 )
 
 # If an additional lib path is specified this is added to libPaths
-if (!is.na(args.lib_path)) {
-  if (!file_test("-d", args.lib_path)) { 
+if (!is.na(args$lib_path)) {
+  if (!file_test("-d", args$lib_path)) { 
     warning("You have specified a non existing folder as additional libpath", immediate. = T)
   } else {
     .libPaths(c(args$lib_path, .libPaths()))
@@ -168,7 +168,7 @@ loadLibraries(libraries)
 # LabKey may be used when in GEL environment to get path of data files
 # If you set --use_labkey, the script will create bam_file and roh_file tabs from labkey
 # At the moment we read ExpHunter data from json while GEL only provides vcf, so this is skipped
-if (args.use_labkey) {
+if (args$use_labkey) {
   exphunter_files <- NULL
   message("LABKEY option active - Get BAM/ROH locations from LabKey DB")
   message("Eventual config file will be ignored")
@@ -204,7 +204,7 @@ if (args.use_labkey) {
 
 if (args$overwrite) { overwrite <- "overwrite" } else { overwrite <- "rename" }
 
-if (is.na(args.index)) { stop("You must specify an index file") }
+if (is.na(args$index)) { stop("You must specify an index file") }
 
 dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
 if (!file_test("-d", args$output)) { 
@@ -219,8 +219,8 @@ idx_file <- args$index
   
 ## READ DATA FROM CONFIG --------------
 #Config is loaded only if use labkey is false otherwise it is ignored
-if (!args.use_labkey) {
-  if (is.na(args.config)) {
+if (!args$use_labkey) {
+  if (is.na(args$config)) {
     warning("You have specified neither LabKey or a config file. No BAM / ROH / ExpHunter files will be loaded",
             immediate. = T) 
     bam_files <- NULL
