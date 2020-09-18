@@ -163,6 +163,7 @@ if (!is.na(args$lib_path)) {
     .libPaths(c(args$lib_path, .libPaths()))
   }
 }
+message("Loading libraries...")
 loadLibraries(libraries)
 
 # LabKey may be used when in GEL environment to get path of data files
