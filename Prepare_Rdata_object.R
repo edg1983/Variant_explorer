@@ -169,44 +169,6 @@ if (!is.na(args$lib_path)) {
 message("Loading libraries...")
 loadLibraries(libraries)
 
-# LabKey may be used when in GEL environment to get path of data files
-# If you set --use_labkey, the script will create bam_file and roh_file tabs from labkey
-# At the moment we read ExpHunter data from json while GEL only provides vcf, so this is skipped
-if (args$use_labkey) {
-  exphunter_files <- NULL
-  message("LABKEY option active - Get BAM/ROH locations from LabKey DB")
-  message("Eventual config file will be ignored")
-  #loadLibraries("Rlabkey")
-  labkey.setDefaults(baseUrl=labkey_url)
-  message("Performing LabKey query...")
-  query_bam <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
-                WHERE File_sub_type == "BAM"'
-  
-  suppressMessages(suppressWarnings(
-  bam_df <- labkey.executeSql(folderPath=paste0("/main_programme/", gel_data_v),
-                                 schemaName="lists",
-                                 colNameOpt="rname",
-                                 sql = query_bam,
-                                 maxRows = 1e+06 )
-  ))
-  if (is.null(bam_files) | nrow(bam_files) == 0) {
-    warning("Unable to get bam files from LabKey table. BAM and ROH files will not be loaded!", immediate. = T)
-    bam_files <- NULL
-    roh_files <- NULL
-  } else {
-    message(nrow(bam_files), " samples loaded from LabKey table")
-    bam_files <- makeNamedList(bam_df, "platekey", "file_path")
-    
-    roh_df <- bam_files
-    roh_df$file_path <- gsub("Assembly.*","",roh_df$file_path)
-    roh_df$file_path <- paste0(roh_df$file_path, "Variations/", roh_df$platekey, ".ROH.bed")
-    roh_files <- makeNamedList(roh_df, "platekey", "file_path")
-    
-    roh_cols <- roh_cols_GEL
-    roh_header <- roh_header_GEL
-  }
-}
-
 if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" }
 
 if (is.na(args$index)) { stop("You must specify an index file") }
@@ -222,9 +184,44 @@ releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
   
-## READ DATA FROM CONFIG --------------
+## READ DATA FROM CONFIG OR LABKEY --------------
+# LabKey may be used when in GEL environment to get path of data files
+# If you set --use_labkey, the script will load bam_files and roh_files locations from labkey
+# At the moment we read ExpHunter data from json while GEL only provides vcf, so this is skipped
+if (args$use_labkey) {
+  exphunter_files <- NULL
+  message("LABKEY option active - Get BAM/ROH locations from LabKey DB")
+  message("Eventual config file will be ignored")
+  #loadLibraries("Rlabkey")
+  labkey.setDefaults(baseUrl=labkey_url)
+  message("Performing LabKey query...")
+  query_bam <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
+                WHERE File_sub_type == "BAM"'
+  
+  suppressMessages(suppressWarnings(
+    bam_df <- labkey.executeSql(folderPath=paste0("/main_programme/", gel_data_v),
+                                schemaName="lists",
+                                colNameOpt="rname",
+                                sql = query_bam,
+                                maxRows = 1e+06 )
+  ))
+  if (is.null(bam_files) | nrow(bam_files) == 0) {
+    warning("Unable to get bam files from LabKey table. BAM and ROH files will not be loaded!", immediate. = T)
+    bam_files <- NULL
+    roh_files <- NULL
+  } else {
+    bam_files <- makeNamedList(bam_df, "platekey", "file_path")
+    
+    roh_df <- bam_files
+    roh_df$file_path <- gsub("Assembly.*","",roh_df$file_path)
+    roh_df$file_path <- paste0(roh_df$file_path, "Variations/", roh_df$platekey, ".ROH.bed")
+    roh_files <- makeNamedList(roh_df, "platekey", "file_path")
+    
+    roh_cols <- roh_cols_GEL
+    roh_header <- roh_header_GEL
+  }
+} else {
 #Config is loaded only if use labkey is false otherwise it is ignored
-if (!args$use_labkey) {
   if (is.na(args$config)) {
     warning("You have specified neither LabKey or a config file. No BAM / ROH / ExpHunter files will be loaded",
             immediate. = T) 
@@ -244,13 +241,13 @@ if (!args$use_labkey) {
       start = config$ROH$ROH_file_structure$start_col,
       stop = config$ROH$ROH_file_structure$stop_col
     )
-    message("
-    Information loaded:
-            \t", length(bam_files), " BAM files
-            \t", length(roh_files), " ROH files
-            \t", length(bam_files), " ExpHunter files")
   }
 }
+message("
+Information loaded:
+        \t", length(bam_files), " BAM files
+        \t", length(roh_files), " ROH files
+        \t", length(exphunter_files), " ExpHunter files")
 # TODO make segregation col names configurable
 
 ## PROCESS DATA ----------------
@@ -412,15 +409,11 @@ for (n in 1:nrow(idx_df)) {
   #ROH data --------------
   newlist$ROH_data <- NULL
   newlist$ROH_ranges <- list()
-  message(roh_files[1])
   if (inherits(roh_files, "list")) {
-    message("roh_files is list")
     for (s in newlist$all_samples) {
       if (!is.null(roh_files[[s]])) {
         ROH_file <- roh_files[[s]]
-        message("ROH file is: ", ROH_file)
         if (checkFileExists(ROH_file,"o","warn")) {
-          message("ROH file exists")
           ROH_df <- loadData(ROH_file,header = roh_header)
           message(head(ROH_df))
           newlist$ROH_ranges[[s]] <- GRanges(
