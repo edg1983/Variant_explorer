@@ -32,7 +32,7 @@ loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
 }
 
 # save R object
-saveData = function(myobj, outf) {
+saveData = function(myobj, outf, mode="overwrite") {
   result <- tryCatch({
     saveRDS(myobj, outf, compress = TRUE)
     return(1)
@@ -134,9 +134,9 @@ option_list <- list(
               help = "A name for this version of the dataset. Default to the current date"),
   make_option(c("-o","--output"), type = "character", default = "processed_data",
               help = "output folder where processed data is saved"),
-  make_option(c("-w","--overwrite"), action = "store_true",
+  make_option(c("-w","--overwrite"), action = "store_true", default=FALSE,
               help = "set this option to overwrite existing output files"),
-  make_option(c("-k","--use_labkey"), action = "store_true",
+  make_option(c("-k","--use_labkey"), action = "store_true", default=FALSE,
               help = "When running in GEL, set this option to get bam / roh files locations from LabKey"),
   make_option(c("-l","--lib_path"), type = "character", default = NA, 
               help = "additional path for R libraries")
@@ -203,7 +203,7 @@ if (args$use_labkey) {
   }
 }
 
-if (args$overwrite) { overwrite <- "overwrite" } else { overwrite <- "rename" }
+if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" }
 
 if (is.na(args$index)) { stop("You must specify an index file") }
 
@@ -262,7 +262,7 @@ for (n in 1:nrow(idx_df)) {
   
   #Set output filename
   out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
-  checkFileExists(c(out_file),"w", overwrite)
+  checkFileExists(c(out_file),"w", write_mode)
   
   #Split samples IDs into vectors 
   newlist$all_samples <- strsplit(newlist$all_samples, ",")[[1]]
