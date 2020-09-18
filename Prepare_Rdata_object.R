@@ -229,7 +229,7 @@ if (!args$use_labkey) {
     exphunter_files <- NULL
   } else {
     message("Loading BAM / ROH locations from files specified in config file")
-    checkFileExists(args$config,"o", "stop")
+    file_exists <- checkFileExists(args$config,"o","stop")
     config <- read_json(args$config)
     bam_files <- readFromConfig(config,"BAM")
     roh_files <- readFromConfig(config,"ROH")
@@ -480,7 +480,7 @@ for (n in 1:nrow(idx_df)) {
   #BAM FILES locations --------------
   newlist$BAM_files <- NULL
   if(inherits(bam_files, "list")) {
-    newlist$BAM_files <- bam_files
+    newlist$bam_files <- bam_files[newlist$all_samples]
   }
   
   #SAVE DATA --------------------
