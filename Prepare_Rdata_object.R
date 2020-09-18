@@ -244,6 +244,11 @@ if (!args$use_labkey) {
       start = config$ROH$ROH_file_structure$start_col,
       stop = config$ROH$ROH_file_structure$stop_col
     )
+    message("
+    Information loaded:
+            \t", length(bam_files), " BAM files
+            \t", length(roh_files), " ROH files
+            \t", length(bam_files), " ExpHunter files")
   }
 }
 # TODO make segregation col names configurable
