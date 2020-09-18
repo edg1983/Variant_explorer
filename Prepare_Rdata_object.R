@@ -254,11 +254,10 @@ message("Loaded var2reg idx file containing ", total, " dataset\n")
 message("#### START PROCESSING ####")
 
 for (n in 1:nrow(idx_df)) {
-  message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
-  
   #convert idx file line to list
   newlist <- as.list(idx_df[n,])
   newlist$releaseID <- releaseID
+  message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
   
   #Set output filename
   out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
