@@ -4,22 +4,15 @@
 
 # Pre-process var2reg results, ROH data and Expansion Hunter data
 # Save a list as single S3 object ready to be loaded into Variant Explorer app
-
+# optparse lib must be installed in one of the locations accessible to R
+# you can then specify an optional lib location to provide other libs
 
 ## DECLARE VARS ------------
-libraries <- c("data.table","dplyr","GenomicRanges","jsonlite","kinship2", "optparse","tidyr")
+libraries <- c("data.table","dplyr","GenomicRanges","jsonlite","kinship2", "optparse","Rlabkey","tidyr")
 VERSION <- "v1.0"
+labkey_url <- "https://labkey-embassy.gel.zone/labkey/"
+gel_data_v <- "main-programme_v10_2020-09-03"
 run_date <- format(Sys.time(),"%Y%m%d_%H%M%S")
-
-help_message <- "Usage as follow:
-       Prepare_data.R output_dir config_file.json releaseID
-       Prepare_data.R output_dir project_dir var2reg_idx_file releaseID
-       You can provide either a project folder OR a config file.
-       If project folder is provided the script expects data to be distributed in standard sub-folders
-       config_file is a tab-separated file containing the following columns:
-       - var2reg: var2reg idx file (var2reg files paths and sampleIDs are read from this)
-       - ROH: directory of ROH files, file names must match sample ID in var2reg idx (sampleID.txt)
-       - ExpansionHunter: directory of ExpHunter json files, file names must match sample ID in var2reg idx (sampleID.json)"
 
 ## FUNCTIONS ---------------
 
@@ -116,15 +109,21 @@ readFromConfig <- function(config, tag) {
   if (!is.null(config[[tag]]$index_file) & !config[[tag]]$index_file=="") {
     if (checkFileExists(c(config[[tag]]$index_file),"o","warn")) {
       df <- loadData(config[[tag]]$index_file, header = config[[tag]]$has_header)
-      outlist <- as.list(bam_list[[config[[tag]]$file_col]])
-      names(outlist) <- bam_list[[config[[tag]]$sampleID_col]]
+      outlist <- makeNamedList(df, config[[tag]]$sampleID_col, config[[tag]]$file_col)
     } 
   }
   return(outlist)
 }
 
+# Make a named list from 2 cols in a df, one as names, one as values
+makeNamedList <- function(df,names_col,values_col) {
+  outlist <- as.list(df[[values_col]])
+  names(outlist) <- df[[names_col]]
+  return(outlist)
+}
+
 ## INITIALIZE --------------
-loadLibraries(libraries)
+loadLibraries("optparse")
 
 option_list <- list(
   make_option(c("-c","--config"), type = "character", default = NA,
@@ -136,39 +135,111 @@ option_list <- list(
   make_option(c("-o","--output"), type = "character", default = "processed_data",
               help = "output folder where processed data is saved"),
   make_option(c("-w","--overwrite"), action = "store_true",
-              help = "set this option to overwrite existing output files")
+              help = "set this option to overwrite existing output files"),
+  make_option(c("-k","--use_labkey"), action = "store_true",
+              help = "When running in GEL, set this option to get bam / roh files locations from LabKey"),
+  make_option(c("-k","--lib_path"), type = "character", default = NA, 
+              help = "additional path for R libraries")
 )
 args <- parse_args(OptionParser(option_list = option_list))
 
+message(
+  "=======================================
+Cohort_VARAN POST PROCESSING ", VERSION, "\n",
+  "----------------------------------------
+var2reg index: ", args$index, "\n",
+  "Config file: ", args$config, "\n",
+  "Get from LabKey: ", args$use_labkey, "\n",
+  "Output folder: ", args$output, "\n",
+  "Dataset version: ", args$dataset_version, "\n",
+  "======================================="
+)
+
+# If an additional lib path is specified this is added to libPaths
+if (!is.na(args.lib_path)) {
+  if (!file_test("-d", args.lib_path)) { 
+    warning("You have specified a non existing folder as additional libpath", immediate. = T)
+  } else {
+    .libPaths(c(args$lib_path, .libPaths()))
+  }
+}
+loadLibraries(libraries)
+
+# LabKey may be used when in GEL environment to get path of data files
+# If you set --use_labkey, the script will create bam_file and roh_file tabs from labkey
+# At the moment we read ExpHunter data from json while GEL only provides vcf, so this is skipped
+if (args.use_labkey) {
+  exphunter_files <- NULL
+  message("LABKEY option active - Get BAM/ROH locations from LabKey DB")
+  message("Eventual config file will be ignored")
+  #loadLibraries("Rlabkey")
+  labkey.setDefaults(baseUrl=labkey_url)
+  message("Performing LabKey query...")
+  query_bam <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
+                WHERE File_sub_type == "BAM"'
+  
+  suppressMessages(suppressWarnings(
+  bam_df <- labkey.executeSql(folderPath=paste0("/main_programme/", gel_data_v),
+                                 schemaName="lists",
+                                 colNameOpt="rname",
+                                 sql = query_bam,
+                                 maxRows = 1e+06 )
+  ))
+  if (is.null(bam_files) | nrow(bam_files) == 0) {
+    warning("Unable to get bam files from LabKey table. BAM and ROH files will not be loaded!", immediate. = T)
+    bam_files <- NULL
+    roh_files <- NULL
+  } else {
+    message(nrow(bam_files), " samples loaded from LabKey table")
+    bam_files <- makeNamedList(bam_df, "platekey", "file_path")
+    
+    roh_df <- bam_files
+    roh_df$file_path <- gsub("Assembly.*","",roh_df$file_path)
+    roh_df$file_path <- paste0(roh_df$file_path, "Variations/", roh_df$platekey, ".ROH.bed")
+    roh_files <- makeNamedList(roh_df, "platekey", "file_path")
+    
+    roh_cols <- list(chrom = "V1", start = "V2", stop = "V3")
+  }
+}
+
 if (args$overwrite) { overwrite <- "overwrite" } else { overwrite <- "rename" }
+
+if (is.na(args.index)) { stop("You must specify an index file") }
 
 dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
 if (!file_test("-d", args$output)) { 
   stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
 }
-checkFileExists(c(args$config, args$index),"o", "stop")
 
-message(
-"=======================================
-Cohort_VARAN POST PROCESSING ", VERSION, "\n",
-"----------------------------------------
-var2reg index: ", args$index, "\n",
-"Reading from config file: ", args$config, "\n",
-"Output folder: ", args$output, "\n",
-"Dataset version: ", args$dataset_version, "\n",
-"======================================="
-)
+checkFileExists(args$index,"o", "stop")
 
-config <- read_json(args$config)
 releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
-
+  
 ## READ DATA FROM CONFIG --------------
-bam_files <- readFromConfig(config,"BAM")
-roh_files <- readFromConfig(config,"ROH")
-exphunter_files <- readFromConfig(config,"EXPHUNTER")
-
+#Config is loaded only if use labkey is false otherwise it is ignored
+if (!args.use_labkey) {
+  if (is.na(args.config)) {
+    warning("You have specified neither LabKey or a config file. No BAM / ROH / ExpHunter files will be loaded",
+            immediate. = T) 
+    bam_files <- NULL
+    roh_files <- NULL
+    exphunter_files <- NULL
+  } else {
+    message("Loading BAM / ROH locations from files specified in config file")
+    checkFileExists(args$config,"o", "stop")
+    config <- read_json(args$config)
+    bam_files <- readFromConfig(config,"BAM")
+    roh_files <- readFromConfig(config,"ROH")
+    exphunter_files <- readFromConfig(config,"EXPHUNTER")
+    roh_cols <- list(
+      chrom = config$ROH$ROH_file_structure$chr_col,
+      start = config$ROH$ROH_file_structure$start_col,
+      stop = config$ROH$ROH_file_structure$stop_col
+    )
+  }
+}
 # TODO make segregation col names configurable
 
 ## PROCESS DATA ----------------
@@ -178,7 +249,7 @@ saved_files <- 0
 failed_files <- 0
 good_peds <- 0
 total <- nrow(idx_df)
-message("Loaded var2reg idx file containing ", total, " dataset")
+message("Loaded var2reg idx file containing ", total, " dataset\n")
 message("#### START PROCESSING ####")
 
 for (n in 1:nrow(idx_df)) {
@@ -339,10 +410,10 @@ for (n in 1:nrow(idx_df)) {
         if (checkFileExists(ROH_file,"o","warn")) {
           ROH_df <- loadData(ROH_file)
           newlist$ROH_ranges[[s]] <- GRanges(
-            seqnames = ROH_df$Chromosome, 
-            ranges = IRanges(ROH_df$Start, end=ROH_df$End), 
+            seqnames = ROH_df[[roh_cols$chrom]], 
+            ranges = IRanges(ROH_df[[roh_cols$start]], end=ROH_df[[roh_cols$stop]]), 
             ID = paste0("ROH_", 1:nrow(ROH_df)),
-            value = ROH_df$End - ROH_df$Start)
+            value = ROH_df[[roh_cols$stop]] - ROH_df[[roh_cols$start]])
           
           ROH_df$Sample <- s
           newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
@@ -430,7 +501,7 @@ message(
 "\n=======================================
 FINISHED PROCESSING in ", elapsed_time, "\n",
 "----------------------------------------
-N input pedigree from index: ", total, "\n",
+N input cases from index: ", total, "\n",
 "N saved: ", saved_files, "\n",
 "N failed: ", failed_files, "\n",
 "N with ped: ", good_peds, "\n",

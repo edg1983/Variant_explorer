@@ -6,13 +6,13 @@
     "file_col": "V2"
   },
   "EXPHUNTER": {
-    "index_file": "",
+    "index_file": "test/exphunter_file.tsv",
     "has_header": false,
     "sampleID_col": "V1",
     "file_col": "V2"
   },
   "ROH": {
-    "index_file": "",
+    "index_file": "test/roh_file.tsv",
     "has_header": false,
     "sampleID_col": "V1",
     "file_col": "V2",
