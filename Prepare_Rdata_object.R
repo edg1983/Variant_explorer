@@ -138,7 +138,7 @@ option_list <- list(
               help = "set this option to overwrite existing output files"),
   make_option(c("-k","--use_labkey"), action = "store_true",
               help = "When running in GEL, set this option to get bam / roh files locations from LabKey"),
-  make_option(c("-k","--lib_path"), type = "character", default = NA, 
+  make_option(c("-l","--lib_path"), type = "character", default = NA, 
               help = "additional path for R libraries")
 )
 args <- parse_args(OptionParser(option_list = option_list))
