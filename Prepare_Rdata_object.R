@@ -407,8 +407,9 @@ for (n in 1:nrow(idx_df)) {
   #ROH data --------------
   newlist$ROH_data <- NULL
   newlist$ROH_ranges <- list()
-  
+  message(roh_files[1])
   if (inherits(roh_files, "list")) {
+    message("roh_files is list")
     for (s in newlist$all_samples) {
       if (!is.null(roh_files[[s]])) {
         ROH_file <- roh_files[[s]]
