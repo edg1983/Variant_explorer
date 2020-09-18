@@ -10,8 +10,6 @@
 ## DECLARE VARS ------------
 libraries <- c("data.table","dplyr","GenomicRanges","jsonlite","kinship2", "optparse","Rlabkey","tidyr")
 VERSION <- "v1.0"
-labkey_url <- "https://labkey-embassy.gel.zone/labkey/"
-gel_data_v <- "main-programme_v10_2020-09-03"
 run_date <- format(Sys.time(),"%Y%m%d_%H%M%S")
 
 roh_header_GEL <- FALSE
@@ -158,6 +156,21 @@ var2reg index: ", args$index, "\n",
   "=======================================\n"
 )
 
+if (is.na(args$index)) { stop("You must specify an index file") }
+index_exists <- checkFileExists(args$index,"o", "stop")
+
+if (is.na(args$config)) { stop("You must specify a config file") }
+file_exists <- checkFileExists(args$config,"o","stop")
+config <- read_json(args$config)
+
+labkey_url <- config$labkey_url 
+gel_data_v <- config$gel_data_v
+
+dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
+if (!file_test("-d", args$output)) { 
+  stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
+}
+
 # If an additional lib path is specified this is added to libPaths
 if (!is.na(args$lib_path)) {
   if (!file_test("-d", args$lib_path)) { 
@@ -171,15 +184,6 @@ loadLibraries(libraries)
 
 if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" }
 
-if (is.na(args$index)) { stop("You must specify an index file") }
-
-dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
-if (!file_test("-d", args$output)) { 
-  stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
-}
-
-index_exists <- checkFileExists(args$index,"o", "stop")
-
 releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
@@ -192,7 +196,10 @@ if (args$use_labkey) {
   exphunter_files <- NULL
   message("LABKEY option active - Get BAM/ROH locations from LabKey DB")
   message("Eventual config file will be ignored")
-  #loadLibraries("Rlabkey")
+  message("LabKey settings\n",
+"\tURL: ", labkey_url, "\n",
+"\tdata: ", gel_data_v)
+
   labkey.setDefaults(baseUrl=labkey_url)
   message("Performing LabKey query...")
   query_bam <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
@@ -222,26 +229,16 @@ if (args$use_labkey) {
   }
 } else {
 #Config is loaded only if use labkey is false otherwise it is ignored
-  if (is.na(args$config)) {
-    warning("You have specified neither LabKey or a config file. No BAM / ROH / ExpHunter files will be loaded",
-            immediate. = T) 
-    bam_files <- NULL
-    roh_files <- NULL
-    exphunter_files <- NULL
-  } else {
-    message("Loading BAM / ROH locations from files specified in config file")
-    file_exists <- checkFileExists(args$config,"o","stop")
-    config <- read_json(args$config)
-    bam_files <- readFromConfig(config,"BAM")
-    roh_files <- readFromConfig(config,"ROH")
-    roh_header <- config$ROH$ROH_file_structure$has_header
-    exphunter_files <- readFromConfig(config,"EXPHUNTER")
-    roh_cols <- list(
-      chrom = config$ROH$ROH_file_structure$chr_col,
-      start = config$ROH$ROH_file_structure$start_col,
-      stop = config$ROH$ROH_file_structure$stop_col
-    )
-  }
+  message("Loading BAM / ROH locations from files specified in config file")
+  bam_files <- readFromConfig(config,"BAM")
+  roh_files <- readFromConfig(config,"ROH")
+  roh_header <- config$ROH$ROH_file_structure$has_header
+  exphunter_files <- readFromConfig(config,"EXPHUNTER")
+  roh_cols <- list(
+    chrom = config$ROH$ROH_file_structure$chr_col,
+    start = config$ROH$ROH_file_structure$start_col,
+    stop = config$ROH$ROH_file_structure$stop_col
+  )
 }
 message("Information loaded:
 \t", length(bam_files), " BAM files
