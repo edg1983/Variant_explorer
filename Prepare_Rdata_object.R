@@ -155,7 +155,7 @@ var2reg index: ", args$index, "\n",
   "Get from LabKey: ", args$use_labkey, "\n",
   "Output folder: ", args$output, "\n",
   "Dataset version: ", args$dataset_version, "\n",
-  "======================================="
+  "=======================================\n"
 )
 
 # If an additional lib path is specified this is added to libPaths
@@ -243,11 +243,10 @@ if (args$use_labkey) {
     )
   }
 }
-message("
-Information loaded:
-        \t", length(bam_files), " BAM files
-        \t", length(roh_files), " ROH files
-        \t", length(exphunter_files), " ExpHunter files")
+message("Information loaded:
+\t", length(bam_files), " BAM files
+\t", length(roh_files), " ROH files
+\t", length(exphunter_files), " ExpHunter files\n")
 # TODO make segregation col names configurable
 
 ## PROCESS DATA ----------------
@@ -257,7 +256,7 @@ saved_files <- 0
 failed_files <- 0
 good_peds <- 0
 total <- nrow(idx_df)
-message("Loaded var2reg idx file containing ", total, " dataset\n")
+message("Loaded var2reg idx file containing ", total, " datasets")
 message("#### START PROCESSING ####")
 
 for (n in 1:nrow(idx_df)) {
@@ -415,7 +414,6 @@ for (n in 1:nrow(idx_df)) {
         ROH_file <- roh_files[[s]]
         if (checkFileExists(ROH_file,"o","warn")) {
           ROH_df <- loadData(ROH_file,header = roh_header)
-          message(head(ROH_df))
           newlist$ROH_ranges[[s]] <- GRanges(
             seqnames = ROH_df[[roh_cols$chrom]], 
             ranges = IRanges(ROH_df[[roh_cols$start]], end=ROH_df[[roh_cols$stop]]), 
