@@ -1,4 +1,11 @@
 {
+  "data_dir": "encrypted_data",
+  "resource_dir": "Resources",
+  "PanelApp_dir": "@resource_dir/PanelApp",
+  "GeneLists_dir": "@resource_dir/geneLists",
+  "HPO_dir": "@resource_dir/HPO",
+  "coverage_dir": "@resource_dir/coverage",
+  "GREENDB": "@resource_dir/RegulatoryRegions.db",
   "var_groups": {
     "consequence_groups": {
       "reg_vars": ["enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant"],

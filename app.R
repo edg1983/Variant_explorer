@@ -5,108 +5,61 @@
 # Input are encrypted RData objects created with Prepare_Rdata_object.R     
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
 
-##########################################
-### Install needed packages if missing ###
-##########################################
-list.of.packages <- c("data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) {install.packages(new.packages)}
 
-#Packages from Bioconductor
-if(!("GenomicRanges" %in% installed.packages()[,"Package"])) {
-    if (!requireNamespace("BiocManager", quietly = TRUE)) {install.packages("BiocManager")}
-    BiocManager::install("GenomicRanges")
-}
-
-#Packages from github
-if(!("scattermore" %in% installed.packages()[,"Package"])) {
-    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
-    devtools::install_github('exaexa/scattermore', upgrade = FALSE)
-}
-if(!("shinycssloaders" %in% installed.packages()[,"Package"])) {
-    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
-    devtools::install_github('daattali/shinycssloaders',upgrade = FALSE)
-}
-
-#################
-### Libraries ###
-#################
-#options(repos = BiocManager::repositories())
-#getOption("repos")
-library(cyphr)
-library(shiny)
-library(shinyBS)
-library(DT)
-library(dplyr)
-library(plotly)
-library(ggplot2)
-library(kinship2)
-library(tidyr)
-library(shinydashboard)
-library(GenomicRanges)
-library(gridExtra)
-library(jsonlite)
-library(scattermore)
-library(shinycssloaders)
-library(ontologyIndex)
-library(stringr)
-library(data.table)
-source("plotModule.R")
-source("downloadModule.R")
-source("segregationModule.R")
-source("intersectBedModule.R")
-source("GQModule.R")
-source("filtersModule.R")
-
-#################
-### Constants ###
-#################
+## CONSTANTS --------------------
 APP_VERSION <- "1.2.1"
-resource_dir <- "Resources"
-PanelApp_dir <- paste0(resource_dir, "/PanelApp")
-GeneLists_dir <- paste0(resource_dir, "/geneLists")
-Coverage_dir <- paste0(resource_dir, "/coverage")
-HPO_dir <- paste0(resource_dir, "/HPO")
+
 BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM"
 VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF"
 SV_VCF <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
 vis_cols <- c("rec_id","var_id","gene","chr","start","end","ref","alt","var_type","known_ids","max_pop_af","cohort_af","consequence")
 
-#Set data dir containing variants tables
-data_dir <- "encrypted_data"
-
-#################
-### FUNCTIONS ###
-#################
+## FUNCTIONS --------------------------
 `%nin%` = Negate(`%in%`)
 
+# load libraries 
+loadLibraries <- function(libs) {
+  message("Loading libraries...")
+  for (l in libs) {
+    suppressMessages(suppressWarnings(
+      sapply(
+        l,
+        library,
+        quietly = TRUE,
+        character.only = TRUE,
+        warn.conflicts = FALSE
+      )
+    ))
+  }
+}
+
 readGMT <- function(input_file) {
-    out_list <- list()
-    con  <- file(input_file, open = "r")
-    while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
-        myvector <- (strsplit(oneLine, "\t"))
-        out_list[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
-    }
-    close(con) 
-    return(out_list)
+  out_list <- list()
+  con  <- file(input_file, open = "r")
+  while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
+    myvector <- (strsplit(oneLine, "\t"))
+    out_list[[myvector[[1]][1]]] <- myvector[[1]][3:length(myvector[[1]])][myvector[[1]][3:length(myvector[[1]])] != ""]
+  }
+  close(con) 
+  return(out_list)
 }
 
 getResource <- function(input_file, parent_dir=resource_dir) {
-    resource_file <- paste0(parent_dir,"/",input_file)
-    return(resource_file)
+  resource_file <- paste0(parent_dir,"/",input_file)
+  return(resource_file)
 }
 
 decrypt_datafile = function(inf, pwd) {
-    #pwd = .rs.askForPassword("Enter password") # asks for pwd in RStudio
-    k = cyphr::key_sodium(sodium::hash(charToRaw(pwd)))
-    d = tryCatch({
-        cyphr::decrypt(readRDS(inf), k)
-    }, error=function(cond) {
-        #RV$decrypt_status = "Could not decrypt! pwd wrong?"
-        #if (file.exists(outf)) { file.remove(outf) }
-        return(0)
-    })
-    return (d)
+  #pwd = .rs.askForPassword("Enter password") # asks for pwd in RStudio
+  k = cyphr::key_sodium(sodium::hash(charToRaw(pwd)))
+  d = tryCatch({
+    cyphr::decrypt(readRDS(inf), k)
+  }, error=function(cond) {
+    #RV$decrypt_status = "Could not decrypt! pwd wrong?"
+    #if (file.exists(outf)) { file.remove(outf) }
+    return(0)
+  })
+  return (d)
 }
 
 computeNormZ <- function(gene,score) {
@@ -137,73 +90,249 @@ getClinvarInfo <- function(ids, prefix="CV") {
   return(clinvar_info)
 }
 
-makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_file, BAM_path=BAM_dir, SV_file=SV_VCF) {
+makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_files, BAM_files, SV_files) {
   header<- paste('<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
-        paste0('<Session genome="hg38" hasGeneTrack="true" hasSequenceTrack="true" locus="', region, '">'),
-        '<Resources>', sep="\n")
-  resources_affected <- paste('<Resource path="', BAM_path, '/', affected_samples, '.bam"/>', collapse="\n", sep="")
-  resources_unaffected <- paste('<Resource path="', BAM_path, '/', unaffected_samples, '.bam"/>', collapse="\n", sep="")
-  resource_vcf <- paste0('<Resource path="', VCF_file, '"/>')
-  resource_sv <- paste0('<Resource path="', SV_VCF, '"/>')
+                 paste0('<Session genome="hg38" hasGeneTrack="true" hasSequenceTrack="true" locus="', region, '">'),
+                 '<Resources>', sep="\n")
   
-  VCF_panel <- paste('<Panel name="VCF_panel">',
-      paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', VCF_file, '" name="Family VCF platypus" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
-      '</Panel>',
-      sep="\n")
-  
-  SV_panel <- paste('<Panel name="SV_panel">',
-                     paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', SV_file, '" name="SV VCF" visible="true"/>'),
-                     '</Panel>',
-                     sep="\n")
-  
-  samples_panels <- NULL
+  BAM_panels <- NULL
+  VCF_panels <- NULL
+  SV_panels <- NULL
   for (sample in affected_samples) {
-      panel <- paste(paste0('<Panel name="', sample,'_panel">'),
-                  paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
-                  paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
-                  paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - affected" visible="true"/>'),
-                  '</Panel>',
-                  sep="\n")
-      samples_panels <- c(samples_panels, panel)
+    BAM_panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                   paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_files[[sample]], '_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_files[[sample]], '_junctions" visible="false"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_files[[sample]], '" name="', sample, ' - affected" visible="true"/>'),
+                   '</Panel>',
+                   sep="\n")
+    VCF_panel <- paste(paste0('<Panel name="', sample,' VCF">'),
+                       paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', 
+                             VCF_files$single_vcf[[sample]], 
+                             '" name="', sample, 'VCF - affected" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
+                       '</Panel>',
+                       sep="\n")
+    SV_panel <- paste(paste0('<Panel name="', sample,' SV VCF">'),
+                       paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', 
+                              SV_files$single_vcf[[sample]], 
+                              '" name="', sample, 'SV - affected" visible="true"/>'),
+                       '</Panel>',
+                       sep="\n")
+    BAM_panels <- c(BAM_panels, BAM_panel)
+    VCF_panels <- c(VCF_panels, VCF_panel)
+    SV_panels <- c(SV_panels, SV_panel)
   }
   for (sample in unaffected_samples) {
-      panel <- paste(paste0('<Panel name="', sample,'_panel">'),
-                     paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_path, '/', sample, '.bam_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
-                     paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_path, '/', sample, '.bam_junctions" visible="false"/>'),
-                     paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_path, '/', sample, '.bam" name="', sample, ' - unaffected" visible="true"/>'),
-                     '</Panel>',
-                     sep="\n")
-      samples_panels <- c(samples_panels, panel)
+    BAM_panel <- paste(paste0('<Panel name="', sample,'_panel">'),
+                   paste0('<Track autoScale="true" clazz="org.broad.igv.sam.CoverageTrack" id="', BAM_files[[sample]], '_coverage" name="', sample, ' Coverage" snpThreshold="0.2" visible="true"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.SpliceJunctionTrack" id="', BAM_files[[sample]], '_junctions" visible="false"/>'),
+                   paste0('<Track clazz="org.broad.igv.sam.AlignmentTrack" id="', BAM_files[[sample]], '" name="', sample, ' - unaffected" visible="true"/>'),
+                   '</Panel>',
+                   sep="\n")
+    VCF_panel <- paste(paste0('<Panel name="', sample,' VCF">'),
+                       paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', 
+                              VCF_files$single_vcf[[sample]], 
+                              '" name="', sample, 'VCF - unaffected" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
+                       '</Panel>',
+                       sep="\n")
+    SV_panel <- paste(paste0('<Panel name="', sample,' SV VCF">'),
+                      paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', 
+                             SV_files$single_vcf[[sample]], 
+                             '" name="', sample, 'SV - unaffected" visible="true"/>'),
+                      '</Panel>',
+                      sep="\n")
+    BAM_panels <- c(BAM_panels, BAM_panel)
+    VCF_panels <- c(VCF_panels, VCF_panel)
+    SV_panels <- c(SV_panels, SV_panel)
   }
-  samples_panels <- paste(samples_panels, collapse="\n")
+  BAM_panels <- paste(BAM_panels, collapse="\n")
+  VCF_panels <- paste(VCF_panels, collapse="\n")
+  SV_panels <- paste(SV_panels, collapse="\n")
+  
+  resource_bam <- paste('<Resource path="', unlist(BAM_files), '"/>', collapse="\n", sep="")
+  if (is.null(VCF_files$family_vcf)) {
+    resource_vcf <- paste('<Resource path="', unlist(VCF_files$single_vcf), '"/>', collapse="\n", sep="")
+  } else {
+    resource_vcf <- paste0('<Resource path="', VCF_files$family_vcf, '"/>')
+    VCF_panels <- paste('<Panel name="VCF_panel">',
+                        paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', VCF_files$family_vcf, '" name="Family VCF" siteColorMode="ALLELE_FREQUENCY" squishedHeight="1" visible="true"/>'),
+                        '</Panel>',
+                        sep="\n")
+  }
+  if (is.null(SV_files$family_vcf)) {
+    resource_sv <- paste('<Resource path="', unlist(SV_files$single_vcf), '"/>', collapse="\n", sep="")
+  } else {
+    resource_sv <- paste0('<Resource path="', SV_files$family_vcf, '"/>')
+    SV_panels <- paste('<Panel name="SV_panel">',
+                       paste0('<Track clazz="org.broad.igv.variant.VariantTrack" id="', SV_files$family_vcf, '" name="SV family VCF" visible="true"/>'),
+                       '</Panel>',
+                       sep="\n")
+  }
   
   close <- paste('<Panel height="61" name="FeaturePanel" width="1235">',
-      '<Track clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" visible="true"/>',
-      '<Track clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;426.0;255,255,255;0,0,178" fontSize="10" height="35" id="hg38_genes" name="Gene" visible="true"/>',
-      '</Panel>',
-      '</Session>', 
-      sep="\n")
+                 '<Track clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" visible="true"/>',
+                 '<Track clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;426.0;255,255,255;0,0,178" fontSize="10" height="35" id="hg38_genes" name="Gene" visible="true"/>',
+                 '</Panel>',
+                 '</Session>', 
+                 sep="\n")
   
   xml_text <- paste(header, 
-                    resources_affected,
-                    resources_unaffected,
+                    resource_bam,
                     resource_vcf, 
                     resource_sv, 
                     '</Resources>', 
-                    VCF_panel, 
-                    SV_panel, 
-                    samples_panels,
+                    VCF_panels, 
+                    SV_panels, 
+                    BAM_panels,
                     close,
                     sep="\n")
+  return(xml_text)
 }
 
-#############################
-### Load supporting files ###
-#############################
+## CHECK AND LOAD PACKAGES ----------------
+# Install missing packages
+packages.cran <- c("RSQLite","data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
+new.packages <- packages.cran[!(packages.cran %in% installed.packages()[,"Package"])]
+if(length(new.packages)) {install.packages(new.packages)}
 
-#Temporary ped and disease data are loaded from an Robject
-#load("Peds_and_HPOs.RData")
+#Packages from Bioconductor
+packages.bioc <- c("GenomicRanges")
+if(!("GenomicRanges" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {install.packages("BiocManager")}
+    BiocManager::install("GenomicRanges")
+}
 
+#Packages from github
+packages.github <- c("scattermore","shinycssloaders")
+if(!("scattermore" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
+    devtools::install_github('exaexa/scattermore', upgrade = FALSE)
+}
+if(!("shinycssloaders" %in% installed.packages()[,"Package"])) {
+    if (!requireNamespace("devtools", quietly = TRUE)) {install.packages("devtools")}
+    devtools::install_github('daattali/shinycssloaders',upgrade = FALSE)
+}
+
+# Load libraries
+#options(repos = BiocManager::repositories())
+#getOption("repos")
+loadLibraries(c(packages.cran, packages.bioc, packages.github))
+
+## LOAD MODULES -----------------------
+source("plotModule.R")
+source("downloadModule.R")
+source("segregationModule.R")
+source("intersectBedModule.R")
+source("GQModule.R")
+source("filtersModule.R")
+source("SQliteModule.R")
+
+## ENVIRONMENT CONFIG ----------------------------
+## Read config files
+app_settings <- read_json("App_configuration.json")
+filters_settings <- read_json("Filters_settings.json")
+
+#Set data dirs from config
+data_dir <- app_settings$data_dir
+Coverage_dir <- app_settings$coverage_dir
+resource_dir <- app_settings$resource_dir
+PanelApp_dir <- gsub("@resource_dir", resource_dir, app_settings$PanelApp_dir)
+GeneLists_dir <- gsub("@resource_dir", resource_dir, app_settings$GeneLists_dir)
+HPO_dir <- gsub("@resource_dir", resource_dir, app_settings$HPO_dir)
+GREENDB_file <- gsub("@resource_dir", resource_dir, app_settings$GREENDB)
+
+##Set axes options for plots
+plot_axes <- list()
+for (n in names(app_settings$plot_axes)) {
+  plot_axes[[n]] <- unlist(app_settings$plot_axes[[n]], use.names = T)
+}
+
+##Plots formatting styles
+format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
+                 axis.text.y = element_text(size=12))
+
+##consequence groups for various variant categories
+reg_vars <- app_settings$var_groups$consequence_groups$reg_vars 
+
+##var_type groups for various variant categories
+sv_vars <- app_settings$var_groups$var_type_groups$sv_vars
+small_vars <- app_settings$var_groups$var_type_groups$small_vars
+
+##Set segregation columns names
+segregation_cols <- unlist(app_settings$segregation_cols, use.names = T)
+
+##Set 3-letter to 1-letter aa codes
+aa_codes <- list(
+  Ala= "A",
+  Arg= "R",
+  Asn= "N",
+  Asp= "D",
+  Cys= "C",
+  Glu= "E",
+  Gln= "Q",
+  Gly= "G",
+  His= "H",
+  Ile= "I",
+  Leu= "L",
+  Lys= "K",
+  Met= "M",
+  Phe= "F",
+  Pro= "P",
+  Ser= "S",
+  Thr= "T",
+  Trp= "W",
+  Tyr= "Y",
+  Val= "V"
+)
+
+##Set reactive objects
+RV <- reactiveValues(
+  cohort_files = NULL,
+  notifications = list(),
+  tasks = list(),
+  data = 0,
+  custom_genes = data.frame(gene=character(), source=character(), stringsAsFactors = F),
+  customBed_ranges = FALSE,
+  filters_summ_genes = data.frame(),
+  filters_summ_vars = data.frame(),
+  selected_vars_region = "NONE",
+  accepted_reg_db = NULL,
+  cov_file = NULL,
+  selected_gene = FALSE,
+  saved_vars = NULL,
+  messages = list(userguide = messageItem(from="Variant Explorer",
+                                          message = "Variant explorer user guide", 
+                                          href="https://variant-explorer.readthedocs.io/en/latest") )
+)
+
+RV_cohort <- reactiveValues()
+
+##Put X scroll bar on top for data tables
+css <- HTML(
+  "#vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
+  transform:rotateX(180deg);
+  }
+  #vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }
+  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
+  transform:rotateX(180deg);
+  }
+  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }
+  #cohort_vars_df > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }
+  #cohort_comphet_df > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+  }"
+)
+
+#Get list of data objects in the data directory
+files <- list.files(data_dir, pattern = ".RData")
+samplesID <- gsub("\\.RData[.enc]*","",files, perl = T)
+
+## LOAD SUPPORTING FILES ------------------------
 ##Load hg38 chrom sizes
 message("Load chromosome size")
 chr_sizes_file <- getResource("hg38_chromSizes.txt")
@@ -286,11 +415,22 @@ ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors
 ##Load GADO distribution
 message("Load HICF2 GADO distribution")
 GADO_file <- getResource("GADO_distribution.tsv.gz")
-gado_distribution <- fread(cmd=paste0("zcat ",GADO_file), sep="\t", header=T)
+if (file.exists(GADO_file)) {
+  gado_distribution <- fread(cmd=paste0("zcat ",GADO_file), sep="\t", header=T)
+} else {
+  gado_distribution <- NULL
+}
 
-message("Compute cohort normalized GADO score")
-genes_dist <- gado_distribution %>% group_by(Hgnc) %>% group_map(~ ecdf(.x$Zscore))
-names(genes_dist) <- levels(as.factor(gado_distribution$Hgnc))
+message("Load cohort normalized GADO score")
+GADO_file <- getResource("GADO_cohortNormalized_score.RData")
+if (file.exists(GADO_file)) {
+  genes_dist <- readRDS(GADO_file)
+} else {
+  message("Cohort normalized GADO file not found. Generating a new file...")
+  genes_dist <- gado_distribution %>% group_by(Hgnc) %>% group_map(~ ecdf(.x$Zscore))
+  names(genes_dist) <- levels(as.factor(gado_distribution$Hgnc))
+  saveRDS(genes_dist, file=GADO_file)  
+}
 
 ##Load HPO data
 message("Load HPO profiles")
@@ -303,104 +443,7 @@ colnames(HPO_genes) <- c("gene","HPO_id","HPO_name")
 HICF2_HPO <- read.table(getResource("HICF2_HPO_terms.tsv"), sep="\t", header=T, stringsAsFactors = F)
 HICF2_HPO <- HICF2_HPO %>% separate_rows(HPO, sep=",")
 
-#################################
-### Environment configuration ###
-#################################
-
-## Read config files
-app_settings <- read_json("App_configuration.json")
-filters_settings <- read_json("Filters_settings.json")
-
-##Set axes options for plots
-plot_axes <- list()
-for (n in names(app_settings$plot_axes)) {
-plot_axes[[n]] <- unlist(app_settings$plot_axes[[n]], use.names = T)
-}
-
-##Plots formatting styles
-format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
-                 axis.text.y = element_text(size=12))
-
-##consequence groups for various variant categories
-reg_vars <- app_settings$var_groups$consequence_groups$reg_vars 
-
-##var_type groups for various variant categories
-sv_vars <- app_settings$var_groups$var_type_groups$sv_vars
-small_vars <- app_settings$var_groups$var_type_groups$small_vars
-
-##Set segregation columns names
-segregation_cols <- unlist(app_settings$segregation_cols, use.names = T)
-
-##Set 3-letter to 1-letter aa codes
-aa_codes <- list(
-  Ala= "A",
-  Arg= "R",
-  Asn= "N",
-  Asp= "D",
-  Cys= "C",
-  Glu= "E",
-  Gln= "Q",
-  Gly= "G",
-  His= "H",
-  Ile= "I",
-  Leu= "L",
-  Lys= "K",
-  Met= "M",
-  Phe= "F",
-  Pro= "P",
-  Ser= "S",
-  Thr= "T",
-  Trp= "W",
-  Tyr= "Y",
-  Val= "V"
-)
-
-##Set reactive objects
-RV <- reactiveValues(
-        notifications = list(),
-        data = 0,
-        custom_genes = data.frame(gene=character(), source=character(), stringsAsFactors = F),
-        customBed_ranges = FALSE,
-        filters_summ_genes = data.frame(),
-        filters_summ_vars = data.frame(),
-        selected_vars_region = "NONE",
-        accepted_reg_db = NULL,
-        cov_file = NULL,
-        selected_gene = FALSE,
-        saved_vars = NULL,
-        messages = list(jigv = messageItem(from="Variant Explorer",
-                                        message = "IGV session usage", 
-                                        href="https://variant-explorer.readthedocs.io/en/latest/usage/IGV_session.html") )
-    )
-
-##Put X scroll bar on top for data tables
-css <- HTML(
-  "#vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
-  transform:rotateX(180deg);
-  }
-  #vars_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
-  transform:rotateX(180deg);
-  }
-  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
-  transform:rotateX(180deg);
-  }
-  #comphet_results_table > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
-  transform:rotateX(180deg);
-  }"
-)
-
-##########################
-### List RData objects ###
-##########################
-
-#and look for files in data_dir
-files <- list.files(data_dir, pattern = ".RData")
-samplesID <- gsub("\\.RData[.enc]*","",files, perl = T)
-
-######################
-### USER INTERFACE ###
-######################
-
+## USER INTERFACE ------------------------
 ui <- dashboardPage(
     dashboardHeader(
         title = paste0("VarExplorer v", APP_VERSION),
@@ -435,11 +478,11 @@ ui <- dashboardPage(
                 menuSubItem("PanelApp and gene lists", tabName = "gene_lists")
             ),
             menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
-            menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th")),
+            menuItemOutput("exphunter_menu"),
             menuItem("Known variants", tabName= "known_variants", icon = icon("th")),
             menuItem("Saved variants", tabName= "preferred_vars", icon = icon("th")),
-            menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
-            
+            menuItemOutput("coverage_menu"),
+            menuItem("Cohort analysis", tabName= "cohort_analysis", icon = icon("th"))
         )
     ),
     dashboardBody(
@@ -700,6 +743,10 @@ ui <- dashboardPage(
                     fluidRow(column(4, uiOutput("go_to_venus"))),
                     
                     hr(),
+                    box(title = "Regulatory regions details", id = "reg_regions_box", status = "info", solidHeader = TRUE, width = 12,
+                        collapsible = TRUE, collapsed = TRUE,
+                        uiOutput("reg_regions_details")
+                    ),
                     box(title = "PanelApp and ClinVar", id = "panelapp_clinvar_details", status = "info", solidHeader = TRUE, width = 12,
                         collapsible = TRUE, collapsed = TRUE,
                         h3("PanelApp panels"),
@@ -758,574 +805,585 @@ ui <- dashboardPage(
                         column(2, textOutput("smooth_dimension")) ),
                     fluidRow(column(12, align="center",actionButton("plot_coverage","Plot coverage"))),
                     withSpinner(plotlyOutput("coverage_plot"))
-            )
+            ),
+            tabItem(tabName = "cohort_analysis",
+                    fluidRow(
+                      column(6, 
+                             selectInput(inputId = "cohort_samples", label = "samples to analyze", choices = samplesID, size = 10, selectize=F, multiple=T)
+                             ),
+                      column(4,
+                             fluidRow(downloadObjUI("save_cohort", label = "Save cohort results"), align="center"),
+                             br(),
+                             fluidRow(actionButton("apply_cohort", "Cohort analysis"), align="center"),
+                             br(),
+                             fluidRow(verbatimTextOutput("cohort_exit_status"))
+                             )
+                    ),
+                    br(),
+                    box(title = "Cohort genes", id = "cohort_genes_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE, width=12,
+                        DT::dataTableOutput("cohort_genes_df")),
+                    box(title = "Cohort variants", id = "cohort_vars_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE, width=12,
+                        DT::dataTableOutput("cohort_vars_df")),
+                    box(title = "Cohort comphet", id = "cohort_comphet_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, collapsed = TRUE, width=12,
+                        DT::dataTableOutput("cohort_comphet_df"))
+                    
+                    )
         )
     )
 )
 
-########################
-### SERVER FUNCTIONS ###
-########################
-
+## SERVER -------------------------------
 server <- function(input, output, session) {
-    ################
-    ### Load Files 
-    ################
-    
-    observeEvent(input$decrypt_button, {
-        #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
-        
-        #Reset relevant values when a new sample is loaded
-        #RV$messages <- list()
-        #RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
-        RV$customBed_ranges <- FALSE
-        RV$notifications <- list()
-        RV$cov_file <- NULL
-        RV$selected_gene <- FALSE
-        RV$custom_genes_n_loaded <- "NO"
-        RV$custom_genes_txt_length <- 0
-        RV$vars_pass_GQ <- NULL
-        RV$vars_pass_BED <- NULL
-        RV$vars_pass_ROH <- NULL 
-        RV$vars_pass_segregation <- NULL
-        RV$vars_pass_filters <- NULL
-        RV$vars_filters_df <- NULL
-        RV$segregation_filters_df <- NULL
-        RV$genes_filters_df <- NULL
-        RV$regions_filters_df <- NULL
-        RV$filters_json <- NULL
-        
-        #Load data from plain or encrypted object
-        if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
-            RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
-        } else if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData"))) {
-            RV$data <- readRDS(paste0(data_dir,"/",input$CaseCode,".RData"))
-        }
-        if (inherits(RV$data, "list")) {
-            RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
-            #RV$data$variants_df$VENUS_link <- "N/A"
-            
-            #RV$data$known_vars <- RV$data$known_vars %>% separate_rows(known_ids, sep=",")
-            #RV$data$known_clinvar <- RV$data$known_vars[grep("CV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
-            #RV$data$known_cosmic <- RV$data$known_vars[grep("COSV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
-
-            #RV$data$segregation_df$sup_dnm <- 0
-            RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
-            RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
-            RV$data$genes_scores$cohort_norm_Z <- apply(RV$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
-            RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
-                                             breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
-                                             labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
-           
-            RV$notifications[["decrypt"]] <- notificationItem(
-                text = paste0("Loaded data for ", input$CaseCode),
-                icon = icon("check-circle"),
-                status = "success")
-            RV$notifications[["pedigree"]] <- notificationItem(
-                text = paste0("Individuals: ", RV$data$
-                                  n_all_samples),
-                icon = icon("check-circle"),
-                status = "success")
-            RV$notifications[["variants"]] <- notificationItem(
-                text = paste0("variants loaded: ", length(unique(RV$data$variants_df$var_id))),
-                icon = icon("check-circle"),
-                status = "success")
-            RV$notifications[["genes"]] <- notificationItem(
-                text = paste0("distinct genes: ", length(unique(RV$data$genes_scores$gene))),
-                icon = icon("check-circle"),
-                status = "success")
-            
-            GQ_cols_all <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$all_samples, sep="_"))
-            RV$GQ_cols_all <- GQ_cols_all
-            RV$GQ_cols_affected <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$affected_samples, sep="_"))
-            RV$maxGQ <- max(RV$data$variants_df[,..GQ_cols_all], na.rm = T)
-            
-        } else {
-            RV$notifications[["decrypt"]] <- notificationItem(
-                text = "Error loading data! Missing file or wrong password!",
-                icon = icon("exclamation-circle"),
-                status = "danger")
-        }
-        
-    })
-
-    observeEvent(input$custom_bed, {
-        req(input$custom_bed)
-        tryCatch({
-        bed_df <- read.table(input$custom_bed$datapath, sep="\t", header=F, stringsAsFactors = F)
-
-        #ID is set to ROH_nline for compatibility with the bed filtering module
-        RV$customBed_ranges <- GRanges(seqnames = bed_df$V1, ranges = IRanges(bed_df$V2, end=bed_df$V3), ID = paste("ROH",1:nrow(bed_df),sep="_"))
-        
-        RV$notifications[["custom_bed"]] <- notificationItem(
-            text = paste0(nrow(bed_df), " regions loaded from BED"),
-            icon = icon("check-circle"),
-            status = "success")
-        } , error=function(cond) {
-            RV$notifications[["custom_bed"]] <- notificationItem(
-                text = paste0("Failed loading custom BED file"),
-                icon = icon("exclamation-circle"),
-                status = "danger")
-        })
-    })
-    
-    output$NotificationMenu <- renderMenu({
-        dropdownMenu(type = "notifications", .list = RV$notifications)
-    })
-    
-    output$MessageMenu <- renderMenu({
-        dropdownMenu(type = "messages", .list = RV$messages)
-    })
-    
-    #######################################
-    ### Data reactive tables configuration
-    #######################################
-    
-    variants_df <- reactive({
-        #input$Apply_filters
-        shiny::validate(need(inherits(RV$data, "list"), FALSE))
-        
-        ## FILTER VARS
-        #Get the final list of vars in accepted comphet intersecting filters and segregation
-        comphet_final_vars <- RV$data$comphet_df %>% filter(
-            rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet)) %>% 
-          gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
-        
-        #GET THE FINAL LIST OF ACCEPTED VARS
-        #the final list of segregating accepted vars is now equal to
-        #single vars passing filters and segregation
-        #vars part of a comphet passing all filters + segregation
-        accepted_vars_list <- unique(intersect(intersect(intersect(intersect(
-          RV$vars_pass_ROH, RV$vars_pass_GQ), 
-          RV$vars_pass_BED),
-          RV$vars_pass_filters$vars),
-          RV$vars_pass_segregation))
-        
-        accepted_vars_list <- unique(c(accepted_vars_list, comphet_final_vars$VarID))
-        
-        #return variants dataframe with updated Class column (PASS/FILTER)
-        as.data.frame(RV$data$variants_df %>% mutate(Class = ifelse(
-            rec_id %in% accepted_vars_list,
-            "PASS","FILTER") ) )
-    })
-    
-    comphet_df <- reactive({
-        filtered_vars_list <- variants_df()$rec_id[variants_df()$Class == "PASS"]
-        
-        as.data.frame(RV$data$comphet_df %>% mutate(Class = ifelse(
-            v1 %in% filtered_vars_list & 
-            v2 %in% filtered_vars_list &
-            rec_id %in% RV$vars_pass_segregation, "PASS", "FILTER")))
-    })
-    
-    genes_df <- reactive({
-        RV$filtered_vars_list <- unique(c(
-            variants_df()$rec_id[variants_df()$Class == "PASS"], 
-            comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
-
-        #Filters on gene scores are applied
-        as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
-            variants %in% RV$filtered_vars_list & 
-            gene %in% RV$genes_pass_filters, "PASS", "FILTER")))    
-    })
-    
-    genes_scores <- reactive({
-        RV$filtered_genes_list <- unique(genes_df()$gene[genes_df()$Class == "PASS"]) 
-        as.data.frame(RV$data$genes_scores %>% mutate(Class = ifelse(
-            gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
-    })
-    
-    filters_summ_genes <- reactive ({
-        tot_genes <- nrow(genes_scores())
-        PASS_count <- length(RV$genes_pass_filters)
-        filters_summ_genes <- data.frame(
-            Filter=c("Genes filters"), 
-            PASS=PASS_count/tot_genes, 
-            FILTERED=(tot_genes-PASS_count)/tot_genes)
-        filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
-        filters_summ_genes$Count <- as.numeric(filters_summ_genes$Count)
-        filters_summ_genes
-    })
-    
-    filters_summ_vars <- reactive ({
-        tot_vars <- RV$data$variants_df %>% select(var_id) %>% distinct() %>% nrow()
-        comphet_seg_vars <- RV$data$comphet_df %>% filter(
-          rec_id %in% RV$vars_pass_segregation) %>% 
-          gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
-        PASS_counts <- c(
-            variants_df() %>% filter(rec_id %in% RV$vars_pass_filters$vars) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(rec_id %in% RV$vars_pass_GQ) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(rec_id %in% c(RV$vars_pass_segregation, comphet_seg_vars$VarID)) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(rec_id %in% RV$vars_pass_ROH) %>% select(var_id) %>% distinct() %>% nrow(),
-            variants_df() %>% filter(rec_id %in% RV$vars_pass_BED) %>% select(var_id) %>% distinct() %>% nrow()
-        )
-        filters_summ_vars <- data.frame(Filter=c("variants","GQ","segregation","ROH","custom BED"),
-            PASS=PASS_counts/tot_vars, 
-            FILTERED=(tot_vars-PASS_counts)/tot_vars)
-        
-        filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
-        filters_summ_vars$Count <- as.numeric(filters_summ_vars$Count)
-        filters_summ_vars
-    })
-    
-    PanelApp_panels_df <- reactive ({
-        panels_idx <- PanelApp_genes$panel_idx[PanelApp_genes$entity_name %in% RV$filtered_genes_list]
-        as.data.frame(PanelApp_data %>% filter(id %in% panels_idx))
-    })
-    
-    geneLists_df <- reactive ({
-        geneLists_idx <- geneLists_genes$genelist_idx[geneLists_genes$entity_name %in% RV$filtered_genes_list]
-        as.data.frame(geneLists_data %>% filter(id %in% geneLists_idx))
-    })
-    
-    ClinVar_df <- reactive ({
-        as.data.frame(ClinVar_genes %>% filter(gene %in% RV$filtered_genes_list))
-    }) 
-
-    
-    ##############################
-    ### Side bar reactive
-    ##############################
-    #Use in UI: menuItemOutput("recOpt") 
-    output$recOpt <- renderMenu({
-      if(input$radio == 2)
-        menuItem("Options", tabName = "recOpt", icon = icon("bell"),
-                 menuSubItem("No option",tabName="RO_00"),
-                 menuSubItem("Option 1",tabName="RO_01")
-        )
-    })
-    ##################
-    ### Overview Tab
-    ##################
-    
-    output$releaseID <- renderText({
-      req(inherits(RV$data, "list"))
-      if (is.null(RV$data$releaseID)) {
-        return("No release ID provided")
-      } else {
-        return(RV$data$releaseID)
+  ## Notifications, tasks and messages -------------------- 
+  output$NotificationMenu <- renderMenu({
+    dropdownMenu(type = "notifications", .list = RV$notifications)
+  })
+  
+  output$MessageMenu <- renderMenu({
+    dropdownMenu(type = "messages", .list = RV$messages)
+  })
+  
+  ## Side bar reactive ----------------------------
+  #Use in UI: menuItemOutput("recOpt") 
+  output$exphunter_menu <- renderMenu({
+    req(inherits(RV$data, "list"))
+    if(!is.null(RV$data$ExpHunter))
+      menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th"))
+  })
+  
+  output$coverage_menu <- renderMenu({
+    if( !is.null(Coverage_dir) & length(list.files(Coverage_dir, pattern = ".bed.gz")) > 0)
+      menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
+  })
+  
+  ## Load Files --------------------
+  observeEvent(input$decrypt_button, {
+      #Rememeber that df in pre-processed object are generated with fread so slicing works differently [,..indexes]
+      
+      #Reset relevant values when a new sample is loaded
+      #RV$messages <- list()
+      #RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
+      RV$customBed_ranges <- FALSE
+      RV$notifications <- list()
+      RV$cov_file <- NULL
+      RV$custom_genes_txt_length <- 0
+      RV$vars_pass_GQ <- NULL
+      RV$vars_pass_BED <- NULL
+      RV$vars_pass_ROH <- NULL 
+      RV$vars_pass_segregation <- NULL
+      RV$vars_pass_filters <- NULL
+      RV$vars_filters_df <- NULL
+      RV$segregation_filters_df <- NULL
+      RV$genes_filters_df <- NULL
+      RV$regions_filters_df <- NULL
+      RV$filters_json <- NULL
+      
+      #Load data from plain or encrypted object
+      if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
+          RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
+      } else if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData"))) {
+          RV$data <- readRDS(paste0(data_dir,"/",input$CaseCode,".RData"))
       }
-    })
-    
-    output$activeCaseID <- renderText({
-      req(inherits(RV$data, "list"))
-      return(RV$data$pedigree)
-    })
-    
-    output$Total_affected <- renderText({
-        paste0("\tTotal number of affected individuals in this pedigree: ", RV$data$n_affected)
-    })
-    
-    output$Total_unaffected <- renderText({
-        paste0("\tTotal number of unaffected individuals in this pedigree: ", RV$data$n_unaffected)
-    })
-    
-    output$ped <- renderPlot({
-        shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-        shiny::validate(need(!is.null(RV$data$ped), "No PED data found for this sample"),
-                        need(RV$data$n_all_samples > 1, "SINGLETON"))
-        plot.pedigree(RV$data$ped, mar = c(5, 3, 5, 3))
-    })
-    
-    output$Var_consequence_plot <- renderPlot({
-        shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-        var_data <- RV$data$variants_df %>% select(var_id, consequence) %>% distinct()
-        ggplot(var_data, aes(x=consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
-    })
-    
-    output$Disease <- renderText({
-      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-      disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == RV$data$pedigree])
-    })
-
-    output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
-      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
-      HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
-    })
-
-    output$Var_type_plot <- renderPlot({
-        shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-        ggplot(RV$data$variants_df, aes(x=var_type)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
-    })
-    
-    output$Var_PopAF_plot <- renderPlot({
-        shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-        AF_data <- RV$data$variants_df %>% select(var_id, max_pop_af, cohort_af, var_type) %>% distinct()
-        AF_data$PopAF_level <- cut(AF_data$max_pop_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
-        AF_data$CohortAF_level <- cut(AF_data$cohort_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
-        
-        cohortAF_p <- ggplot(AF_data, aes(x=CohortAF_level, fill=CohortAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Cohort AF distribution") + theme(legend.position = "none")
-        PopAF_p <- ggplot(AF_data, aes(x=PopAF_level, fill=PopAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Max pop AF distribution") + theme(legend.position = "none")
-        AF_scatter <- ggplot(AF_data, aes(x=max_pop_af, y=cohort_af, color=var_type)) + geom_point() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(title = "AF comparison") + theme(legend.position = "none")
-        plot_layout <- rbind(c(1,1,2,2),c(NA,3,3,NA))
-        grid.arrange(cohortAF_p, PopAF_p, AF_scatter, layout_matrix = plot_layout)
-        
-    })
-    
-    output$ROH_total_plot <- renderPlot({
-        Total_ROH <- aggregate(RV$data$ROH_data$Length_bp, list(RV$data$ROH_data$Sample, RV$data$ROH_data$ROHClass), FUN=sum)
-        Total_ROH$pctROH <- Total_ROH$x/genome_size
-        ggplot(Total_ROH, aes(x=Group.1,y=pctROH,fill=Group.2)) + 
-            geom_bar(stat="identity", position = position_dodge(0.9)) + 
-            geom_hline(yintercept = 0.1, linetype="dashed") + 
-            labs(x="sample", y="fraction of genome within ROH", fill="ROH size") + 
-            format1
-    })
-    
-    output$ROH_plot_select <- renderUI ({
-        selectInput("ROH_plot_sample", label = "Select sample:", choices = RV$data$all_samples, multiple = FALSE, selected = RV$data$affected_samples[1])
-    })
-    
-    output$ROH_chrom_plot <- renderPlot({
-        Total_ROH_bychr <- aggregate(RV$data$ROH_data$Length_bp, list(RV$data$ROH_data$Sample, RV$data$ROH_data$ROHClass, RV$data$ROH_data$Chromosome), FUN=sum)
-        Total_ROH_bychr <- merge(Total_ROH_bychr, chr_sizes, by.x="Group.3", by.y="V1")
-        Total_ROH_bychr$pctROH <- Total_ROH_bychr$x / Total_ROH_bychr$V2
-        ggplot(Total_ROH_bychr[Total_ROH_bychr$Group.1 == input$ROH_plot_sample,], aes(x=Group.3,y=pctROH,fill=Group.2)) + 
-            geom_bar(stat="identity", position = position_dodge(0.9)) + 
-            geom_hline(yintercept = 0.1, linetype="dashed") + 
-            labs(x="chromosome", y="fraction of chromosome within ROH", fill="ROH size", title=paste0("ROH distribution by chromosome for ", input$ROH_plot_sample)) + 
-            format1
-    })
-    
-    #####################
-    ### Custom genes tab
-    #####################
-    
-    ### MANUAL INPUT ###
-    observeEvent(input$custom_genes_reset, {
-      RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
-    })
-    
-    observeEvent(input$custom_genes_remove, {
-      shiny::validate(need(input$custom_genes_table_rows_selected, "Select a gene"))
-      RV$custom_genes <- RV$custom_genes[-input$custom_genes_table_rows_selected,]
-    })
-    
-    output$custom_genes_table <- DT::renderDataTable(selection="multiple", {
-      RV$custom_genes
-    })
-    
-    observeEvent(input$custom_genes_txt, {
-      genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
-      RV$custom_genes_txt_length <- length(genes) 
-    })
-    
-    output$custom_genes_list_length <- renderText({
-      paste0(RV$custom_genes_txt_length, " genes in the list")
-    })
-    
-    observeEvent(input$custom_genes_load_txt, {
-      genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
-      mydf <- data.frame(gene=genes, source=rep("manual_input", length(genes)))
-      RV$custom_genes <- rbind(RV$custom_genes, mydf) %>% distinct()
-    })
-    
-    observeEvent(input$custom_genes_file, {
-      req(input$custom_genes_file)
+      if (inherits(RV$data, "list")) {
+          RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
+          #RV$data$variants_df$VENUS_link <- "N/A"
+          
+          #RV$data$known_vars <- RV$data$known_vars %>% separate_rows(known_ids, sep=",")
+          #RV$data$known_clinvar <- RV$data$known_vars[grep("CV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
+          #RV$data$known_cosmic <- RV$data$known_vars[grep("COSV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
+  
+          #RV$data$segregation_df$sup_dnm <- 0
+          RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
+          RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
+          RV$data$genes_scores$cohort_norm_Z <- apply(RV$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
+          RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
+                                           breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
+                                           labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
+         
+          RV$notifications[["decrypt"]] <- notificationItem(
+              text = paste0("Loaded data for ", input$CaseCode),
+              icon = icon("check-circle"),
+              status = "success")
+          RV$notifications[["pedigree"]] <- notificationItem(
+              text = paste0("Individuals: ", RV$data$n_all_samples),
+              icon = icon("check-circle"),
+              status = "success")
+          RV$notifications[["variants"]] <- notificationItem(
+              text = paste0("variants loaded: ", length(unique(RV$data$variants_df$var_id))),
+              icon = icon("check-circle"),
+              status = "success")
+          RV$notifications[["genes"]] <- notificationItem(
+              text = paste0("distinct genes: ", length(unique(RV$data$genes_scores$gene))),
+              icon = icon("check-circle"),
+              status = "success")
+          
+          GQ_cols_all <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$all_samples, sep="_"))
+          RV$GQ_cols_all <- GQ_cols_all
+          RV$GQ_cols_affected <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$affected_samples, sep="_"))
+          RV$maxGQ <- max(RV$data$variants_df[,..GQ_cols_all], na.rm = T)
+          
+      } else {
+          RV$notifications[["decrypt"]] <- notificationItem(
+              text = "Error loading data! Missing file or wrong password!",
+              icon = icon("exclamation-circle"),
+              status = "danger")
+      }
+      
+  })
+  
+  observeEvent(input$custom_bed, {
+      req(input$custom_bed)
       tryCatch({
-        genes <- scan(input$custom_genes_file$datapath,what="",sep="\n")
-        RV$custom_genes_n_loaded <- length(genes)
-        values <- paste(c(input$custom_genes_txt,
-                          paste(genes, collapse="\n") ), collapse="\n")
-        updateTextAreaInput(session, "custom_genes_txt", value = values) 
-      }, error=function(cond) {
-        RV$notifications[["custom_file"]] <- notificationItem(
-          text = paste0("Failed loading custom genes list"),
-          icon = icon("exclamation-circle"),
-          status = "danger")
+      bed_df <- read.table(input$custom_bed$datapath, sep="\t", header=F, stringsAsFactors = F)
+  
+      #ID is set to ROH_nline for compatibility with the bed filtering module
+      RV$customBed_ranges <- GRanges(seqnames = bed_df$V1, ranges = IRanges(bed_df$V2, end=bed_df$V3), ID = paste("ROH",1:nrow(bed_df),sep="_"))
+      
+      RV$notifications[["custom_bed"]] <- notificationItem(
+          text = paste0(nrow(bed_df), " regions loaded from BED"),
+          icon = icon("check-circle"),
+          status = "success")
+      } , error=function(cond) {
+          RV$notifications[["custom_bed"]] <- notificationItem(
+              text = paste0("Failed loading custom BED file"),
+              icon = icon("exclamation-circle"),
+              status = "danger")
       })
+  })
+    
+  ## Data reactive tables configuration -------------------------
+  
+  variants_df <- reactive({
+      #input$Apply_filters
+      shiny::validate(need(inherits(RV$data, "list"), FALSE))
       
-    })
-    
-    output$custom_genes_file_txt <- renderText({
-      paste0(RV$custom_genes_n_loaded, " genes loaded from file")
-    })
-    
-    ### PANELAPP SELECTION ###
-    output$panelapp_selection_table <- DT::renderDataTable(selection="multiple", {
-      PanelApp_data
-    })
-    
-    panelapp_selected_genes <- reactive ({
-      shiny::req(input$panelapp_selection_table_rows_selected)
-      panelID <- PanelApp_data[input$panelapp_selection_table_rows_selected, "id"]
-      genes_df <- PanelApp_genes %>% 
-        filter(panel_idx %in% panelID, confidence_level >= input$panelapp_confidence) %>%  
-        left_join(., PanelApp_data[,c("id","name")], by = c("panel_idx" = "id")) %>%
-        select(entity_name, name)
-      colnames(genes_df) <- c("gene","source")
-      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
-    })
-    
-    output$panelapp_n_genes <- renderText({
-      paste0(nrow(panelapp_selected_genes()), " genes to be imported")
-    })
-    
-    panelapp_selection_proxy <- DT::dataTableProxy("panelapp_selection_table")
-    
-    observeEvent(input$panelapp_reset, {
-      panelapp_selection_proxy %>% selectRows(NULL)
-    })
-    
-    observeEvent(input$panelapp_genes_load, {
-      shiny::req(nrow(panelapp_selected_genes()) > 0)
-      RV$custom_genes <- rbind(RV$custom_genes, panelapp_selected_genes()) %>% distinct()
-      panelapp_selection_proxy %>% selectRows(NULL)
-    })
-    
-    ### CLINVAR SELECTION ###
-    output$clinvar_selection_table <-  DT::renderDataTable(selection="multiple", {
-      ClinVar_genes 
-    })
+      ## FILTER VARS
+      #Get the final list of vars in accepted comphet intersecting filters and segregation
+      comphet_final_vars <- RV$data$comphet_df %>% filter(
+          rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet)) %>% 
+        gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
       
-    clinvar_selection_proxy <- DT::dataTableProxy("clinvar_selection_table")
-    
-    output$clinvar_n_genes <- renderText({
-      paste0(nrow(clinvar_selected_genes()), " genes to be imported")
+      #GET THE FINAL LIST OF ACCEPTED VARS
+      #the final list of segregating accepted vars is now equal to
+      #single vars passing filters and segregation
+      #vars part of a comphet passing all filters + segregation
+      accepted_vars_list <- unique(intersect(intersect(intersect(intersect(
+        RV$vars_pass_ROH, RV$vars_pass_GQ), 
+        RV$vars_pass_BED),
+        RV$vars_pass_filters$vars),
+        RV$vars_pass_segregation))
+      
+      accepted_vars_list <- unique(c(accepted_vars_list, comphet_final_vars$VarID))
+      
+      #return variants dataframe with updated Class column (PASS/FILTER)
+      as.data.frame(RV$data$variants_df %>% mutate(Class = ifelse(
+          rec_id %in% accepted_vars_list,
+          "PASS","FILTER") ) )
+  })
+  
+  comphet_df <- reactive({
+      filtered_vars_list <- variants_df()$rec_id[variants_df()$Class == "PASS"]
+      
+      as.data.frame(RV$data$comphet_df %>% mutate(Class = ifelse(
+          v1 %in% filtered_vars_list & 
+          v2 %in% filtered_vars_list &
+          rec_id %in% RV$vars_pass_segregation, "PASS", "FILTER")))
+  })
+  
+  genes_df <- reactive({
+      RV$filtered_vars_list <- unique(c(
+          variants_df()$rec_id[variants_df()$Class == "PASS"], 
+          comphet_df()$rec_id[comphet_df()$Class == "PASS"])) 
+  
+      #Filters on gene scores are applied
+      as.data.frame(RV$data$genes_df %>% mutate(Class = ifelse(
+          variants %in% RV$filtered_vars_list & 
+          gene %in% RV$genes_pass_filters, "PASS", "FILTER")))    
+  })
+  
+  genes_scores <- reactive({
+      RV$filtered_genes_list <- unique(genes_df()$gene[genes_df()$Class == "PASS"]) 
+      as.data.frame(RV$data$genes_scores %>% mutate(Class = ifelse(
+          gene %in% RV$filtered_genes_list, "PASS", "FILTER")))
+  })
+  
+  filters_summ_genes <- reactive ({
+      tot_genes <- nrow(genes_scores())
+      PASS_count <- length(RV$genes_pass_filters)
+      filters_summ_genes <- data.frame(
+          Filter=c("Genes filters"), 
+          PASS=PASS_count/tot_genes, 
+          FILTERED=(tot_genes-PASS_count)/tot_genes)
+      filters_summ_genes <- gather(filters_summ_genes, key="Class", value="Count", PASS:FILTERED)
+      filters_summ_genes$Count <- as.numeric(filters_summ_genes$Count)
+      filters_summ_genes
+  })
+  
+  filters_summ_vars <- reactive ({
+      tot_vars <- RV$data$variants_df %>% select(var_id) %>% distinct() %>% nrow()
+      comphet_seg_vars <- RV$data$comphet_df %>% filter(
+        rec_id %in% RV$vars_pass_segregation) %>% 
+        gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
+      PASS_counts <- c(
+          variants_df() %>% filter(rec_id %in% RV$vars_pass_filters$vars) %>% select(var_id) %>% distinct() %>% nrow(),
+          variants_df() %>% filter(rec_id %in% RV$vars_pass_GQ) %>% select(var_id) %>% distinct() %>% nrow(),
+          variants_df() %>% filter(rec_id %in% c(RV$vars_pass_segregation, comphet_seg_vars$VarID)) %>% select(var_id) %>% distinct() %>% nrow(),
+          variants_df() %>% filter(rec_id %in% RV$vars_pass_ROH) %>% select(var_id) %>% distinct() %>% nrow(),
+          variants_df() %>% filter(rec_id %in% RV$vars_pass_BED) %>% select(var_id) %>% distinct() %>% nrow()
+      )
+      filters_summ_vars <- data.frame(Filter=c("variants","GQ","segregation","ROH","custom BED"),
+          PASS=PASS_counts/tot_vars, 
+          FILTERED=(tot_vars-PASS_counts)/tot_vars)
+      
+      filters_summ_vars <- gather(filters_summ_vars, key="Class", value="Count", PASS:FILTERED)
+      filters_summ_vars$Count <- as.numeric(filters_summ_vars$Count)
+      filters_summ_vars
+  })
+  
+  PanelApp_panels_df <- reactive ({
+      panels_idx <- PanelApp_genes$panel_idx[PanelApp_genes$entity_name %in% RV$filtered_genes_list]
+      as.data.frame(PanelApp_data %>% filter(id %in% panels_idx))
+  })
+  
+  geneLists_df <- reactive ({
+      geneLists_idx <- geneLists_genes$genelist_idx[geneLists_genes$entity_name %in% RV$filtered_genes_list]
+      as.data.frame(geneLists_data %>% filter(id %in% geneLists_idx))
+  })
+  
+  ClinVar_df <- reactive ({
+      as.data.frame(ClinVar_genes %>% filter(gene %in% RV$filtered_genes_list))
+  }) 
+  
+  ## Overview tab ---------------------------
+  
+  output$releaseID <- renderText({
+    req(inherits(RV$data, "list"))
+    if (is.null(RV$data$releaseID)) {
+      return("No release ID provided")
+    } else {
+      return(RV$data$releaseID)
+    }
+  })
+  
+  output$activeCaseID <- renderText({
+    req(inherits(RV$data, "list"))
+    return(RV$data$pedigree)
+  })
+  
+  output$Total_affected <- renderText({
+      paste0("\tTotal number of affected individuals in this pedigree: ", RV$data$n_affected)
+  })
+  
+  output$Total_unaffected <- renderText({
+      paste0("\tTotal number of unaffected individuals in this pedigree: ", RV$data$n_unaffected)
+  })
+  
+  output$ped <- renderPlot({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      shiny::validate(need(!is.null(RV$data$ped), "No PED data found for this sample"),
+                      need(RV$data$n_all_samples > 1, "SINGLETON"))
+      plot.pedigree(RV$data$ped, mar = c(5, 3, 5, 3))
+  })
+  
+  output$Var_consequence_plot <- renderPlot({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      var_data <- RV$data$variants_df %>% select(var_id, consequence) %>% distinct()
+      ggplot(var_data, aes(x=consequence)) + geom_bar()+ theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
+  })
+  
+  output$Disease <- renderText({
+    shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+    disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == RV$data$pedigree])
+  })
+  
+  output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
+    shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+    HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
+    HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
+  })
+  
+  output$Var_type_plot <- renderPlot({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      ggplot(RV$data$variants_df, aes(x=var_type)) + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + scale_y_sqrt()
+  })
+  
+  output$Var_PopAF_plot <- renderPlot({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
+      AF_data <- RV$data$variants_df %>% select(var_id, max_pop_af, cohort_af, var_type) %>% distinct()
+      AF_data$PopAF_level <- cut(AF_data$max_pop_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
+      AF_data$CohortAF_level <- cut(AF_data$cohort_af, breaks=c(0,0.005,0.01,0.05,1), labels = c("VERY_RARE\n(<= 0.005)","RARE\n(<= 0.01)","LOW_FREQ\n(<= 0.05)", "COMMON"), include.lowest = T)
+      
+      cohortAF_p <- ggplot(AF_data, aes(x=CohortAF_level, fill=CohortAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Cohort AF distribution") + theme(legend.position = "none")
+      PopAF_p <- ggplot(AF_data, aes(x=PopAF_level, fill=PopAF_level)) + geom_bar() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(x="", title = "Max pop AF distribution") + theme(legend.position = "none")
+      AF_scatter <- ggplot(AF_data, aes(x=max_pop_af, y=cohort_af, color=var_type)) + geom_point() + scale_y_sqrt() + scale_fill_brewer(palette="Set1") + labs(title = "AF comparison") + theme(legend.position = "none")
+      plot_layout <- rbind(c(1,1,2,2),c(NA,3,3,NA))
+      grid.arrange(cohortAF_p, PopAF_p, AF_scatter, layout_matrix = plot_layout)
+      
+  })
+  
+  output$ROH_total_plot <- renderPlot({
+      shiny::validate(need(RV$data$ROH_data), "No ROH data found for this sample")
+      Total_ROH <- aggregate(RV$data$ROH_data$Length_bp, list(RV$data$ROH_data$Sample, RV$data$ROH_data$ROHClass), FUN=sum)
+      Total_ROH$pctROH <- Total_ROH$x/genome_size
+      ggplot(Total_ROH, aes(x=Group.1,y=pctROH,fill=Group.2)) + 
+          geom_bar(stat="identity", position = position_dodge(0.9)) + 
+          geom_hline(yintercept = 0.1, linetype="dashed") + 
+          labs(x="sample", y="fraction of genome within ROH", fill="ROH size") + 
+          format1
+  })
+  
+  output$ROH_plot_select <- renderUI ({
+      selectInput("ROH_plot_sample", label = "Select sample:", choices = RV$data$all_samples, multiple = FALSE, selected = RV$data$affected_samples[1])
+  })
+  
+  output$ROH_chrom_plot <- renderPlot({
+    shiny::validate(need(RV$data$ROH_data), "No ROH data found for this sample")
+      Total_ROH_bychr <- aggregate(RV$data$ROH_data$Length_bp, list(RV$data$ROH_data$Sample, RV$data$ROH_data$ROHClass, RV$data$ROH_data$Chromosome), FUN=sum)
+      Total_ROH_bychr <- merge(Total_ROH_bychr, chr_sizes, by.x="Group.3", by.y="V1")
+      Total_ROH_bychr$pctROH <- Total_ROH_bychr$x / Total_ROH_bychr$V2
+      ggplot(Total_ROH_bychr[Total_ROH_bychr$Group.1 == input$ROH_plot_sample,], aes(x=Group.3,y=pctROH,fill=Group.2)) + 
+          geom_bar(stat="identity", position = position_dodge(0.9)) + 
+          geom_hline(yintercept = 0.1, linetype="dashed") + 
+          labs(x="chromosome", y="fraction of chromosome within ROH", fill="ROH size", title=paste0("ROH distribution by chromosome for ", input$ROH_plot_sample)) + 
+          format1
+  })
+  
+  ## Custom genes tab ------------------------------
+  ### MANUAL INPUT ###
+  observeEvent(input$custom_genes_reset, {
+    RV$custom_genes <- data.frame(gene=character(), source=character(), stringsAsFactors = F)
+  })
+  
+  observeEvent(input$custom_genes_remove, {
+    shiny::validate(need(input$custom_genes_table_rows_selected, "Select a gene"))
+    RV$custom_genes <- RV$custom_genes[-input$custom_genes_table_rows_selected,]
+  })
+  
+  output$custom_genes_table <- DT::renderDataTable(selection="multiple", {
+    RV$custom_genes
+  })
+  
+  observeEvent(input$custom_genes_txt, {
+    genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
+    RV$custom_genes_txt_length <- length(genes) 
+  })
+  
+  output$custom_genes_list_length <- renderText({
+    paste0(RV$custom_genes_txt_length, " genes in the list")
+  })
+  
+  observeEvent(input$custom_genes_load_txt, {
+    genes <- unlist(strsplit(input$custom_genes_txt, "\n"))
+    mydf <- data.frame(gene=genes, source=rep("manual_input", length(genes)))
+    RV$custom_genes <- rbind(RV$custom_genes, mydf) %>% distinct()
+  })
+  
+  observeEvent(input$custom_genes_file, {
+    req(input$custom_genes_file)
+    tryCatch({
+      genes <- scan(input$custom_genes_file$datapath,what="",sep="\n")
+      RV$custom_genes_n_loaded <- length(genes)
+      values <- paste(c(input$custom_genes_txt,
+                        paste(genes, collapse="\n") ), collapse="\n")
+      updateTextAreaInput(session, "custom_genes_txt", value = values) 
+    }, error=function(cond) {
+      RV$notifications[["custom_file"]] <- notificationItem(
+        text = paste0("Failed loading custom genes list"),
+        icon = icon("exclamation-circle"),
+        status = "danger")
     })
     
-    observeEvent(input$clinvar_reset, {
-      clinvar_selection_proxy %>% selectRows(NULL)
-    })
+  })
+  
+  output$custom_genes_file_txt <- renderText({
+    paste0(RV$custom_genes_n_loaded, " genes loaded from file")
+  })
+  
+  ### PANELAPP SELECTION ###
+  output$panelapp_selection_table <- DT::renderDataTable(selection="multiple", {
+    PanelApp_data
+  })
+  
+  panelapp_selected_genes <- reactive ({
+    shiny::req(input$panelapp_selection_table_rows_selected)
+    panelID <- PanelApp_data[input$panelapp_selection_table_rows_selected, "id"]
+    genes_df <- PanelApp_genes %>% 
+      filter(panel_idx %in% panelID, confidence_level >= input$panelapp_confidence) %>%  
+      left_join(., PanelApp_data[,c("id","name")], by = c("panel_idx" = "id")) %>%
+      select(entity_name, name)
+    colnames(genes_df) <- c("gene","source")
+    genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
+  })
+  
+  output$panelapp_n_genes <- renderText({
+    paste0(nrow(panelapp_selected_genes()), " genes to be imported")
+  })
+  
+  panelapp_selection_proxy <- DT::dataTableProxy("panelapp_selection_table")
+  
+  observeEvent(input$panelapp_reset, {
+    panelapp_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$panelapp_genes_load, {
+    shiny::req(nrow(panelapp_selected_genes()) > 0)
+    RV$custom_genes <- rbind(RV$custom_genes, panelapp_selected_genes()) %>% distinct()
+    panelapp_selection_proxy %>% selectRows(NULL)
+  })
+  
+  ### CLINVAR SELECTION ###
+  output$clinvar_selection_table <-  DT::renderDataTable(selection="multiple", {
+    ClinVar_genes 
+  })
     
-    observeEvent(input$clinvar_genes_load, {
-      shiny::req(nrow(clinvar_selected_genes()) > 0)
-      RV$custom_genes <- rbind(RV$custom_genes, clinvar_selected_genes()) %>% distinct()
-      clinvar_selection_proxy %>% selectRows(NULL)
-    })
-    
-    observeEvent(input$clinvar_select_all, {
-      clinvar_selection_proxy %>% selectRows(input$clinvar_selection_table_rows_all)
-    })
-    
-    clinvar_selected_genes <- reactive ({
-      shiny::req(input$clinvar_selection_table_rows_selected)
-      genes <- ClinVar_genes[input$clinvar_selection_table_rows_selected, "gene"]
-      genes_df <- data.frame(gene=genes, source=rep("ClinVar", length(genes)))
-      genes_df <- genes_df[order(genes_df$gene),]
-    })
-    
-    ### GENE LISTS SELECTION ###
-    output$genelists_selection_table <- DT::renderDataTable(selection="multiple", {
-      geneLists_data
-    })
-    
-    genelists_selection_proxy <- DT::dataTableProxy("genelists_selection_table")
-    
-    genelists_selected_genes <- reactive ({
-      shiny::req(input$genelists_selection_table_rows_selected)
-      panelID <- geneLists_data[input$genelists_selection_table_rows_selected, "id"]
-      genes_df <- geneLists_genes %>% 
-        filter(genelist_idx %in% panelID) %>%  
-        left_join(., geneLists_data[,c("id","list_name")], by = c("genelist_idx" = "id")) %>%
-        select(entity_name, list_name)
-      colnames(genes_df) <- c("gene","source")
-      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
-    })
-    
-    output$genelists_n_genes <- renderText({
-      paste0(nrow(genelists_selected_genes()), " genes to be imported")
-    })
-    
-    observeEvent(input$genelists_reset, {
-      genelists_selection_proxy %>% selectRows(NULL)
-    })
-    
-    observeEvent(input$genelists_genes_load, {
-      shiny::req(nrow(genelists_selected_genes()) > 0)
-      RV$custom_genes <- rbind(RV$custom_genes, genelists_selected_genes()) %>% distinct()
-      genelists_selection_proxy %>% selectRows(NULL)
-    })
-    
-    ### HPO GENES SELECTION ###
-    output$hpo_selection_table <-  DT::renderDataTable(selection="multiple", {
-      HPO_genes 
-    })
-    
-    hpo_selection_proxy <- DT::dataTableProxy("hpo_selection_table")
-    
-    output$hpo_n_genes <- renderText({
-      paste0(nrow(hpo_selected_genes()), " genes to be imported")
-    })
-    
-    observeEvent(input$hpo_reset, {
-      hpo_selection_proxy %>% selectRows(NULL)
-    })
-    
-    observeEvent(input$hpo_genes_load, {
-      shiny::req(nrow(hpo_selected_genes()) > 0)
-      RV$custom_genes <- rbind(RV$custom_genes, hpo_selected_genes()) %>% distinct()
-      hpo_selection_proxy %>% selectRows(NULL)
-    })
-    
-    observeEvent(input$hpo_select_all, {
-      hpo_selection_proxy %>% selectRows(input$hpo_selection_table_rows_all)
-    })
-    
-    hpo_selected_genes <- reactive ({
-      shiny::req(input$hpo_selection_table_rows_selected)
-      genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
-      hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"]
-      genes_df <- data.frame(gene=genes, source=hpo_ids)
-      genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
-    })
-    
-    ### HPO PROFILE SELECTION ###
-    observeEvent(input$hpo_profile_load,{
-      shiny::req(nrow(hpo_profile_genes()) > 0)
-      hpo_profile_df <- data.frame(gene=hpo_profile_genes()$gene, source="HPO_profile", stringsAsFactors = F)
-      RV$custom_genes <- rbind(RV$custom_genes, hpo_profile_df) %>% distinct()
-    })
-    
-    observeEvent(input$hpo_profile_reset, {
-      updateTextAreaInput(session, "hpo_profile_txt", value = "")
-    })
-    
-    output$hpo_profile_n_genes <- renderText({
-      paste0(nrow(hpo_profile_genes()), " genes to be imported")  
-    })
-    
-    observeEvent(input$hpo_profile_set, {
-      req(inherits(RV$data, "list"))
-      HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
-      updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
-    })
-    
-    observeEvent(input$hpo_profile_get, {
-      genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
-      hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"] 
-    })
-    
-    output$hpo_n_min <- renderUI({
-      n_hpos <- length(hpo_terms_in_profile())
-      selectInput("hpo_n_min_select", "Select genes associated to at least N HPOs:", choices = seq(0,n_hpos), selected = 1, multiple = FALSE)  
-    }) 
-    
-    hpo_terms_in_profile <- reactive({
-      unlist(strsplit(input$hpo_profile_txt, "\n"))  
-    })
-    
-    hpo_profile_genes <- reactive({
-      HPO_genes %>% 
-        filter(HPO_id %in% hpo_terms_in_profile()) %>% 
-        group_by(gene) %>% 
-        mutate(N_HPOs = n()) %>% 
-        select(gene, N_HPOs) %>%
-        filter(N_HPOs >= input$hpo_n_min_select) %>%
-        distinct()
-    })
-    
-    output$hpo_profile_table <- DT::renderDataTable(selection="none", {
-      req(nrow(hpo_profile_genes()) > 0)
-      hpo_profile_genes()
-    })
-    
-    
-    ######################
-    ### Filters Overview
-    ######################
-    
+  clinvar_selection_proxy <- DT::dataTableProxy("clinvar_selection_table")
+  
+  output$clinvar_n_genes <- renderText({
+    paste0(nrow(clinvar_selected_genes()), " genes to be imported")
+  })
+  
+  observeEvent(input$clinvar_reset, {
+    clinvar_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$clinvar_genes_load, {
+    shiny::req(nrow(clinvar_selected_genes()) > 0)
+    RV$custom_genes <- rbind(RV$custom_genes, clinvar_selected_genes()) %>% distinct()
+    clinvar_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$clinvar_select_all, {
+    clinvar_selection_proxy %>% selectRows(input$clinvar_selection_table_rows_all)
+  })
+  
+  clinvar_selected_genes <- reactive ({
+    shiny::req(input$clinvar_selection_table_rows_selected)
+    genes <- ClinVar_genes[input$clinvar_selection_table_rows_selected, "gene"]
+    genes_df <- data.frame(gene=genes, source=rep("ClinVar", length(genes)))
+    genes_df <- genes_df[order(genes_df$gene),]
+  })
+  
+  ### GENE LISTS SELECTION ###
+  output$genelists_selection_table <- DT::renderDataTable(selection="multiple", {
+    geneLists_data
+  })
+  
+  genelists_selection_proxy <- DT::dataTableProxy("genelists_selection_table")
+  
+  genelists_selected_genes <- reactive ({
+    shiny::req(input$genelists_selection_table_rows_selected)
+    panelID <- geneLists_data[input$genelists_selection_table_rows_selected, "id"]
+    genes_df <- geneLists_genes %>% 
+      filter(genelist_idx %in% panelID) %>%  
+      left_join(., geneLists_data[,c("id","list_name")], by = c("genelist_idx" = "id")) %>%
+      select(entity_name, list_name)
+    colnames(genes_df) <- c("gene","source")
+    genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
+  })
+  
+  output$genelists_n_genes <- renderText({
+    paste0(nrow(genelists_selected_genes()), " genes to be imported")
+  })
+  
+  observeEvent(input$genelists_reset, {
+    genelists_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$genelists_genes_load, {
+    shiny::req(nrow(genelists_selected_genes()) > 0)
+    RV$custom_genes <- rbind(RV$custom_genes, genelists_selected_genes()) %>% distinct()
+    genelists_selection_proxy %>% selectRows(NULL)
+  })
+  
+  ### HPO GENES SELECTION ###
+  output$hpo_selection_table <-  DT::renderDataTable(selection="multiple", {
+    HPO_genes 
+  })
+  
+  hpo_selection_proxy <- DT::dataTableProxy("hpo_selection_table")
+  
+  output$hpo_n_genes <- renderText({
+    paste0(nrow(hpo_selected_genes()), " genes to be imported")
+  })
+  
+  observeEvent(input$hpo_reset, {
+    hpo_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$hpo_genes_load, {
+    shiny::req(nrow(hpo_selected_genes()) > 0)
+    RV$custom_genes <- rbind(RV$custom_genes, hpo_selected_genes()) %>% distinct()
+    hpo_selection_proxy %>% selectRows(NULL)
+  })
+  
+  observeEvent(input$hpo_select_all, {
+    hpo_selection_proxy %>% selectRows(input$hpo_selection_table_rows_all)
+  })
+  
+  hpo_selected_genes <- reactive ({
+    shiny::req(input$hpo_selection_table_rows_selected)
+    genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
+    hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"]
+    genes_df <- data.frame(gene=genes, source=hpo_ids)
+    genes_df <- genes_df[order(genes_df$source, genes_df$gene),]
+  })
+  
+  ### HPO PROFILE SELECTION ###
+  observeEvent(input$hpo_profile_load,{
+    shiny::req(nrow(hpo_profile_genes()) > 0)
+    hpo_profile_df <- data.frame(gene=hpo_profile_genes()$gene, source="HPO_profile", stringsAsFactors = F)
+    RV$custom_genes <- rbind(RV$custom_genes, hpo_profile_df) %>% distinct()
+  })
+  
+  observeEvent(input$hpo_profile_reset, {
+    updateTextAreaInput(session, "hpo_profile_txt", value = "")
+  })
+  
+  output$hpo_profile_n_genes <- renderText({
+    paste0(nrow(hpo_profile_genes()), " genes to be imported")  
+  })
+  
+  observeEvent(input$hpo_profile_set, {
+    req(inherits(RV$data, "list"))
+    HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
+    updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
+  })
+  
+  observeEvent(input$hpo_profile_get, {
+    genes <- HPO_genes[input$hpo_selection_table_rows_selected, "gene"]
+    hpo_ids <- HPO_genes[input$hpo_selection_table_rows_selected, "HPO_id"] 
+  })
+  
+  output$hpo_n_min <- renderUI({
+    n_hpos <- length(hpo_terms_in_profile())
+    selectInput("hpo_n_min_select", "Select genes associated to at least N HPOs:", choices = seq(0,n_hpos), selected = 1, multiple = FALSE)  
+  }) 
+  
+  hpo_terms_in_profile <- reactive({
+    unlist(strsplit(input$hpo_profile_txt, "\n"))  
+  })
+  
+  hpo_profile_genes <- reactive({
+    HPO_genes %>% 
+      filter(HPO_id %in% hpo_terms_in_profile()) %>% 
+      group_by(gene) %>% 
+      mutate(N_HPOs = n()) %>% 
+      select(gene, N_HPOs) %>%
+      filter(N_HPOs >= input$hpo_n_min_select) %>%
+      distinct()
+  })
+  
+  output$hpo_profile_table <- DT::renderDataTable(selection="none", {
+    req(nrow(hpo_profile_genes()) > 0)
+    hpo_profile_genes()
+  })
+  
+  
+  ## Filters ---------------------------------
+    ## Filters Overview ----------------------------
     #Apply the filters and go to gene result page
     observeEvent(input$apply_filters, {
       shiny::validate(need(inherits(RV$data, "list"), FALSE))
@@ -1402,10 +1460,10 @@ server <- function(input, output, session) {
         GENES = genes_json,
         ROH = ROH_json,
         BED = BED_json)
-
+    
       callModule(downloadObj, id="get_json_filters", output_prefix="Effective_filters.json", output_data=RV$filters_json)
     })
-  
+    
     #Load filter setting from json file
     observeEvent(input$load_filters, {
       req(input$load_filters)
@@ -1473,9 +1531,7 @@ server <- function(input, output, session) {
       RV$regions_filters_df
     })
     
-    ##########################
-    ### Variants filters tab
-    ##########################
+    ## Variants filters tab --------------------------------
     
     observeEvent(input$next_variants_filters, {
       RV$vars_filters_df <- callModule(getDF_filters, "variants_filters", filters_settings$VARIANTS)
@@ -1493,10 +1549,8 @@ server <- function(input, output, session) {
                    variants_df = RV$data$variants_df, 
                    na_values = app_settings$fill_na$fill_na_vars)
       })
-    #############################
-    ### Segregation Filters tab
-    #############################
-    
+
+    ## Segregation filters tab -----------------------------------
     observeEvent(input$next_segregation_filters, {
       df1 <- callModule(getDF_segregation, "segregation")
       df2 <- callModule(getDF_GQ, "GQ_filter")
@@ -1513,9 +1567,7 @@ server <- function(input, output, session) {
       GQfilterUI("GQ_filter",maxGQ = RV$maxGQ, defaultGQ=10)    
     })
     
-    #######################
-    ### Genes filters tab
-    #######################
+    ## Genes filters tab -----------------------
     
     observeEvent(input$next_genes_filters, {
       RV$genes_filters_df <- callModule(getDF_filters, "genes_filters", filters_settings$GENES)
@@ -1532,9 +1584,7 @@ server <- function(input, output, session) {
                variants_df = RV$data$genes_scores, 
                na_values = app_settings$fill_na$fill_na_genes)
     
-    #########################
-    ### Regions Filters tab 
-    #########################
+    ## Regions Filters tab ------------------------
     
     observeEvent(input$next_regions_filters, {
       df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
@@ -1553,7 +1603,7 @@ server <- function(input, output, session) {
     #})
     
     output$ROH_filters_UI <- renderUI({ 
-      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))  
+      shiny::validate(need(inherits(RV$data, "list"), "No ROH data loaded" ))  
       shiny::validate(need(inherits(RV$data$ROH_ranges, "list"), "No ROH regions loaded"))
       bedcontrolUI("ROH_filter", label = "ROH regions", ranges=RV$data$ROH_ranges, slider=TRUE, samples=TRUE, selected_sample = RV$data$all_samples[1])
     })
@@ -1561,53 +1611,48 @@ server <- function(input, output, session) {
       callModule(configureSlider, "ROH_filter", ranges=RV$data$ROH_ranges, scale_value=1000)  
     })
     
-    ########################
-    ### Filter Explorer tab
-    ########################
-    
-    output$summary_variants_filters <- renderPlot({
-        req(nrow(filters_summ_vars())>0)
-        #ggplotly(dynamicTicks = T,
-            ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class,label=round(Count,2))) + geom_bar(stat="identity") + 
-              geom_label(data=filters_summ_vars() %>% filter(Class=="PASS")) + 
-              labs(y="% variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        #)
-    })
-    
-    output$summary_genes_filters <- renderPlot({
-        req(nrow(filters_summ_genes())>0)
-        #ggplotly(dynamicTicks = T,
-            ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class, label=round(Count,3))) + geom_bar(stat="identity") + 
-              geom_label(data=filters_summ_genes() %>% filter(Class=="PASS")) +
-              labs(y="% genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
-        #)
-    })
-    
-    output$variants_filters_plot <- renderPlot({
-      req(inherits(RV$data,"list"))
-      counts <- callModule(getPASScounts_filters,"variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
-      print(str(counts))
-      counts_df <- NULL
-      for (n in names(counts$tot)) {
-        counts_df <- rbind(counts_df, c(n,counts$PASS[[n]],counts$tot[[n]]))
-      }
-      counts_df <- as.data.frame(counts_df, stringsAsFactors=F)
-      counts_df$V2 <- as.numeric(counts_df$V2)
-      counts_df$V3 <- as.numeric(counts_df$V3)
-      counts_df$pct <- counts_df$V2/counts_df$V3
-      ggplot(counts_df, aes(x=V1, y=pct, label=round(pct,3))) + geom_bar(stat="identity") + geom_label() + 
-        labs(y="% variants", x="filter group", title="Variants filter groups") + 
-        theme(axis.text.x=element_text(angle=45, hjust = 1))
-    })
-    
-    callModule(plotModule, "genes_scatter", plot_data = genes_scores(), missingValues = c(99,-99), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))
-    callModule(plotModule, "variants_scatter", plot_data = variants_df(), missingValues = c(99,-99), plotType = "bigdata", variables = list("color"="Class", "size" = 1))
-    callModule(plotModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
-    
-    ########################
-    ### Results GENES tab
-    ########################
-    
+  ## Filter Explorer tab ----------------------------------
+  output$summary_variants_filters <- renderPlot({
+      req(nrow(filters_summ_vars())>0)
+      #ggplotly(dynamicTicks = T,
+          ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class,label=round(Count,2))) + geom_bar(stat="identity") + 
+            geom_label(data=filters_summ_vars() %>% filter(Class=="PASS")) + 
+            labs(y="% variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
+      #)
+  })
+  
+  output$summary_genes_filters <- renderPlot({
+      req(nrow(filters_summ_genes())>0)
+      #ggplotly(dynamicTicks = T,
+          ggplot(filters_summ_genes(), aes(x=Filter,y=Count,fill=Class, label=round(Count,3))) + geom_bar(stat="identity") + 
+            geom_label(data=filters_summ_genes() %>% filter(Class=="PASS")) +
+            labs(y="% genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
+      #)
+  })
+  
+  output$variants_filters_plot <- renderPlot({
+    req(inherits(RV$data,"list"))
+    counts <- callModule(getPASScounts_filters,"variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
+    print(str(counts))
+    counts_df <- NULL
+    for (n in names(counts$tot)) {
+      counts_df <- rbind(counts_df, c(n,counts$PASS[[n]],counts$tot[[n]]))
+    }
+    counts_df <- as.data.frame(counts_df, stringsAsFactors=F)
+    counts_df$V2 <- as.numeric(counts_df$V2)
+    counts_df$V3 <- as.numeric(counts_df$V3)
+    counts_df$pct <- counts_df$V2/counts_df$V3
+    ggplot(counts_df, aes(x=V1, y=pct, label=round(pct,3))) + geom_bar(stat="identity") + geom_label() + 
+      labs(y="% variants", x="filter group", title="Variants filter groups") + 
+      theme(axis.text.x=element_text(angle=45, hjust = 1))
+  })
+  
+  callModule(plotModule, "genes_scatter", plot_data = genes_scores(), missingValues = c(99,-99), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))
+  callModule(plotModule, "variants_scatter", plot_data = variants_df(), missingValues = c(99,-99), plotType = "bigdata", variables = list("color"="Class", "size" = 1))
+  callModule(plotModule, "variants_barplot", plot_data = variants_df(), plotType = "barplot", variables = list("fill"="Class"), additionalOptions = list(format1, scale_y_sqrt()))
+  
+  ## Results ----------------------------
+    ## Results GENES tab --------------------------
     output$GADO_rank <- renderPlotly({
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         if (length(input$genesTable_rows_selected) > 0) {
@@ -1621,7 +1666,7 @@ server <- function(input, output, session) {
     
     output$GADO_distribution <- renderPlotly({
         shiny::validate(need(input$genesTable_rows_selected, "Select a gene"))
-        
+        shiny::validate(need(gado_distribution, "Cohort GADO distribution not available"))
         genedetail_tab <- as.data.frame(genes_scores() %>% filter(Class == "PASS") %>% select(-Class))
         gene_name <- genedetail_tab[input$genesTable_rows_selected, "gene"]
         Zscore <- genedetail_tab[input$genesTable_rows_selected, "gado_zscore"]
@@ -1716,10 +1761,7 @@ server <- function(input, output, session) {
       zip_archive = paste0(input$CaseCode, ".results.zip") )
     })
     
-    ########################
-    ### Results VARIANTS tab
-    ########################
-    
+    ## Results VARIANTS tab --------------------------
     variants_pass_df <- reactive ({
       if (input$vars_results_genes == "ALL GENES") {
         variants_df() %>% filter(Class == "PASS")
@@ -1806,10 +1848,7 @@ server <- function(input, output, session) {
       RV$saved_vars <- rbind(RV$saved_vars, vars_to_save) %>% distinct()
     })
     
-    ################################
-    ### PanelApp and genes lists tab
-    ################################
-    
+    ## PanelApp and genes lists tab ------------------------------
     output$PanelApp_panels_table <- DT::renderDataTable(selection="single", options = list(scrollX = TRUE), {
         PanelApp_panels_df()
     })
@@ -1864,456 +1903,676 @@ server <- function(input, output, session) {
         genesTable_proxy %>% selectRows(row_idx) 
     })
     
-    ####################
-    ### Gene detail tab
-    ####################
-    
-    gene_name <- reactive ({
-        symbol = candidate_genes_df()[input$genesTable_rows_selected, "gene"]
-        updateSelectInput(session = session, inputId = "chr_coverage",selected = genes_bed$V1[genes_bed$V4 == symbol])
-        RV$selected_gene <- symbol
-        candidate_genes_df()[input$genesTable_rows_selected, "gene"]
-    })
-    
-    venus_link <- reactive({
-      selected_vars <- gene_comphet_vars_df()[input$comphetTable_rows_selected, ]
-      aa_changes <- selected_vars$aa_change[selected_vars$consequence == "missense_variant"]
-      selected_vars <- gene_vars_df()[input$variantsTable_rows_selected, ]
-      aa_changes <- unique(c(aa_changes, selected_vars$aa_change[selected_vars$consequence == "missense_variant"]))
-      #aa_changes <- unique(c(gene_comphet_vars_df()$aa_change[input$comphetTable_rows_selected], gene_vars_df()$aa_change[input$variantsTable_rows_selected]))
-      links <- list()
-      for (aa_change in aa_changes)
-        if (!is.na(aa_change)) {
-          aa_change <- unlist(strsplit(aa_change,","))[1]
-          id <- aa_change
-          transcript_id <- unlist(strsplit(aa_change,":"))[1]
-          aa_change <- unlist(strsplit(aa_change,":"))[2]
-          aa_change <- gsub("p\\.","",aa_change)
-          aa <- str_extract_all(aa_change, "[A-Za-z]{3}")[[1]]
-          pos <- str_extract(aa_change, "\\d+")
-          aa_change <- paste0(aa_codes[[aa[1]]],pos,aa_codes[[aa[2]]])
-          url_link <- paste0("https://michelanglo.sgc.ox.ac.uk/venus_transcript?enst=",transcript_id, "&mutation=", aa_change, "&redirect")
-          links[[id]] <- url_link
-        }
-      return(links)
-    })
-    
-    output$Gene_symbol <- renderText({
-        shiny::validate(need(gene_name() != "", 'No gene selected'))
-        gene_name()
-    })
-    
-    output$Gene_name <- renderText({
-        shiny::validate(need(gene_name() != "", 'No gene selected'))
-        genes_info[genes_info$symbol == gene_name(), "name"]
-    })
-    
-    output$GTeX_link <- renderUI({
-        shiny::validate(need(gene_name() != "", 'No gene selected'))
-        ensg_id <- genes_info[genes_info$symbol == gene_name(), "ensembl_gene_id"]
-        tags$a(href=paste0("https://gtexportal.org/home/gene/", gene_name()), paste0(gene_name(), "(", ensg_id, ")"), target="_blank")
-    })
-    
-    output$geneDetail <- DT::renderDataTable(selection="none", {
-        candidate_genes_df()[input$genesTable_rows_selected,]
-    })
-    
-    output$geneInfo <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        shiny::validate(need(gene_name() != "", 'No gene selected'))
-        selected <- list()
-        
-        for (n in names(gene_anno)) {
-            id_list <- grep(gene_name(), gene_anno[[n]])
-            selected[[n]] <- names(gene_anno[[n]])[id_list]
-        }
-        Additional_info <- data.frame(lapply(selected, "length<-", max(lengths(selected))), stringsAsFactors = F)
-    })
-    
-    output$gtex_plot <- renderPlot ({
-        gene_exp <- GTeX_data[GTeX_data$Description == gene_name(),]
-        shiny::validate(need(nrow(gene_exp)>0, "Gene not found in GTeX"))
-        gene_exp <- gather(gene_exp, key="tissue", value="median_TPM", 3:ncol(gene_exp))
-        ggplot(gene_exp, aes(x=tissue, y=median_TPM)) + geom_bar(stat="identity") + format1
-    })
-    
-    gene_comphet_vars_df <- reactive({
-        #shiny::validate(gene_name != "")
-        
-        comphet_details <- comphet_df() %>% filter(Class == "PASS", gene == gene_name()) %>% gather(key="variant",value = "varID", v1:v2) %>% select(-gene, -variant) %>% distinct()
-        #shiny::validate(need(nrow(comphet_details)>0, 'No compound het variants'))
-        comphet_details <- merge(comphet_details,variants_df()[variants_df()$Class == "PASS",], by.x="varID",by.y="rec_id")
-        as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))
-    })
-    
-    gene_vars_df <- reactive ({
-        #shiny::validate(gene_name != "")
-        #comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", V1:V2)
-        
-        #as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name))
-        #message("Selected gene: ", gene_name())
-        as.data.frame(variants_df() %>% filter(Class == "PASS", gene == gene_name(), rec_id %nin% gene_comphet_vars_df()$varID)) 
-    })
-    
-    output$variantsTable <- DT::renderDataTable({
-        #shiny::validate(need(gene_name != "", 'No gene selected'))
-        na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
-        na_values <- na_values[na_values != 0]
-        if (is.null(RV$saved_vars)) {
-          datatable(gene_vars_df(), 
-                    selection="multiple",
-                    options = list(scrollX = TRUE)) %>%
-            formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))   
-        } else {
-          datatable(gene_vars_df(), 
-                selection="multiple",
-                options = list(scrollX = TRUE)) %>%
-            formatStyle(  'internal_id',
-                          target = 'row',
-                          backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
-            formatStyle(  'rec_id',
-                          target = 'row',
-                          backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
-            formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
-        }
-    })
-    
-    output$comphetTable <- DT::renderDataTable({
-        #shiny::validate(need(gene_name != "", 'No gene selected'))
-        shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
-        na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
-        na_values <- na_values[na_values != 0]
-        
-        if (is.null(RV$saved_vars)) {
-          datatable(gene_comphet_vars_df(), 
-                    selection="multiple",
-                    options = list(scrollX = TRUE)) %>%
-            formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) 
-        } else {
-          datatable(gene_comphet_vars_df(), 
-                selection="multiple",
-                options = list(scrollX = TRUE)) %>%
-            formatStyle(  'internal_id',
-                          target = 'row',
-                          backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
-            formatStyle(  'rec_id',
-                          target = 'row',
-                          backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
-            formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
-        }
-    })
-    
-    observeEvent(input$save_vars_genedetail, {
-      col_names <- colnames(variants_pass_df() %>% select(-Class))
-      vars_to_save_1 <- gene_vars_df()[input$variantsTable_rows_selected,] %>% select(-Class)
-      vars_to_save_2 <- gene_comphet_vars_df()[input$comphetTable_rows_selected,col_names]
-      vars_to_save <- rbind(vars_to_save_1, vars_to_save_2)
-      vars_to_save$caseID <- RV$data$pedigree
-      
-      #Remove samples GQ and GT cols since they are different for each case
-      #GTs and samples order are collapsed and saved in new cols
-      GT_cols <- grep("GT_",colnames(vars_to_save))
-      GQ_cols <- grep("GQ_",colnames(vars_to_save))
-      #message("COLNAMES SAVED")
-      #message(colnames(RV$saved_vars), sep=",")
-      #message("COLNAMES VARS TO SAVE")
-      #message(colnames(vars_to_save), sep=",")
-      #message("GT COLS ", paste(GT_cols, collapse=","))
-      #message("DIM VARS_TO_SAVE ", dim(vars_to_save))
-      vars_to_save$GTs <- apply( as.data.frame(vars_to_save[ , GT_cols ]) , 1 , paste, collapse=",")
-      vars_to_save$samples_order <- paste(gsub("GT_","",colnames(vars_to_save)[GT_cols]), collapse=",")
-      vars_to_save <- vars_to_save %>% select(-GT_cols, -GQ_cols)
-      
-
-      RV$saved_vars <- rbind(RV$saved_vars, vars_to_save) %>% distinct()
-    })
-    
-    output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
-      req(gene_name() != "" & !is.null(gene_name()))  
-      gene_df <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), c("entity_name","panel_idx","confidence_level")]
-        shiny::validate(need(nrow(gene_df)>0, "No PanelApp panels for this gene"))
-        
-        #conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
-        #df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
-        df <- merge(gene_df, PanelApp_panels_df(), by.x="panel_idx", by.y="id")
-        #df$gene <- gene_name()
-        #df$confidence_level <- conf_level
-        df[,c("entity_name","confidence_level","panel_idx","name","disease_group","version","relevant_disorders")]
-    })
-    
-    output$clinvar_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        ClinVar_df()[ClinVar_df()$gene == gene_name(),]
-    })
-    
-    output$genelists_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
-        listID <- geneLists_genes[geneLists_genes$entity_name == gene_name(), "genelist_idx"]
-        geneLists_df()[geneLists_df()$id %in% listID,]
-    })
-    
-    output$hpo_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-      HPO_ids <- unique(HPO_genes$HPO_id[HPO_genes$gene == gene_name()])
-      HPO_table <- HPO_obo %>% filter(HPO_id %in% HPO_ids) %>% distinct()
-    })
-    
-    IGV_session <- reactive ({
-        shiny::validate(need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"))
-        chromosome <- unique(c(gene_comphet_vars_df()$chr[input$comphetTable_rows_selected], gene_vars_df()$chr[input$variantsTable_rows_selected]))
-        start_pos <- unique(c(gene_comphet_vars_df()$start[input$comphetTable_rows_selected], gene_vars_df()$start[input$variantsTable_rows_selected]))
-        end_pos <- unique(c(gene_comphet_vars_df()$end[input$comphetTable_rows_selected], gene_vars_df()$end[input$variantsTable_rows_selected]))
-        
-        shiny::validate(need(length(chromosome) == 1, "Please select vars on the same chromosome"))
-        
-        start_pos <- min(start_pos) - 100
-        end_pos <- max(end_pos) + 100
-        region <- paste0(chromosome,":",start_pos,"-",end_pos)
-        out_file <- paste0(chromosome,"_",start_pos,"-",end_pos,".xml")
-        RV$selected_vars_region <- region
-        
-        igv_xml <- makeIGVxml(region, 
-                              RV$data$affected_samples, 
-                              RV$data$unaffected_samples,
-                              VCF_file = paste0(VCF_dir,"/",RV$data$pedigree, ".PASS.NORM.vcf.gz"))
-        
-        #jigv_command <- paste("jigv --region", region,
-        #                      paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
-        #                      paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
-        #                      paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
-        #                      SV_file, collapse=" ")
-        callModule(downloadObj, id="get_igv_session", output_prefix= out_file, output_data=igv_xml, col_names=FALSE)
-        
-        list(outfile=out_file, session_xml=igv_xml)
-    })
-    
-    #callModule(downloadObj, id="get_igv_session", output_prefix= IGV_session()$outfile, output_data=IGV_session()$session_xml, col_names=FALSE)
-
-    output$go_to_venus <- renderUI ({
-      req(length(venus_link())>0)
-      #message(str(venus_link()))
-      mybutton <- list()
-      for (i in 1:length(venus_link())) {
-        mybutton[[paste0("venus_",i)]] <- actionButton(paste0("venus_",i), 
-                                              paste0("VENUS prediction for ", names(venus_link())[i]), 
-                                              onclick =paste0("window.open('", venus_link()[[i]], "', '_blank')"))
+  ## Gene detail tab -----------------------------
+  gene_name <- reactive ({
+      symbol = candidate_genes_df()[input$genesTable_rows_selected, "gene"]
+      updateSelectInput(session = session, inputId = "chr_coverage",selected = genes_bed$V1[genes_bed$V4 == symbol])
+      RV$selected_gene <- symbol
+      candidate_genes_df()[input$genesTable_rows_selected, "gene"]
+  })
+  
+  venus_link <- reactive({
+    selected_vars <- gene_comphet_vars_df()[input$comphetTable_rows_selected, ]
+    aa_changes <- selected_vars$aa_change[selected_vars$consequence == "missense_variant"]
+    selected_vars <- gene_vars_df()[input$variantsTable_rows_selected, ]
+    aa_changes <- unique(c(aa_changes, selected_vars$aa_change[selected_vars$consequence == "missense_variant"]))
+    #aa_changes <- unique(c(gene_comphet_vars_df()$aa_change[input$comphetTable_rows_selected], gene_vars_df()$aa_change[input$variantsTable_rows_selected]))
+    links <- list()
+    for (aa_change in aa_changes)
+      if (!is.na(aa_change)) {
+        aa_change <- unlist(strsplit(aa_change,","))[1]
+        id <- aa_change
+        transcript_id <- unlist(strsplit(aa_change,":"))[1]
+        aa_change <- unlist(strsplit(aa_change,":"))[2]
+        aa_change <- gsub("p\\.","",aa_change)
+        aa <- str_extract_all(aa_change, "[A-Za-z]{3}")[[1]]
+        pos <- str_extract(aa_change, "\\d+")
+        aa_change <- paste0(aa_codes[[aa[1]]],pos,aa_codes[[aa[2]]])
+        url_link <- paste0("https://michelanglo.sgc.ox.ac.uk/venus_transcript?enst=",transcript_id, "&mutation=", aa_change, "&redirect")
+        links[[id]] <- url_link
       }
-      col_dimension <- ceiling(12 / length(venus_link()))
-      buttons_row <- NULL
-      for (n in names(mybutton)) {
-        buttons_row <- tagList(buttons_row,tagList(column(col_dimension, mybutton[[n]], align="center")))
+    return(links)
+  })
+  
+  output$Gene_symbol <- renderText({
+      shiny::validate(need(gene_name() != "", 'No gene selected'))
+      gene_name()
+  })
+  
+  output$Gene_name <- renderText({
+      shiny::validate(need(gene_name() != "", 'No gene selected'))
+      genes_info[genes_info$symbol == gene_name(), "name"]
+  })
+  
+  output$GTeX_link <- renderUI({
+      shiny::validate(need(gene_name() != "", 'No gene selected'))
+      ensg_id <- genes_info[genes_info$symbol == gene_name(), "ensembl_gene_id"]
+      tags$a(href=paste0("https://gtexportal.org/home/gene/", gene_name()), paste0(gene_name(), "(", ensg_id, ")"), target="_blank")
+  })
+  
+  output$geneDetail <- DT::renderDataTable(selection="none", {
+      candidate_genes_df()[input$genesTable_rows_selected,]
+  })
+  
+  output$geneInfo <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+      shiny::validate(need(gene_name() != "", 'No gene selected'))
+      selected <- list()
+      
+      for (n in names(gene_anno)) {
+          id_list <- grep(gene_name(), gene_anno[[n]])
+          selected[[n]] <- names(gene_anno[[n]])[id_list]
       }
-      fluidRow(buttons_row)
-    })
-    
-    output$igv_region <- renderText({
-        paste0("Generated session: ", IGV_session()$outfile)
-    })
-    
-    ########################
-    ### Expansion Hunter tab
-    ########################
-    
-    output$exphunter_selection <- renderUI({
-        selectInput("exphunter_loci", h3("Gene:"), choices = sort(unique(RV$data$ExpHunter$PEDIGREE$LocusId)), multiple = FALSE)
-    })
-    
-    output$exphunter_variants <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
-        RV$data$ExpHunter$PEDIGREE %>% filter(LocusId == input$exphunter_loci) %>% select(VariantId,RepeatUnit,ReferenceRegion) %>% distinct()
-    })
-    
-    output$exphunter_plot <- renderPlot({ 
-        shiny::validate(need(input$exphunter_loci != "", "No gene selected"))
-        ggplot(RV$data$ExpHunter$PEDIGREE[RV$data$ExpHunter$PEDIGREE$LocusId == input$exphunter_loci,], aes(y=sampleID, x=Genotype, fill=Coverage)) + 
-            geom_tile() + 
-            facet_grid(group~VariantId, scales="free") +
-            format1
-    })
-    
-    ########################
-    ### Explore coverage tab
-    ########################
-    
-    output$gene_cov_select <- renderUI({
-        genes_list <- sort(unique(genes_bed$V4[genes_bed$V1 == input$chr_coverage]))
-        if (RV$selected_gene != FALSE) {
-            selected_gene = RV$selected_gene
-        } else {
-            selected_gene = "NO_GENE"
-        }
-        selectInput("gene_coverage", "Gene: ", choices = c("NO_GENE",genes_list), selected = selected_gene)
-    })
-    
-    observeEvent(input$plot_coverage, {
-        filename <- paste0(Coverage_dir,"/indexcov-", input$chr_coverage, ".bed.gz")
-        shiny::validate(need(file_test("-f", filename), "No coverage data"))
-        
-        RV$cov_file <- filename
-    })
-    
-    output$smooth_dimension <- renderText({
-        paste0("Window size: ", as.numeric(input$smooth_factor) * 16.4, " kb")
-    })
-    
-    output$coverage_plot <- renderPlotly({
-        req(RV$cov_file)
-        cov_file <- gzfile(RV$cov_file)
-        cov_data <- read.table(cov_file, sep="\t", header=T, comment.char = "@", stringsAsFactors = F)
-        cov_df <- cov_data %>% select(all_of(c("X.chrom","start","end", RV$data$all_samples))) %>% gather(.,key="sample",value="norm_cov", 4:(3+length(RV$data$all_samples)))
-        cov_df$middle_point <- round(cov_df$start + ((cov_df$end - cov_df$start) / 2))
-        
-        #if a gene is selected resctric data to juts this gene
-        if (input$gene_coverage != "NO_GENE") {
-            plot_chr <- genes_bed$V1[genes_bed$V4 == input$gene_coverage]
-            plot_start <- genes_bed$V2[genes_bed$V4 == input$gene_coverage] - as.numeric(input$cov_region_pad)*1000
-            plot_end <- genes_bed$V3[genes_bed$V4 == input$gene_coverage] + as.numeric(input$cov_region_pad)*1000
-            cov_df <- cov_df %>% filter(X.chrom == plot_chr, middle_point >= plot_start & middle_point <= plot_end)   
-        }
-        
-        #apply smooth factor to coverage data
-        d <- as.data.frame(cov_df %>% group_by(sample,G=trunc(0:(n()-1)/input$smooth_factor)) %>% summarise(mean=mean(norm_cov), pos=median(middle_point)))
-        
-        cov_plot <- ggplot(d, aes(x=pos/100000, y=mean, color=sample)) + 
-            geom_line(size=0.5, alpha=0.5) + scale_y_continuous(limits=c(0,3), breaks=0:3) + 
-            theme(axis.text.x=element_text(size=8, angle=45, hjust=1)) + 
-            labs(x="position (x 100kb)", title=paste0("Chromosome: ", input$chr_coverage), subtitle = paste0("Gene: ", input$gene_coverage))
-        
-        ggplotly(cov_plot, tooltip = c("color","y"), dynamicTicks = T)
-    })
-
-    outputOptions(output, "vars_filters_UI", suspendWhenHidden = FALSE)
-    outputOptions(output, "segregation_controls", suspendWhenHidden = FALSE)
-    outputOptions(output, "GQfilter_controls", suspendWhenHidden = FALSE)
-    outputOptions(output, "genes_filters_UI", suspendWhenHidden = FALSE)
-    outputOptions(output, "custom_bed_check", suspendWhenHidden = FALSE)
-    outputOptions(output, "ROH_filters_UI", suspendWhenHidden = FALSE)    
-    ########################
-    ### Known variants tab
-    ########################
-    output$known_clinvar_tab <- DT::renderDataTable({
-      ok_cols <- c(vis_cols,
-                   colnames(RV$data$known_clinvar)[grep("GT_",colnames(RV$data$known_clinvar))])
-      hide_cols <- setdiff(colnames(RV$data$known_clinvar), ok_cols)
-      hide_cols_idx <- which(colnames(RV$data$known_clinvar) %in% hide_cols)
-      datatable(
-        RV$data$known_clinvar, extensions = 'Buttons', selection="single", filter = "top",
-        options = list(
-          scrollX = TRUE,
-          dom = 'lBfrtip',
-          buttons = c('copy', 'csv', 'excel','colvis'),
-          columnDefs = list(
-            list(targets = hide_cols_idx, visible = FALSE)
-          )
-        )
-      )
-    })
-    
-    output$known_cosmic_tab <- DT::renderDataTable({
-      ok_cols <- c(vis_cols,
-                   colnames(RV$data$known_cosmic)[grep("GT_",colnames(RV$data$known_cosmic))])
-      hide_cols <- setdiff(colnames(RV$data$known_cosmic), ok_cols)
-      hide_cols_idx <- which(colnames(RV$data$known_clinvar) %in% hide_cols)
-      datatable(
-        RV$data$known_cosmic, extensions = 'Buttons', selection="none", filter = "top",
-        options = list(
-          scrollX = TRUE,
-          dom = 'lBfrtip',
-          buttons = c('copy', 'csv', 'excel','colvis'),
-          columnDefs = list(
-            list(targets = hide_cols, visible = FALSE)
-          )
-        )
-      )
-    })
-    
-    clinvar_var_info <- reactive({
-      req(input$known_clinvar_tab_rows_selected)
-      infos <- getClinvarInfo(RV$data$known_clinvar$known_ids[input$known_clinvar_tab_rows_selected])
-      return(infos)
-    })
-    
-    output$clinvar_var_sig <- renderText({
-      if (is.null(clinvar_var_info()$significance) | is.na(clinvar_var_info()$significance) | clinvar_var_info()$significance == "") {
-        return ("NONE")
+      Additional_info <- data.frame(lapply(selected, "length<-", max(lengths(selected))), stringsAsFactors = F)
+  })
+  
+  output$gtex_plot <- renderPlot ({
+      gene_exp <- GTeX_data[GTeX_data$Description == gene_name(),]
+      shiny::validate(need(nrow(gene_exp)>0, "Gene not found in GTeX"))
+      gene_exp <- gather(gene_exp, key="tissue", value="median_TPM", 3:ncol(gene_exp))
+      ggplot(gene_exp, aes(x=tissue, y=median_TPM)) + geom_bar(stat="identity") + format1
+  })
+  
+  gene_comphet_vars_df <- reactive({
+      #shiny::validate(gene_name != "")
+      
+      comphet_details <- comphet_df() %>% filter(Class == "PASS", gene == gene_name()) %>% gather(key="variant",value = "varID", v1:v2) %>% select(-gene, -variant) %>% distinct()
+      #shiny::validate(need(nrow(comphet_details)>0, 'No compound het variants'))
+      comphet_details <- merge(comphet_details,variants_df()[variants_df()$Class == "PASS",], by.x="varID",by.y="rec_id")
+      as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))
+  })
+  
+  gene_vars_df <- reactive ({
+      #shiny::validate(gene_name != "")
+      #comphet_details <- comphet_df() %>% filter(Class == "PASS", Gene == gene_name) %>% gather(key="Variant",value = "varID", V1:V2)
+      
+      #as.data.frame(variants_df() %>% filter(Class == "PASS", Gene == gene_name))
+      #message("Selected gene: ", gene_name())
+      as.data.frame(variants_df() %>% filter(Class == "PASS", gene == gene_name(), rec_id %nin% gene_comphet_vars_df()$varID)) 
+  })
+  
+  output$variantsTable <- DT::renderDataTable({
+      #shiny::validate(need(gene_name != "", 'No gene selected'))
+      na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+      na_values <- na_values[na_values != 0]
+      if (is.null(RV$saved_vars)) {
+        datatable(gene_vars_df(), 
+                  selection="multiple",
+                  options = list(scrollX = TRUE)) %>%
+          formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))   
       } else {
-        return(clinvar_var_info()$significance)
+        datatable(gene_vars_df(), 
+              selection="multiple",
+              options = list(scrollX = TRUE)) %>%
+          formatStyle(  'internal_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
+          formatStyle(  'rec_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+          formatStyle(names(gene_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
       }
-    })
-    
-    output$clinvar_var_pheno <- renderText({
-      if (is.null(clinvar_var_info()$phenotype) | is.na(clinvar_var_info()$phenotype) | clinvar_var_info()$phenotype == "") {
-        return ("NONE")
-      } else {
-        return(clinvar_var_info()$phenotype)
-      }
-    }) 
-    ########################
-    ### Preferred vars
-    ########################
-    
-    observeEvent(input$preferred_vars_remove, {
-      shiny::validate(need(input$preferred_vars_tab_rows_selected, "Select a variant"))
-      RV$saved_vars <- RV$saved_vars[-input$preferred_vars_tab_rows_selected,]
-      if(nrow(RV$saved_vars) == 0) {RV$saved_vars <- NULL}
-    })
-    
-    observeEvent(input$preferred_vars_reset, {
-      RV$saved_vars <- NULL
-    })
-    
-    observeEvent(input$preferred_vars_file, {
-      req(input$preferred_vars_file)
-      tryCatch({
-        preferred_vars_df <- read.table(input$preferred_vars_file$datapath,header=T,sep=",",stringsAsFactors = F)
-        RV$saved_vars <- preferred_vars_df %>% select(-X)
-        RV$notifications[["preferred_vars"]] <- notificationItem(
-          text = paste0("Loaded ", nrow(RV$saved_vars), " preferred variants"),
-          icon = icon("check-circle"),
-          status = "success")
-      }, error=function(cond) {
-        RV$notifications[["preferred_vars"]] <- notificationItem(
-          text = paste0("Failed loading preferred variants"),
-          icon = icon("exclamation-circle"),
-          status = "danger")
-      })
+  })
+  
+  output$comphetTable <- DT::renderDataTable({
+      #shiny::validate(need(gene_name != "", 'No gene selected'))
+      shiny::validate(need(nrow(gene_comphet_vars_df())>0, 'No compound het variants'))
+      na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+      na_values <- na_values[na_values != 0]
       
-    })
+      if (is.null(RV$saved_vars)) {
+        datatable(gene_comphet_vars_df(), 
+                  selection="multiple",
+                  options = list(scrollX = TRUE)) %>%
+          formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) 
+      } else {
+        datatable(gene_comphet_vars_df(), 
+              selection="multiple",
+              options = list(scrollX = TRUE)) %>%
+          formatStyle(  'internal_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(saved_vars()$all)))) %>%
+          formatStyle(  'rec_id',
+                        target = 'row',
+                        backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+          formatStyle(names(gene_comphet_vars_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+      }
+  })
+  
+  observeEvent(input$save_vars_genedetail, {
+    col_names <- colnames(variants_pass_df() %>% select(-Class))
+    vars_to_save_1 <- gene_vars_df()[input$variantsTable_rows_selected,] %>% select(-Class)
+    vars_to_save_2 <- gene_comphet_vars_df()[input$comphetTable_rows_selected,col_names]
+    vars_to_save <- rbind(vars_to_save_1, vars_to_save_2)
+    vars_to_save$caseID <- RV$data$pedigree
     
-    output$preferred_vars_tab <- DT::renderDataTable({
-      req(RV$saved_vars)
-      ok_cols <- c(vis_cols, "caseID",
-                   colnames(RV$saved_vars)[grep("GT_",colnames(RV$saved_vars))])
-      hide_cols <- setdiff(colnames(RV$saved_vars), ok_cols)
-      hide_cols_idx <- which(colnames(RV$saved_vars) %in% hide_cols)
-      datatable(
-        RV$saved_vars, extensions = 'Buttons', selection="multiple",
-        options = list(
-          pageLength = 20, lengthMenu = c(10, 20, 50, 100, 200),
-          scrollX = TRUE,
-          dom = 'lBfrtip',
-          buttons = c('copy', 'csv', 'excel','colvis'),
-          columnDefs = list(
-            list(targets = hide_cols_idx, visible = FALSE)
-          )
+    #Remove samples GQ and GT cols since they are different for each case
+    #GTs and samples order are collapsed and saved in new cols
+    GT_cols <- grep("GT_",colnames(vars_to_save))
+    GQ_cols <- grep("GQ_",colnames(vars_to_save))
+    #message("COLNAMES SAVED")
+    #message(colnames(RV$saved_vars), sep=",")
+    #message("COLNAMES VARS TO SAVE")
+    #message(colnames(vars_to_save), sep=",")
+    #message("GT COLS ", paste(GT_cols, collapse=","))
+    #message("DIM VARS_TO_SAVE ", dim(vars_to_save))
+    vars_to_save$GTs <- apply( as.data.frame(vars_to_save[ , GT_cols ]) , 1 , paste, collapse=",")
+    vars_to_save$samples_order <- paste(gsub("GT_","",colnames(vars_to_save)[GT_cols]), collapse=",")
+    vars_to_save <- vars_to_save %>% select(-GT_cols, -GQ_cols)
+    
+  
+    RV$saved_vars <- rbind(RV$saved_vars, vars_to_save) %>% distinct()
+  })
+  
+  output$panelapp_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
+    req(gene_name() != "" & !is.null(gene_name()))  
+    gene_df <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), c("entity_name","panel_idx","confidence_level")]
+      shiny::validate(need(nrow(gene_df)>0, "No PanelApp panels for this gene"))
+      
+      #conf_level <- PanelApp_genes[PanelApp_genes$entity_name == gene_name(), "confidence_level"]
+      #df <- PanelApp_panels_df()[PanelApp_panels_df()$id %in% panelID,]
+      df <- merge(gene_df, PanelApp_panels_df(), by.x="panel_idx", by.y="id")
+      #df$gene <- gene_name()
+      #df$confidence_level <- conf_level
+      df[,c("entity_name","confidence_level","panel_idx","name","disease_group","version","relevant_disorders")]
+  })
+  
+  output$clinvar_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+      ClinVar_df()[ClinVar_df()$gene == gene_name(),]
+  })
+  
+  output$genelists_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE),  {
+      listID <- geneLists_genes[geneLists_genes$entity_name == gene_name(), "genelist_idx"]
+      geneLists_df()[geneLists_df()$id %in% listID,]
+  })
+  
+  output$hpo_detail_tab <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+    HPO_ids <- unique(HPO_genes$HPO_id[HPO_genes$gene == gene_name()])
+    HPO_table <- HPO_obo %>% filter(HPO_id %in% HPO_ids) %>% distinct()
+  })
+  
+  IGV_session <- reactive ({
+      shiny::validate(need(!is.null(input$variantsTable_rows_selected) | !is.null(input$comphetTable_rows_selected), "No rows selected"))
+      chromosome <- unique(c(gene_comphet_vars_df()$chr[input$comphetTable_rows_selected], gene_vars_df()$chr[input$variantsTable_rows_selected]))
+      start_pos <- unique(c(gene_comphet_vars_df()$start[input$comphetTable_rows_selected], gene_vars_df()$start[input$variantsTable_rows_selected]))
+      end_pos <- unique(c(gene_comphet_vars_df()$end[input$comphetTable_rows_selected], gene_vars_df()$end[input$variantsTable_rows_selected]))
+      
+      shiny::validate(need(length(chromosome) == 1, "Please select vars on the same chromosome"))
+      shiny::validate(need(!is.null(RV$data$bam_files), "No information on BAM files loaded"))
+      
+      start_pos <- min(start_pos) - 100
+      end_pos <- max(end_pos) + 100
+      region <- paste0(chromosome,":",start_pos,"-",end_pos)
+      out_file <- paste0(chromosome,"_",start_pos,"-",end_pos,".xml")
+      RV$selected_vars_region <- region
+      
+      igv_xml <- makeIGVxml(region, 
+                            RV$data$affected_samples, 
+                            RV$data$unaffected_samples,
+                            VCF_files = RV$data$vcf_files,
+                            SV_files = RV$data$sv_files,
+                            BAM_files = RV$data$bam_files )
+      
+      #jigv_command <- paste("jigv --region", region,
+      #                      paste('"',BAM_dir, RV$data$affected_samples, '.bam#', RV$data$affected_samples, '_affected"', sep="", collapse=" " ),
+      #                      paste('"',BAM_dir, RV$data$unaffected_samples, '.bam#', RV$data$affected_samples, '_unaffected"', sep="", collapse=" " ),
+      #                      paste0(VCF_dir, RV$data$pedigree, ".PASS.NORM.vcf.gz"), 
+      #                      SV_file, collapse=" ")
+      callModule(downloadObj, id="get_igv_session", output_prefix= out_file, output_data=igv_xml, col_names=FALSE)
+      
+      list(outfile=out_file, session_xml=igv_xml)
+  })
+  
+  output$go_to_venus <- renderUI ({
+    req(length(venus_link())>0)
+    #message(str(venus_link()))
+    mybutton <- list()
+    for (i in 1:length(venus_link())) {
+      mybutton[[paste0("venus_",i)]] <- actionButton(paste0("venus_",i), 
+                                            paste0("VENUS prediction for ", names(venus_link())[i]), 
+                                            onclick =paste0("window.open('", venus_link()[[i]], "', '_blank')"))
+    }
+    col_dimension <- ceiling(12 / length(venus_link()))
+    buttons_row <- NULL
+    for (n in names(mybutton)) {
+      buttons_row <- tagList(buttons_row,tagList(column(col_dimension, mybutton[[n]], align="center")))
+    }
+    fluidRow(buttons_row)
+  })
+  
+  selected_var <- reactive({
+    if(length(input$comphetTable_rows_selected) > 0 | length(input$variantsTable_rows_selected) > 0) {
+      selected_vars <- rbind(gene_comphet_vars_df()[input$comphetTable_rows_selected, c("start","reg_id")],
+                             gene_vars_df()[input$variantsTable_rows_selected, c("start","reg_id")])
+      if (nrow(selected_vars)==1 & selected_vars$reg_id != "") {
+        reg_ids <- unlist(strsplit(selected_vars$reg_id, ","))
+        return(list(var_pos=selected_vars$start, reg_ids=reg_ids))
+      } else {
+        return(NULL)
+      }
+    }
+  })
+  
+  output$reg_regions_details <- renderUI({
+    req(inherits(selected_var(), "list"))
+    query_results_UI("GREENDB_query",selected_var()$reg_ids, boxes=TRUE)
+  })
+  
+  observeEvent(selected_var(), {
+    req(inherits(selected_var(), "list"))
+    callModule(SQlite_query,"GREENDB_query",db=GREENDB_file, var_position=selected_var()$var_pos, regions=selected_var()$reg_ids)
+  })
+  
+  output$igv_region <- renderText({
+      paste0("Generated session: ", IGV_session()$outfile)
+  })
+  
+  ## Expansion Hunter tab -----------------------
+  output$exphunter_selection <- renderUI({
+      selectInput("exphunter_loci", h3("Gene:"), choices = sort(unique(RV$data$ExpHunter$PEDIGREE$LocusId)), multiple = FALSE)
+  })
+  
+  output$exphunter_variants <- DT::renderDataTable(selection="none", options = list(scrollX = TRUE), {
+      RV$data$ExpHunter$PEDIGREE %>% filter(LocusId == input$exphunter_loci) %>% select(VariantId,RepeatUnit,ReferenceRegion) %>% distinct()
+  })
+  
+  output$exphunter_plot <- renderPlot({ 
+      shiny::validate(need(input$exphunter_loci != "", "No gene selected"))
+      ggplot(RV$data$ExpHunter$PEDIGREE[RV$data$ExpHunter$PEDIGREE$LocusId == input$exphunter_loci,], aes(y=sampleID, x=Genotype, fill=Coverage)) + 
+          geom_tile() + 
+          facet_grid(group~VariantId, scales="free") +
+          format1
+  })
+  
+  ## Explore coverage tab ----------------------
+  output$gene_cov_select <- renderUI({
+      genes_list <- sort(unique(genes_bed$V4[genes_bed$V1 == input$chr_coverage]))
+      if (RV$selected_gene != FALSE) {
+          selected_gene = RV$selected_gene
+      } else {
+          selected_gene = "NO_GENE"
+      }
+      selectInput("gene_coverage", "Gene: ", choices = c("NO_GENE",genes_list), selected = selected_gene)
+  })
+  
+  observeEvent(input$plot_coverage, {
+      filename <- paste0(Coverage_dir,"/indexcov-", input$chr_coverage, ".bed.gz")
+      shiny::validate(need(file_test("-f", filename), "No coverage data"))
+      
+      RV$cov_file <- filename
+  })
+  
+  output$smooth_dimension <- renderText({
+      paste0("Window size: ", as.numeric(input$smooth_factor) * 16.4, " kb")
+  })
+  
+  output$coverage_plot <- renderPlotly({
+      req(RV$cov_file)
+      cov_file <- gzfile(RV$cov_file)
+      cov_data <- read.table(cov_file, sep="\t", header=T, comment.char = "@", stringsAsFactors = F)
+      cov_df <- cov_data %>% select(all_of(c("X.chrom","start","end", RV$data$all_samples))) %>% gather(.,key="sample",value="norm_cov", 4:(3+length(RV$data$all_samples)))
+      cov_df$middle_point <- round(cov_df$start + ((cov_df$end - cov_df$start) / 2))
+      
+      #if a gene is selected resctric data to juts this gene
+      if (input$gene_coverage != "NO_GENE") {
+          plot_chr <- genes_bed$V1[genes_bed$V4 == input$gene_coverage]
+          plot_start <- genes_bed$V2[genes_bed$V4 == input$gene_coverage] - as.numeric(input$cov_region_pad)*1000
+          plot_end <- genes_bed$V3[genes_bed$V4 == input$gene_coverage] + as.numeric(input$cov_region_pad)*1000
+          cov_df <- cov_df %>% filter(X.chrom == plot_chr, middle_point >= plot_start & middle_point <= plot_end)   
+      }
+      
+      #apply smooth factor to coverage data
+      d <- as.data.frame(cov_df %>% group_by(sample,G=trunc(0:(n()-1)/input$smooth_factor)) %>% summarise(mean=mean(norm_cov), pos=median(middle_point)))
+      
+      cov_plot <- ggplot(d, aes(x=pos/100000, y=mean, color=sample)) + 
+          geom_line(size=0.5, alpha=0.5) + scale_y_continuous(limits=c(0,3), breaks=0:3) + 
+          theme(axis.text.x=element_text(size=8, angle=45, hjust=1)) + 
+          labs(x="position (x 100kb)", title=paste0("Chromosome: ", input$chr_coverage), subtitle = paste0("Gene: ", input$gene_coverage))
+      
+      ggplotly(cov_plot, tooltip = c("color","y"), dynamicTicks = T)
+  })
+  
+  outputOptions(output, "vars_filters_UI", suspendWhenHidden = FALSE)
+  outputOptions(output, "segregation_controls", suspendWhenHidden = FALSE)
+  outputOptions(output, "GQfilter_controls", suspendWhenHidden = FALSE)
+  outputOptions(output, "genes_filters_UI", suspendWhenHidden = FALSE)
+  outputOptions(output, "custom_bed_check", suspendWhenHidden = FALSE)
+  outputOptions(output, "ROH_filters_UI", suspendWhenHidden = FALSE)    
+  ## Known variants tab --------------------------
+  output$known_clinvar_tab <- DT::renderDataTable({
+    ok_cols <- c(vis_cols,
+                 colnames(RV$data$known_clinvar)[grep("GT_",colnames(RV$data$known_clinvar))])
+    hide_cols <- setdiff(colnames(RV$data$known_clinvar), ok_cols)
+    hide_cols_idx <- which(colnames(RV$data$known_clinvar) %in% hide_cols)
+    datatable(
+      RV$data$known_clinvar, extensions = 'Buttons', selection="single", filter = "top",
+      options = list(
+        scrollX = TRUE,
+        dom = 'lBfrtip',
+        buttons = c('copy', 'csv', 'excel','colvis'),
+        columnDefs = list(
+          list(targets = hide_cols_idx, visible = FALSE)
         )
       )
+    )
+  })
+  
+  output$known_cosmic_tab <- DT::renderDataTable({
+    ok_cols <- c(vis_cols,
+                 colnames(RV$data$known_cosmic)[grep("GT_",colnames(RV$data$known_cosmic))])
+    hide_cols <- setdiff(colnames(RV$data$known_cosmic), ok_cols)
+    hide_cols_idx <- which(colnames(RV$data$known_clinvar) %in% hide_cols)
+    datatable(
+      RV$data$known_cosmic, extensions = 'Buttons', selection="none", filter = "top",
+      options = list(
+        scrollX = TRUE,
+        dom = 'lBfrtip',
+        buttons = c('copy', 'csv', 'excel','colvis'),
+        columnDefs = list(
+          list(targets = hide_cols, visible = FALSE)
+        )
+      )
+    )
+  })
+  
+  clinvar_var_info <- reactive({
+    req(input$known_clinvar_tab_rows_selected)
+    infos <- getClinvarInfo(RV$data$known_clinvar$known_ids[input$known_clinvar_tab_rows_selected])
+    return(infos)
+  })
+  
+  output$clinvar_var_sig <- renderText({
+    if (is.null(clinvar_var_info()$significance) | is.na(clinvar_var_info()$significance) | clinvar_var_info()$significance == "") {
+      return ("NONE")
+    } else {
+      return(clinvar_var_info()$significance)
+    }
+  })
+  
+  output$clinvar_var_pheno <- renderText({
+    if (is.null(clinvar_var_info()$phenotype) | is.na(clinvar_var_info()$phenotype) | clinvar_var_info()$phenotype == "") {
+      return ("NONE")
+    } else {
+      return(clinvar_var_info()$phenotype)
+    }
+  }) 
+  ## Preferred vars -------------------------
+  observeEvent(input$preferred_vars_remove, {
+    shiny::validate(need(input$preferred_vars_tab_rows_selected, "Select a variant"))
+    RV$saved_vars <- RV$saved_vars[-input$preferred_vars_tab_rows_selected,]
+    if(nrow(RV$saved_vars) == 0) {RV$saved_vars <- NULL}
+  })
+  
+  observeEvent(input$preferred_vars_reset, {
+    RV$saved_vars <- NULL
+  })
+  
+  observeEvent(input$preferred_vars_file, {
+    req(input$preferred_vars_file)
+    tryCatch({
+      preferred_vars_df <- read.table(input$preferred_vars_file$datapath,header=T,sep=",",stringsAsFactors = F)
+      RV$saved_vars <- preferred_vars_df %>% select(-X)
+      RV$notifications[["preferred_vars"]] <- notificationItem(
+        text = paste0("Loaded ", nrow(RV$saved_vars), " preferred variants"),
+        icon = icon("check-circle"),
+        status = "success")
+    }, error=function(cond) {
+      RV$notifications[["preferred_vars"]] <- notificationItem(
+        text = paste0("Failed loading preferred variants"),
+        icon = icon("exclamation-circle"),
+        status = "danger")
     })
     
-    saved_genes <- reactive ({
-      thisCase <- "HACKTHIS"
-      all <- "NOTHING_SAVED"
-      if(!is.null(RV$saved_vars)) {
-        thisCase <- c(thisCase, unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree]))
-        all <- unique(RV$saved_vars$gene)
+  })
+  
+  output$preferred_vars_tab <- DT::renderDataTable({
+    req(RV$saved_vars)
+    ok_cols <- c(vis_cols, "caseID",
+                 colnames(RV$saved_vars)[grep("GT_",colnames(RV$saved_vars))])
+    hide_cols <- setdiff(colnames(RV$saved_vars), ok_cols)
+    hide_cols_idx <- which(colnames(RV$saved_vars) %in% hide_cols)
+    datatable(
+      RV$saved_vars, extensions = 'Buttons', selection="multiple",
+      options = list(
+        pageLength = 20, lengthMenu = c(10, 20, 50, 100, 200),
+        scrollX = TRUE,
+        dom = 'lBfrtip',
+        buttons = c('copy', 'csv', 'excel','colvis'),
+        columnDefs = list(
+          list(targets = hide_cols_idx, visible = FALSE)
+        )
+      )
+    )
+  })
+  
+  saved_genes <- reactive ({
+    thisCase <- "HACKTHIS"
+    all <- "NOTHING_SAVED"
+    if(!is.null(RV$saved_vars)) {
+      thisCase <- c(thisCase, unique(RV$saved_vars$gene[RV$saved_vars$caseID == RV$data$pedigree]))
+      all <- unique(RV$saved_vars$gene)
+    }
+    return(list(thisCase=thisCase,all=all))
+  })
+  saved_vars <- reactive ({
+    thisCase <- "HACKTHIS"
+    all <- "NOTHING_SAVED"
+    if(!is.null(RV$saved_vars)) {
+      thisCase <- c(thisCase, unique(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))
+      all <- unique(RV$saved_vars$internal_id)
+    }
+    return(list(thisCase=thisCase,all=all))
+  })
+  ## Cohort mode ------------------
+  cohort_results <- observeEvent(input$apply_cohort, {
+    req(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df)
+    n <- length(input$cohort_samples)
+    message("Started cohort analysis for ", n, " samples")
+    #updateTabItems(session, "tabs", "cohort_analysis")
+    withProgress(message = 'Cohort analysis', value = 0, {
+                 
+      cohort <- list()
+      RV$cohort_files <- list(applied_genelist.txt = as.data.frame(RV$custom_genes),
+                           applied_filters.json = RV$filters_json)
+      
+      for (sampleID in input$cohort_samples) {
+        #sampleID <- gsub("\\.RData[.enc]*","",file, perl = T)
+        incProgress(1/n, detail = paste("Doing", sampleID))
+        
+        cohort$vars_pass_GQ <- NULL
+        cohort$vars_pass_BED <- NULL
+        cohort$vars_pass_ROH <- NULL 
+        cohort$vars_pass_segregation <- NULL
+        cohort$vars_pass_filters <- NULL
+        cohort$vars_filters_df <- NULL
+        cohort$segregation_filters_df <- NULL
+        cohort$genes_filters_df <- NULL
+        cohort$regions_filters_df <- NULL
+        cohort$filters_json <- NULL
+        
+        #Load data from plain or encrypted object
+        if (file_test("-f", paste0(data_dir,"/",sampleID,".RData.enc"))) {
+          cohort$data <- decrypt_datafile(paste0(data_dir,"/",sampleID,".RData.enc"), pwd = input$pwd)
+        } else if (file_test("-f", paste0(data_dir,"/",sampleID,".RData"))) {
+          cohort$data <- readRDS(paste0(data_dir,"/",sampleID,".RData"))
+        }
+        
+        shiny::validate(need(inherits(cohort$data, "list"), FALSE))
+        cohort$data$variants_df <- cohort$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
+        cohort$data$segregation_df$sup_dnm[cohort$data$segregation_df$sup_dnm < 0] <- 0
+        cohort$data$genes_scores <- cohort$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
+        #cohort$data$genes_scores$cohort_norm_Z <- apply(cohort$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
+        
+        cohort$GQ_cols_all <- which(colnames(cohort$data$variants_df) %in% paste("GQ", cohort$data$all_samples, sep="_"))
+        cohort$GQ_cols_affected <- which(colnames(cohort$data$variants_df) %in% paste("GQ", cohort$data$affected_samples, sep="_"))
+        cohort$maxGQ <- max(cohort$data$variants_df[,..cohort$GQ_cols_all], na.rm = T)
+        
+        #Apply same filters
+        cohort$vars_pass_filters <- callModule(getPASSVars_filters, "variants_filters", filters_settings$VARIANTS, cohort$data$variants_df, cohort$data$comphet_df)
+        #message("PASS vars ", length(cohort$vars_pass_filters$vars))
+        cohort$genes_pass_filters <- callModule(getPASSGenes_filters, "genes_filters", filters_settings$GENES, cohort$data$genes_scores)
+        #message("PASS genes ", length(cohort$genes_pass_filters))
+        cohort$vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = cohort$data$segregation_df, cols_names = segregation_cols)
+        #message("PASS segregation ", length(cohort$vars_pass_segregation))
+        cohort$vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
+                                      variants_df = cohort$data$variants_df, 
+                                      GQ_cols = cohort$GQ_cols_all, 
+                                      affected_cols = cohort$GQ_cols_affected,
+                                      exclude_var_type = sv_vars)
+        #message("PASS GQ ", length(cohort$vars_pass_GQ))
+        
+        if (inherits(RV$customBed_ranges, "GRanges")) {
+          cohort$vars_pass_BED <- callModule(bedfilterModule,"bed_filter",variants_ranges=cohort$data$variants_ranges, bed_ranges=RV$customBed_ranges)
+        } else {
+          cohort$vars_pass_BED <- cohort$data$variants_df$rec_id
+        }
+        #message("PASS BED ", length(cohort$vars_pass_BED))
+        
+        #Variants results
+        ## FILTER VARS
+        #Get the final list of vars in accepted comphet intersecting filters and segregation
+        cohort$comphet_final_vars <- cohort$data$comphet_df %>% filter(
+          rec_id %in% intersect(cohort$vars_pass_segregation,cohort$vars_pass_filters$comphet)) %>% 
+          gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
+        
+        #GET THE FINAL LIST OF ACCEPTED VARS
+        #the final list of segregating accepted vars is now equal to
+        #single vars passing filters and segregation
+        #vars part of a comphet passing all filters + segregation
+        cohort$accepted_vars_list <- unique(intersect(intersect(intersect(
+          cohort$vars_pass_GQ, 
+          cohort$vars_pass_BED),
+          cohort$vars_pass_filters$vars),
+          cohort$vars_pass_segregation))
+        
+        cohort$accepted_vars_list <- unique(c(cohort$accepted_vars_list, cohort$comphet_final_vars$VarID))
+        #message("Final PASS count ", length(cohort$accepted_vars_list))
+        
+        #return variants dataframe with updated Class column (PASS/FILTER)
+        cohort$data$variants_df <- as.data.frame(cohort$data$variants_df %>% mutate(Class = ifelse(
+          rec_id %in% cohort$accepted_vars_list,
+          "PASS","FILTER") ) )
+        
+        #comphet results
+        cohort$filtered_vars_list <- cohort$data$variants_df$rec_id[cohort$data$variants_df$Class == "PASS"]
+        cohort$data$comphet_df <- as.data.frame(cohort$data$comphet_df %>% mutate(Class = ifelse(
+          v1 %in% cohort$filtered_vars_list & 
+            v2 %in% cohort$filtered_vars_list &
+            rec_id %in% cohort$vars_pass_segregation, "PASS", "FILTER")))
+  
+        #genes results
+        cohort$filtered_vars_list <- unique(c(
+          cohort$data$variants_df$rec_id[cohort$data$variants_df$Class == "PASS"], 
+          cohort$data$comphet_df$rec_id[cohort$data$comphet_df$Class == "PASS"])) 
+        
+        #Filters on gene scores are applied
+        cohort$data$genes_df <- as.data.frame(cohort$data$genes_df %>% mutate(Class = ifelse(
+          variants %in% cohort$filtered_vars_list & 
+            gene %in% cohort$genes_pass_filters, "PASS", "FILTER")))    
+        
+        #genes scores
+        cohort$filtered_genes_list <- unique(cohort$data$genes_df$gene[cohort$data$genes_df$Class == "PASS"]) 
+        cohort$data$genes_scores <- as.data.frame(cohort$data$genes_scores %>% mutate(Class = ifelse(
+          gene %in% cohort$filtered_genes_list, "PASS", "FILTER")))
+        
+        #Create results table
+        cohort$data$genes_scores$caseID <- sampleID
+        cohort$data$variants_df$caseID <- sampleID
+        cols_to_remove <- c(paste("GQ", cohort$data$all_samples, sep="_"),
+                            paste("GT", cohort$data$all_samples, sep="_"))
+        cohort$data$variants_df <- cohort$data$variants_df %>% select(-all_of(cols_to_remove))
+        
+        RV$cohort_files$genes.tsv = rbind(RV$cohort_files$genes.tsv, 
+                                       cohort$data$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
+        RV$cohort_files$customGenes.tsv = rbind(RV$cohort_files$customGenes.tsv,
+                                             cohort$data$genes_scores %>% filter(Class == "PASS") %>% filter(gene %in% cohort$custom_genes) %>% select(-Class))
+        RV$cohort_files$variants.tsv = rbind(RV$cohort_files$variants.tsv,
+                                          cohort$data$variants_df %>% filter(Class == "PASS", gene %in% cohort$filtered_genes_list))
+
+        comphet_PASS_vars <- cohort$data$comphet_df %>% filter(Class == "PASS", gene %in% cohort$filtered_genes_list)
+        if (nrow(comphet_PASS_vars) > 0) {
+          message("There are comphet to save")
+          comphet_to_save <- comphet_PASS_vars %>% 
+            gather(key="Variant",value = "varID", v1:v2) %>% 
+            inner_join(., cohort$data$variants_df[cohort$data$variants_df$Class == "PASS",], by=c("varID"="rec_id")) %>%
+            select(-Class.x,-Class.y)
+          
+          comphet_to_save$caseID <- sampleID
+          
+          RV$cohort_files$comphet.tsv = rbind(RV$cohort_files$comphet.tsv, comphet_to_save)
+        }
       }
-      return(list(thisCase=thisCase,all=all))
+      RV$cohort_exit_status <- paste0("Finished with\n\t", nrow(RV$cohort_files$genes.tsv), " genes\n\t", nrow(RV$cohort_files$variants.tsv), " variants")
+      callModule(downloadObj, id = "save_cohort",
+                 output_prefix= "Cohort",
+                 output_data = RV$cohort_files,
+                 zip_archive ="Cohort.results.zip")
     })
-    saved_vars <- reactive ({
-      thisCase <- "HACKTHIS"
-      all <- "NOTHING_SAVED"
-      if(!is.null(RV$saved_vars)) {
-        thisCase <- c(thisCase, unique(RV$saved_vars$rec_id[RV$saved_vars$caseID == RV$data$pedigree]))
-        all <- unique(RV$saved_vars$internal_id)
-      }
-      return(list(thisCase=thisCase,all=all))
-    })
+  })
+  
+  output$cohort_exit_status <- renderText(RV$cohort_exit_status)
+  
+  output$cohort_genes_df <- DT::renderDataTable({
+    na_values <- unique(unlist(app_settings$fill_na$fill_na_genes))
+    #Check if there are saved vars, if yes change row backgrounds accordingly
+    if (is.null(RV$saved_vars)) {
+      datatable(RV$cohort_files$genes.tsv, selection="single") %>% formatStyle(names(RV$cohort_files$genes.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+    } else {
+      datatable(RV$cohort_files$genes.tsv, selection="single") %>% formatStyle(names(RV$cohort_files$genes.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
+        formatStyle(  'gene',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_genes()$all, rep('yellow', length(saved_genes()$all)))) %>%
+        formatStyle(  'gene',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_genes()$thisCase, rep('red', length(saved_genes()$thisCase))))
+    }
+  })
+  
+  output$cohort_vars_df <- DT::renderDataTable({
+    na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+    na_values <- na_values[na_values != 0]
+    if (is.null(RV$saved_vars)) {
+      datatable(RV$cohort_files$variants.tsv, 
+                selection="multiple",
+                options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
+        formatStyle(names(RV$cohort_files$variants.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+    } else {
+      datatable(RV$cohort_files$variants.tsv, 
+                selection="multiple",
+                options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
+        formatStyle(  'internal_id',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(unique(saved_vars()$all))))) %>%
+        formatStyle(  'rec_id',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+        formatStyle(names(RV$cohort_files$variants.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+      
+    }
+  })
+  
+  output$cohort_comphet_df <- DT::renderDataTable({
+    na_values <- unique(unlist(app_settings$fill_na$fill_na_vars))
+    na_values <- na_values[na_values != 0]
+    if (is.null(RV$saved_vars)) {
+      datatable(RV$cohort_files$comphet.tsv, 
+                selection="multiple",
+                options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
+        formatStyle(names(RV$cohort_files$comphet.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+    } else {
+      datatable(RV$cohort_files$comphet.tsv, 
+                selection="multiple",
+                options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200))) %>%
+        formatStyle(  'internal_id',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_vars()$all, rep('yellow', length(unique(saved_vars()$all))))) %>%
+        formatStyle(  'rec_id',
+                      target = 'row',
+                      backgroundColor = styleEqual(saved_vars()$thisCase, rep('red', length(saved_vars()$thisCase)))) %>%
+        formatStyle(names(RV$cohort_files$comphet.tsv), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+      
+    }
+  })
 }
 
-# Run the application 
+## Run the application ------------------
 shinyApp(ui = ui, server = server)

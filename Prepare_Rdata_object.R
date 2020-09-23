@@ -201,7 +201,7 @@ if (args$use_labkey) {
 "\tdata: ", gel_data_v)
 
   labkey.setDefaults(baseUrl=labkey_url)
-  message("Performing LabKey query...")
+  message("Performing LabKey query for BAM files...")
   query_bam <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
                 WHERE File_sub_type == "BAM"'
   
@@ -212,7 +212,7 @@ if (args$use_labkey) {
                                 sql = query_bam,
                                 maxRows = 1e+06 )
   ))
-  if (is.null(bam_files) | nrow(bam_files) == 0) {
+  if (is.null(bam_df) | nrow(bam_df) == 0) {
     warning("Unable to get bam files from LabKey table. BAM and ROH files will not be loaded!", immediate. = T)
     bam_files <- NULL
     roh_files <- NULL
@@ -227,13 +227,60 @@ if (args$use_labkey) {
     roh_cols <- roh_cols_GEL
     roh_header <- roh_header_GEL
   }
+  
+  message("Performing LabKey query for VCF files...")
+  query_smallvars <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
+                WHERE File_sub_type == "Standard VCF"'
+  suppressMessages(suppressWarnings(
+    smallvars_df <- labkey.executeSql(folderPath=paste0("/main_programme/", gel_data_v),
+                                schemaName="lists",
+                                colNameOpt="rname",
+                                sql = query_smallvars,
+                                maxRows = 1e+06 )
+  ))
+  if (is.null(smallvars_df) | nrow(smallvars_df) == 0) {
+    warning("Unable to get smallvars VCF files from LabKey table. VCF files will not be loaded!", immediate. = T)
+    vcf_files <- NULL
+  } else {
+    vcf_files <- makeNamedList(bam_df, "platekey", "file_path")
+  }
+  query_SVvars <- 'SELECT Platekey, File_path FROM genome_file_paths_and_types 
+                WHERE File_sub_type == "Structural VCF"'
+  
+  suppressMessages(suppressWarnings(
+    sv_df <- labkey.executeSql(folderPath=paste0("/main_programme/", gel_data_v),
+                                      schemaName="lists",
+                                      colNameOpt="rname",
+                                      sql = query_SVvars,
+                                      maxRows = 1e+06 )
+  ))
+  if (is.null(sv_df) | nrow(sv_df) == 0) {
+    warning("Unable to get SV VCF files from LabKey table. VCF files will not be loaded!", immediate. = T)
+    sv_files <- NULL
+  } else {
+    sv_files <- makeNamedList(bam_df, "platekey", "file_path")
+  }
 } else {
 #Config is loaded only if use labkey is false otherwise it is ignored
   message("Loading BAM / ROH locations from files specified in config file")
   bam_files <- readFromConfig(config,"BAM")
-  roh_files <- readFromConfig(config,"ROH")
-  roh_header <- config$ROH$ROH_file_structure$has_header
+  # Location of the BAM files for the samples analyzed
+  # One BAM file per sample, same sampleID as used in input VCF
+  
   exphunter_files <- readFromConfig(config,"EXPHUNTER")
+  # Location of the exp hunter files for the samples analyzed
+  # One JSON file per sample, same sampleID as used in input VCF
+  
+  sv_files <- readFromConfig(config,"SV_DATA")
+  vcf_files <- readFromConfig(config,"SMALLVARS_DATA")
+  # Location of the VCF files for the small vars and SV for samples analyzed
+  # One VCF file per sample or per pedigree
+  # same sampleID as used in input VCF or same pedigree ID as defined for var2reg
+  
+  roh_files <- readFromConfig(config,"ROH")
+  # Location of the ROH regions files for the samples analyzed
+  # One text file per sample (with chrom, start, stop), same sampleID as used in input VCF
+  roh_header <- config$ROH$ROH_file_structure$has_header
   roh_cols <- list(
     chrom = config$ROH$ROH_file_structure$chr_col,
     start = config$ROH$ROH_file_structure$start_col,
@@ -480,10 +527,25 @@ for (n in 1:nrow(idx_df)) {
   }
 
   #BAM FILES locations --------------
-  newlist$BAM_files <- NULL
+  newlist$bam_files <- NULL
   if(inherits(bam_files, "list")) {
     newlist$bam_files <- bam_files[newlist$all_samples]
   }
+  
+  #SMALL VARS / SV VCF locations -----------------
+  newlist$vcf_files <- NULL
+  if(inherits(vcf_files, "list")) {
+    newlist$vcf_files <- list(family_vcf = NULL, single_vcf = list())
+    newlist$vcf_files$family_vcf <- vcf_files[[newlist$pedigree]]
+    newlist$vcf_files$single_vcf <- vcf_files[newlist$all_samples]
+  }
+  newlist$sv_files <- NULL
+  if(inherits(sv_files, "list")) {
+    newlist$sv_files <- list(family_vcf = NULL, single_vcf = list())
+    newlist$sv_files$family_vcf <- sv_files[[newlist$pedigree]]
+    newlist$sv_files$single_vcf <- sv_files[newlist$all_samples]
+  }
+  
   
   #SAVE DATA --------------------
   #Save the list containig processed data into an RDS object

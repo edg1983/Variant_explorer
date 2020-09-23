@@ -11,6 +11,18 @@
     "sampleID_col": "V1",
     "file_col": "V2"
   },
+  "SV_DATA": {
+    "index_file": "test/sv_files.tsv",
+    "has_header": false,
+    "sampleID_col": "V1",
+    "file_col": "V2"
+  },
+  "SMALLVARS_DATA": {
+    "index_file": "test/vcf_files.tsv",
+    "has_header": false,
+    "sampleID_col": "V1",
+    "file_col": "V2"
+  },
   "ROH": {
     "index_file": "test/roh_files.tsv",
     "has_header": false,
