@@ -8,7 +8,7 @@
 # you can then specify an optional lib location to provide other libs
 
 ## DECLARE VARS ------------
-libraries <- c("data.table","dplyr","GenomicRanges","jsonlite","kinship2", "optparse","Rlabkey","tidyr")
+libraries <- c("data.table","dplyr","doParallel","foreach","GenomicRanges","jsonlite","kinship2", "optparse","Rlabkey","tidyr")
 VERSION <- "v1.0"
 run_date <- format(Sys.time(),"%Y%m%d_%H%M%S")
 
@@ -18,6 +18,12 @@ roh_cols_GEL <- list(chrom = "V1", start = "V2", stop = "V3")
 ## FUNCTIONS ---------------
 
 # load (gziped) data file
+monitorProgress <- function(pb, ...) {
+  completed <- length(list(...)) 
+  setTxtProgressBar(pb,completed)
+  rbind(...)
+}
+
 loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
   #message("Loading ", dataF)
   if ( endsWith(dataF, ".gz") ) {
@@ -140,7 +146,9 @@ option_list <- list(
   make_option(c("-k","--use_labkey"), action = "store_true", default=FALSE,
               help = "When running in GEL, set this option to get bam / roh files locations from LabKey"),
   make_option(c("-l","--lib_path"), type = "character", default = NA, 
-              help = "additional path for R libraries")
+              help = "additional path for R libraries"),
+  make_option(c("-t","--threads"), type = "integer", default = 4, 
+              help = "N threads for data processing")
 )
 args <- parse_args(OptionParser(option_list = option_list))
 
@@ -190,6 +198,7 @@ if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" 
 releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
+numCores <- args$threads
 
 ## READ DATA FROM CONFIG OR LABKEY --------------
 # LabKey may be used when in GEL environment to get path of data files
@@ -307,8 +316,12 @@ good_peds <- 0
 total <- nrow(idx_df)
 message("Loaded var2reg idx file containing ", total, " datasets")
 message("#### START PROCESSING ####")
+registerDoParallel(numCores)
+pb <- txtProgressBar(min=1, max=total,style=3)
 
-for (n in 1:nrow(idx_df)) {
+processing_results <- foreach (n = 1:nrow(idx_df), 
+                               .init=pb, .combine=monitorProgress, .inorder = F,
+                               .packages=c("data.table","dplyr","GenomicRanges","kinship2","tidyr")) %dopar% {
   #convert idx file line to list
   newlist <- as.list(idx_df[n,])
   newlist$releaseID <- releaseID
@@ -560,8 +573,10 @@ for (n in 1:nrow(idx_df)) {
   } else {
     failed_files = failed_files + 1
   }
+  return(c(save_results,failed_files,good_peds))
 }
-
+stopImplicitCluster()
+message(head(processing_results))
 ## CLOSE MESSAGE ----------------------
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
