@@ -1,9 +1,9 @@
-query_results_UI <- function(id,regionIDs,boxes=FALSE) {
+query_results_UI <- function(id,boxes=FALSE) {
   ns <- NS(id)
   region_select <- tagList(selectInput(ns("region_select"), 
                                        "Regulatory region",
-                                       choices = regionIDs,
-                                       selected = regionIDs[1], 
+                                       choices = c("global","by tissue"),
+                                       selected = "global", 
                                        multiple = FALSE) )
   
   plot_output <- tagList(withSpinner(plotlyOutput(ns("region_plot"))))
@@ -11,7 +11,7 @@ query_results_UI <- function(id,regionIDs,boxes=FALSE) {
   if (boxes == TRUE) {
     details <- tagList(
       box(title = "Reg regions details", width = 12, status = "primary", solidHeader = T, 
-          collapsed = F, collapsible = T,
+          collapsed = T, collapsible = T,
           DT::dataTableOutput(ns("regions"))),
       box(title = "Controlled genes details", width = 12, status = "primary", solidHeader = T, 
           collapsed = T, collapsible = T,
@@ -132,17 +132,30 @@ SQlite_query <- function(input, output, session, db, var_position, regions) {
     req(input$region_select)
     regions_plot <- regions_df()[,c("chromosome","start","stop","regionID","cell_or_tissue")]
     colnames(regions_plot)[4] <- "name"
-    plot_df <- rbind(TFBS_details_df() %>% filter(regionID == input$region_select) %>% select(chromosome,start,stop,name,cell_or_tissue) %>% mutate(group=paste0("TFBS - ",name)),
-                     regions_plot %>% filter(name == input$region_select) %>% mutate(group="region"))
-    
-      p <- ggplot(plot_df, aes(ymin=start, ymax=stop, x=group, colour=cell_or_tissue, label=name, group=rownames(plot_df))) +
+    plot_df <- rbind(TFBS_details_df() %>% select(chromosome,start,stop,name,cell_or_tissue) %>% mutate(group=paste0("TFBS - ",name)),
+                     regions_plot %>% mutate(group="region"))
+    if (input$region_select == "by tissue") {
+      p <- ggplot(plot_df, aes(ymin=start, ymax=stop, x=group, colour=cell_or_tissue, label=name)) +
         geom_linerange(size=1, position=position_dodge(1)) +
+        geom_text(data=plot_df %>% filter(group=="region"), aes(y=start+(stop-start)/2), position=position_dodge(1), color="black") +
         geom_hline(yintercept = var_position, linetype="dashed") +
         labs(y=paste0(unique(plot_df$chromosome), " genomic position"), x="") +
         coord_flip() +
         theme(axis.text.y = element_text(size=10), axis.text.x=element_text(angle=45, hjust=1), legend.position = "none")
-     
-     ggplotly(p, tooltip=c("label","colour"))
+      tooltip <- c("label","colour")
+    } else if (input$region_select == "global") {
+      p <- ggplot(plot_df, aes(ymin=start, ymax=stop, x=group, label=name)) +
+        geom_linerange(size=2, position=position_dodge(0.6), color="deepskyblue3") +
+        geom_text(data=plot_df %>% filter(group=="region"), aes(y=start+(stop-start)/2), position=position_dodge(0.6), color="black") +
+        geom_hline(yintercept = var_position, linetype="dashed") +
+        labs(y=paste0(unique(plot_df$chromosome), " genomic position"), x="") +
+        coord_flip() +
+        theme(axis.text.y = element_text(size=10), axis.text.x=element_text(angle=45, hjust=1), legend.position = "none")
+      tooltip <- c("label","ymin","ymax")
+    }
+     ggplotly(p, tooltip=tooltip)
+  
+      
   })
   
   #RSQLite::dbDisconnect(conn)

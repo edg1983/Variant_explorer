@@ -7,11 +7,7 @@
 
 
 ## CONSTANTS --------------------
-APP_VERSION <- "1.2.1"
-
-BAM_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/BAM"
-VCF_dir <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/VCF"
-SV_VCF <- "/well/gel/HICF2/HICF2_hg38_remap/RareDisease_data/CNV/HICF2_RareDisease_SV.PASS.vcf.gz"
+APP_VERSION <- "1.2.2"
 vis_cols <- c("rec_id","var_id","gene","chr","start","end","ref","alt","var_type","known_ids","max_pop_af","cohort_af","consequence")
 
 ## FUNCTIONS --------------------------
@@ -440,8 +436,13 @@ HPO_obo$HPO_id <- rownames(HPO_obo)
 colnames(HPO_obo)[1] <- "HPO_name"
 HPO_genes <- read.table(paste0(HPO_dir, "/genes_to_phenotype.txt"), sep="\t", header=F, stringsAsFactors = F) %>% select(V2,V3,V4)
 colnames(HPO_genes) <- c("gene","HPO_id","HPO_name")
-HICF2_HPO <- read.table(getResource("HICF2_HPO_terms.tsv"), sep="\t", header=T, stringsAsFactors = F)
-HICF2_HPO <- HICF2_HPO %>% separate_rows(HPO, sep=",")
+cohort_HPO_file <- getResource("cohort_HPO_terms.tsv")
+if (file.exists(cohort_HPO_file)) {
+  cohort_HPO <- read.table(cohort_HPO_file, sep="\t", header=T, stringsAsFactors = F)
+  cohort_HPO <- cohort_HPO %>% separate_rows(HPO, sep=",")
+} else {
+  cohort_HPO <- NULL
+}
 
 ## USER INTERFACE ------------------------
 ui <- dashboardPage(
@@ -1095,13 +1096,15 @@ server <- function(input, output, session) {
   })
   
   output$Disease <- renderText({
-    shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-    disease <- unique(HICF2_HPO$Disease[HICF2_HPO$CaseID == RV$data$pedigree])
+    shiny::validate(need(inherits(RV$data, "list"), "Please load a case"),
+                    need(cohort_HPO, "No phenotype data present"))
+    disease <- unique(cohort_HPO$Disease[cohort_HPO$CaseID == RV$data$pedigree])
   })
   
   output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
-    shiny::validate(need(inherits(RV$data, "list"), "No data loaded"))
-    HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
+    shiny::validate(need(inherits(RV$data, "list"), "Please load a case"),
+                    need(cohort_HPO, "No phenotype data present"))
+    HPO_ids <- unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
     HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
   })
   
@@ -1347,8 +1350,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$hpo_profile_set, {
-    req(inherits(RV$data, "list"))
-    HPO_ids <- unique(HICF2_HPO$HPO[HICF2_HPO$CaseID == RV$data$pedigree])
+    req(inherits(RV$data, "list"), cohort_HPO)
+    HPO_ids <- unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
     updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
   })
   
@@ -2143,18 +2146,34 @@ server <- function(input, output, session) {
     if(length(input$comphetTable_rows_selected) > 0 | length(input$variantsTable_rows_selected) > 0) {
       selected_vars <- rbind(gene_comphet_vars_df()[input$comphetTable_rows_selected, c("start","reg_id")],
                              gene_vars_df()[input$variantsTable_rows_selected, c("start","reg_id")])
-      if (nrow(selected_vars)==1 & selected_vars$reg_id != "") {
+      if (nrow(selected_vars)==1 & !is.na(selected_vars$reg_id)) {
         reg_ids <- unlist(strsplit(selected_vars$reg_id, ","))
         return(list(var_pos=selected_vars$start, reg_ids=reg_ids))
       } else {
-        return(NULL)
+        return(2)
       }
+    } else {
+      return(0)
     }
   })
   
   output$reg_regions_details <- renderUI({
-    req(inherits(selected_var(), "list"))
-    query_results_UI("GREENDB_query",selected_var()$reg_ids, boxes=TRUE)
+    if(inherits(selected_var(), "list")) {
+      query_results_UI("GREENDB_query", boxes=TRUE)
+    } else {
+      verbatimTextOutput("reg_region_detail_error")
+    }
+  })
+  
+  output$reg_region_detail_error <- renderText({
+    req(!inherits(selected_var(), "list"))
+    text <- NULL
+    if (selected_var() > 0) {
+      text <- "You can only select a single variant and it must have regulatory region annotations"
+    } else if(selected_var() == 0) {
+      text <- "No variant selected"
+    }
+    return(text)
   })
   
   observeEvent(selected_var(), {
