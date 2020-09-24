@@ -162,14 +162,6 @@ index_exists <- checkFileExists(args$index,"o", "stop")
 if (is.na(args$config)) { stop("You must specify a config file") }
 file_exists <- checkFileExists(args$config,"o","stop")
 
-labkey_url <- config$labkey_url 
-gel_data_v <- config$gel_data_v
-
-dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
-if (!file_test("-d", args$output)) { 
-  stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
-}
-
 # If an additional lib path is specified this is added to libPaths
 if (!is.na(args$lib_path)) {
   if (!file_test("-d", args$lib_path)) { 
@@ -178,15 +170,26 @@ if (!is.na(args$lib_path)) {
     .libPaths(c(args$lib_path, .libPaths()))
   }
 }
+
+#Load needed libraries and config file
 message("Loading libraries...")
 loadLibraries(libraries)
+config <- read_json(args$config)
 
+labkey_url <- config$labkey_url 
+gel_data_v <- config$gel_data_v
+
+#Crate output dir
+dir.create(args$output, showWarnings = FALSE, recursive = TRUE)
+if (!file_test("-d", args$output)) { 
+  stop("Output folder: ", args$output, "\nThe folder does not exists and cannot be created", call. = FALSE)
+}
+
+#Set variables
 if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" }
-
 releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
-config <- read_json(args$config)
 
 ## READ DATA FROM CONFIG OR LABKEY --------------
 # LabKey may be used when in GEL environment to get path of data files
