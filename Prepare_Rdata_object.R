@@ -308,7 +308,7 @@ idx_df <- loadData(idx_file)
 total <- nrow(idx_df)
 message("Loaded var2reg idx file containing ", total, " datasets")
 message("#### START PROCESSING USING ", numCores, " THREADS ####")
-
+message("|", rep(" ", 50), "| 0%" )
 registerDoParallel(numCores)
 processing_results <- foreach (n = 1:total, 
                                .combine=rbind, .inorder = F,
@@ -571,9 +571,9 @@ processing_results <- foreach (n = 1:total,
   write(out_file, file=log_file, append = TRUE)
   N_completed <- length(scan(log_file, what="", sep="\n", quiet=T))
   perc_completed <- round((N_completed / total) * 100,1)
-  message("\r|",
-          rep("=", round(perc_completed/2,1)),
-          rep(" ", 50-round(perc_completed/5,1)),
+  cat("\r|",
+          rep("=", round(perc_completed/2)),
+          rep(" ", 50-round(perc_completed/2)),
           "| ",perc_completed,"%" )
 
   return(c(save_results,failed_files,good_peds))
