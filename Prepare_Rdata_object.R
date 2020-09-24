@@ -450,6 +450,7 @@ processing_results <- foreach (n = 1:total,
   ped_df$V5[ped_df$V5==2] <- "female"
   ped_df$V5[ped_df$V5==0] <- "unknown"
   ped_df$V6[ped_df$V6 == 0] <- 1
+  good_peds <- 0
   
   #Load ped file and auto fix, if failed the ped cannot be displayed
   tryCatch({
@@ -460,7 +461,6 @@ processing_results <- foreach (n = 1:total,
     good_peds <- 1
   }, error=function(cond) {
     newlist$ped <- NA
-    good_peds <- 0
   })
   
   #KNOWN VARS data ----------------
