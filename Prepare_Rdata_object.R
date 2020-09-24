@@ -161,7 +161,6 @@ index_exists <- checkFileExists(args$index,"o", "stop")
 
 if (is.na(args$config)) { stop("You must specify a config file") }
 file_exists <- checkFileExists(args$config,"o","stop")
-config <- read_json(args$config)
 
 labkey_url <- config$labkey_url 
 gel_data_v <- config$gel_data_v
@@ -187,7 +186,8 @@ if (args$overwrite) { write_mode <- "overwrite" } else { write_mode <- "rename" 
 releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
-  
+config <- read_json(args$config)
+
 ## READ DATA FROM CONFIG OR LABKEY --------------
 # LabKey may be used when in GEL environment to get path of data files
 # If you set --use_labkey, the script will load bam_files and roh_files locations from labkey
