@@ -573,8 +573,10 @@ processing_results <- foreach (n = 1:total,
   save_results <- saveData(newlist,outf=out_file)
   if (save_results == 1) {
     saved_files = 1
+    failed_files = 0
   } else {
     failed_files = 1
+    saved_files = 0
   }
   return(c(save_results,failed_files,good_peds))
 }
