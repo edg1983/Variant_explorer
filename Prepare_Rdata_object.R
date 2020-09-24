@@ -18,18 +18,6 @@ roh_cols_GEL <- list(chrom = "V1", start = "V2", stop = "V3")
 ## FUNCTIONS ---------------
 
 # load (gziped) data file
-monitorProgress <- function() {
-  pb <- txtProgressBar(min=1, max=total,style=3)
-  count <- 0
-  function(...) {
-    count <<- count + length(list(...))
-    setTxtProgressBar(pb,count)
-    Sys.sleep(0.01)
-    flush.console()
-    rbind(...)
-  }
-}
-
 loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
   #message("Loading ", dataF)
   if ( endsWith(dataF, ".gz") ) {
@@ -205,6 +193,7 @@ releaseID <- args$dataset_version
 output_dir <- args$output
 idx_file <- args$index 
 numCores <- args$threads
+log_file <- paste0(output_dir, "/", run_date, ".log")
 
 ## READ DATA FROM CONFIG OR LABKEY --------------
 # LabKey may be used when in GEL environment to get path of data files
@@ -322,7 +311,7 @@ message("#### START PROCESSING USING ", numCores, " THREADS ####")
 
 registerDoParallel(numCores)
 processing_results <- foreach (n = 1:total, 
-                               .combine=monitorProgress(), .inorder = F,
+                               .combine=rbind, .inorder = F,
                                .packages=c("data.table","dplyr","GenomicRanges","kinship2","tidyr")) %dopar% {
   #convert idx file line to list
   newlist <- as.list(idx_df[n,])
@@ -578,10 +567,19 @@ processing_results <- foreach (n = 1:total,
     failed_files = 1
     saved_files = 0
   }
+  
+  write(out_file, file=log_file, append = TRUE)
+  N_completed <- length(scan(log_file, what="", sep="\n"))
+  perc_completed <- round((N_completed / total) * 100,1)
+  message("|",
+          rep("=", round(perc_completed/5,1)),
+          rep(" ", 20-round(perc_completed/5,1)),
+          "| ",perc_completed,"%" )
+
   return(c(save_results,failed_files,good_peds))
 }
 stopImplicitCluster()
-message(head(processing_results))
+
 ## CLOSE MESSAGE ----------------------
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
