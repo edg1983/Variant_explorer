@@ -18,10 +18,16 @@ roh_cols_GEL <- list(chrom = "V1", start = "V2", stop = "V3")
 ## FUNCTIONS ---------------
 
 # load (gziped) data file
-monitorProgress <- function(pb, ...) {
-  completed <- length(list(...)) 
-  setTxtProgressBar(pb,completed)
-  rbind(...)
+monitorProgress <- function() {
+  pb <- txtProgressBar(min=1, max=total,style=3)
+  count <- 0
+  function(...) {
+    count <<- count + length(list(...))
+    setTxtProgressBar(pb,count)
+    Sys.sleep(0.01)
+    flush.console()
+    rbind(...)
+  }
 }
 
 loadData <- function(dataF, skipchar="#", header=T, sep="\t", source=NA) {
@@ -310,22 +316,18 @@ message("Information loaded:
 ## PROCESS DATA ----------------
 start_time <- Sys.time()
 idx_df <- loadData(idx_file)
-saved_files <- 0
-failed_files <- 0
-good_peds <- 0
 total <- nrow(idx_df)
 message("Loaded var2reg idx file containing ", total, " datasets")
-message("#### START PROCESSING ####")
-registerDoParallel(numCores)
-pb <- txtProgressBar(min=1, max=total,style=3)
+message("#### START PROCESSING USING ", numCores, " THREADS ####")
 
-processing_results <- foreach (n = 1:nrow(idx_df), 
-                               .init=pb, .combine=monitorProgress, .inorder = F,
+registerDoParallel(numCores)
+processing_results <- foreach (n = 1:total, 
+                               .combine=monitorProgress(), .inorder = F,
                                .packages=c("data.table","dplyr","GenomicRanges","kinship2","tidyr")) %dopar% {
   #convert idx file line to list
   newlist <- as.list(idx_df[n,])
   newlist$releaseID <- releaseID
-  message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
+  #message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
   
   #Set output filename
   out_file <- paste0(output_dir, "/", newlist$pedigree, ".RData")
@@ -455,9 +457,10 @@ processing_results <- foreach (n = 1:nrow(idx_df),
     fixed_ped <- merge(fixed_ped, ped_df[,c("V2","V6")], by.x="id", by.y="V2", all.x=T)
     fixed_ped$V6[is.na(fixed_ped$V6)] <- 1
     newlist$ped <- with(fixed_ped, pedigree(id=id, dadid = dadid, momid = momid, sex = sex, affected = V6, missid = 0))
-    good_peds <- good_peds + 1
+    good_peds <- 1
   }, error=function(cond) {
     newlist$ped <- NA
+    good_peds <- 0
   })
   
   #KNOWN VARS data ----------------
@@ -569,9 +572,9 @@ processing_results <- foreach (n = 1:nrow(idx_df),
   #Save the list containig processed data into an RDS object
   save_results <- saveData(newlist,outf=out_file)
   if (save_results == 1) {
-    saved_files = saved_files + 1
+    saved_files = 1
   } else {
-    failed_files = failed_files + 1
+    failed_files = 1
   }
   return(c(save_results,failed_files,good_peds))
 }
@@ -581,6 +584,10 @@ message(head(processing_results))
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
 elapsed_time <- paste0(round(elapsed_time,2), " ", units(elapsed_time))
+saved_files <- sum(processing_results[,1])
+failed_files <- sum(processing_results[,2])
+good_peds <- sum(processing_results[,3])
+
 message(
 "\n=======================================
 FINISHED PROCESSING in ", elapsed_time, "\n",
