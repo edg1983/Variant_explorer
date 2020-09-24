@@ -569,11 +569,11 @@ processing_results <- foreach (n = 1:total,
   }
   
   write(out_file, file=log_file, append = TRUE)
-  N_completed <- length(scan(log_file, what="", sep="\n"))
+  N_completed <- length(scan(log_file, what="", sep="\n", quiet=T))
   perc_completed <- round((N_completed / total) * 100,1)
-  message("|",
-          rep("=", round(perc_completed/5,1)),
-          rep(" ", 20-round(perc_completed/5,1)),
+  message("\r|",
+          rep("=", round(perc_completed/2,1)),
+          rep(" ", 50-round(perc_completed/5,1)),
           "| ",perc_completed,"%" )
 
   return(c(save_results,failed_files,good_peds))
