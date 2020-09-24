@@ -293,6 +293,8 @@ if (args$use_labkey) {
 message("Information loaded:
 \t", length(bam_files), " BAM files
 \t", length(roh_files), " ROH files
+\t", length(vcf_files), " small variants VCF files
+\t", length(sv_files), " SV VCF files
 \t", length(exphunter_files), " ExpHunter files\n")
 # TODO make segregation col names configurable
 
