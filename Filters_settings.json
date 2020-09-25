@@ -63,7 +63,8 @@
             "SpliceAI_INDEL_SpliceAI_max": ["Min SpliceAI score INDEL",">=", 0],
             "NCBoost_score": ["Min NCBoost score",">=", 0],
             "cohort_hom" : ["Max N hom","<=", "max"],
-            "cohort_het" : ["Max N het","<=", "max"]
+            "cohort_het" : ["Max N het","<=", "max"],
+            "Reg_constraint" : ["Reg region constrain",">=", 0]
         },
         "factors_fields": {
           "consequence": ["Consequence", "%in%", "ALL"],
@@ -124,7 +125,7 @@
         },
         "regulatory": {
             "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],
-            "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
+            "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "Reg_constraint", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
         }
       },
       "PRESETS": {
@@ -275,7 +276,8 @@
                     "NCBoost_score": 0.4,
                     "LoF_tolerance": 0.5,
                     "reg_type": "reg_db",
-                    "TFBS": true
+                    "TFBS": true,
+                    "Reg_constraint": 0.5
                 }
             },
             "max accuracy": {

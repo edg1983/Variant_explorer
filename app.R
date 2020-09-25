@@ -235,6 +235,7 @@ PanelApp_dir <- gsub("@resource_dir", resource_dir, app_settings$PanelApp_dir)
 GeneLists_dir <- gsub("@resource_dir", resource_dir, app_settings$GeneLists_dir)
 HPO_dir <- gsub("@resource_dir", resource_dir, app_settings$HPO_dir)
 GREENDB_file <- gsub("@resource_dir", resource_dir, app_settings$GREENDB)
+compute_cohort_GADO <- app_settings$compute_cohort_GADO
 
 ##Set axes options for plots
 plot_axes <- list()
@@ -890,16 +891,13 @@ server <- function(input, output, session) {
       }
       if (inherits(RV$data, "list")) {
           RV$data$variants_df <- RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars)
-          #RV$data$variants_df$VENUS_link <- "N/A"
-          
-          #RV$data$known_vars <- RV$data$known_vars %>% separate_rows(known_ids, sep=",")
-          #RV$data$known_clinvar <- RV$data$known_vars[grep("CV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
-          #RV$data$known_cosmic <- RV$data$known_vars[grep("COSV[0-9]+",RV$data$known_vars$known_ids,perl = T),]
-  
-          #RV$data$segregation_df$sup_dnm <- 0
           RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
           RV$data$genes_scores <- RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes)
-          RV$data$genes_scores$cohort_norm_Z <- apply(RV$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
+          #Compute cohort normalized GADO is slow, so yo can turn it on or off from app config
+          if (compute_cohort_GADO) {
+            RV$data$genes_scores$cohort_norm_Z <- apply(RV$data$genes_scores,1,function(x) computeNormZ(x["gene"],x["gado_zscore"]))
+          }
+          
           RV$data$ROH_data$ROHClass <- cut(RV$data$ROH_data$Length_bp, 
                                            breaks = c(0,500000,2000000,max(RV$data$ROH_data$Length_bp)), 
                                            labels = c("small (< 500kb)","medium (500kb-2Mb)","large (>= 2Mb)"))
@@ -1689,9 +1687,9 @@ server <- function(input, output, session) {
       na_values <- unique(unlist(app_settings$fill_na$fill_na_genes))
       #Check if there are saved vars, if yes change row backgrounds accordingly
       if (is.null(RV$saved_vars)) {
-        datatable(candidate_genes_df(), selection="single") %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
+        datatable(candidate_genes_df(), selection="single", options = list(scrollX = TRUE)) %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values))))
       } else {
-        datatable(candidate_genes_df(), selection="single") %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
+        datatable(candidate_genes_df(), selection="single", options = list(scrollX = TRUE)) %>% formatStyle(names(candidate_genes_df()), backgroundColor = styleEqual(na_values, rep('gray', length(na_values)))) %>%
           formatStyle(  'gene',
                         target = 'row',
                         backgroundColor = styleEqual(saved_genes()$all, rep('yellow', length(saved_genes()$all)))) %>%
