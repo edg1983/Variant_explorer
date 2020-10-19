@@ -105,27 +105,51 @@ SQlite_query <- function(input, output, session, db, var_position, regions) {
   })
   
   output$regions <- DT::renderDataTable({
-    datatable(regions_df(), 
+    datatable(regions_df(),
+              extensions = 'Buttons',
               selection="none",
-              options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200)))
+              filter = "top",
+              options = list(
+                scrollX = TRUE, 
+                pageLength = 20, lengthMenu = c(20, 50, 100, 200),
+                dom = 'lBfrtip',
+                buttons = c('copy', 'csv', 'excel','colvis')))
   })
   
   output$genes_details <- DT::renderDataTable({
     datatable(genes_details_df(), 
+              extensions = 'Buttons',
               selection="none",
-              options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200)))
+              filter = "top",
+              options = list(
+                scrollX = TRUE, 
+                pageLength = 20, lengthMenu = c(20, 50, 100, 200),
+                dom = 'lBfrtip',
+                buttons = c('copy', 'csv', 'excel','colvis')))
   })
   
   output$pheno_details <- DT::renderDataTable({
     datatable(pheno_details_df(), 
+              extensions = 'Buttons',
               selection="none",
-              options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200)))
+              filter = "top",
+              options = list(
+                scrollX = TRUE, 
+                pageLength = 20, lengthMenu = c(20, 50, 100, 200),
+                dom = 'lBfrtip',
+                buttons = c('copy', 'csv', 'excel','colvis')))
   })
   
   output$TFBS_details <- DT::renderDataTable({
     datatable(TFBS_details_df(), 
+              extensions = 'Buttons',
               selection="none",
-              options = list(scrollX = TRUE, pageLength = 20, lengthMenu = c(20, 50, 100, 200)))
+              filter = "top",
+              options = list(
+                scrollX = TRUE, 
+                pageLength = 20, lengthMenu = c(20, 50, 100, 200),
+                dom = 'lBfrtip',
+                buttons = c('copy', 'csv', 'excel','colvis')))
   })
   
   output$region_plot <- renderPlotly({

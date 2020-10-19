@@ -212,7 +212,7 @@ getDefaultValue <- function(var_name, ctrl_type, ctrl_value, na_values, df) {
            } else if (base::grepl("SPLIT", ctrl_value)) {
              sep = gsub("SPLIT ", "",ctrl_value)
              all_values = paste(unique(df[[var_name]]), collapse=sep)
-             default = unique(unlist(strsplit(all_values,split = ",")))
+             default = unique(unlist(strsplit(all_values,split = sep)))
            }else {
              default <- ctrl_value
            }

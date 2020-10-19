@@ -13,6 +13,10 @@ vis_cols <- c("rec_id","var_id","gene","chr","start","end","ref","alt","var_type
 ## FUNCTIONS --------------------------
 `%nin%` = Negate(`%in%`)
 
+combine_df <- function (x, ...) {
+  mapply(rbind, x, ..., SIMPLIFY = FALSE)
+}
+
 # load libraries 
 loadLibraries <- function(libs) {
   message("Loading libraries...")
@@ -186,7 +190,7 @@ makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_files, 
 
 ## CHECK AND LOAD PACKAGES ----------------
 # Install missing packages
-packages.cran <- c("RSQLite","data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
+packages.cran <- c("foreach","doParallel","R.utils","RSQLite","data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- packages.cran[!(packages.cran %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -398,7 +402,7 @@ n <- 0
 for (id in geneLists_data$id) {
     n <- n + 1
     filename <- paste0(GeneLists_dir,"/", id, ".tsv")
-    mydf <- data.frame(entity_name=scan(filename, what="", sep="\n"), genelist_idx = id, stringsAsFactors = F)
+    mydf <- data.frame(entity_name=scan(filename, what="", sep="\n",quiet = T), genelist_idx = id, stringsAsFactors = F)
     geneLists_genes <- rbind(geneLists_genes, mydf)
 }
 message(n, " gene lists loaded")
@@ -413,7 +417,7 @@ ClinVar_genes <- read.table(ClinVar_file, sep="\t", header = T, stringsAsFactors
 message("Load HICF2 GADO distribution")
 GADO_file <- getResource("GADO_distribution.tsv.gz")
 if (file.exists(GADO_file)) {
-  gado_distribution <- fread(cmd=paste0("zcat ",GADO_file), sep="\t", header=T)
+  gado_distribution <- fread(GADO_file, sep="\t", header=T)
 } else {
   gado_distribution <- NULL
 }
@@ -989,7 +993,7 @@ server <- function(input, output, session) {
       as.data.frame(RV$data$comphet_df %>% mutate(Class = ifelse(
           v1 %in% filtered_vars_list & 
           v2 %in% filtered_vars_list &
-          rec_id %in% RV$vars_pass_segregation, "PASS", "FILTER")))
+          rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet), "PASS", "FILTER")))
   })
   
   genes_df <- reactive({
@@ -2050,12 +2054,6 @@ server <- function(input, output, session) {
     #GTs and samples order are collapsed and saved in new cols
     GT_cols <- grep("GT_",colnames(vars_to_save))
     GQ_cols <- grep("GQ_",colnames(vars_to_save))
-    #message("COLNAMES SAVED")
-    #message(colnames(RV$saved_vars), sep=",")
-    #message("COLNAMES VARS TO SAVE")
-    #message(colnames(vars_to_save), sep=",")
-    #message("GT COLS ", paste(GT_cols, collapse=","))
-    #message("DIM VARS_TO_SAVE ", dim(vars_to_save))
     vars_to_save$GTs <- apply( as.data.frame(vars_to_save[ , GT_cols ]) , 1 , paste, collapse=",")
     vars_to_save$samples_order <- paste(gsub("GT_","",colnames(vars_to_save)[GT_cols]), collapse=",")
     vars_to_save <- vars_to_save %>% select(-GT_cols, -GQ_cols)
@@ -2141,22 +2139,38 @@ server <- function(input, output, session) {
   })
   
   selected_var <- reactive({
-    if(length(input$comphetTable_rows_selected) > 0 | length(input$variantsTable_rows_selected) > 0) {
-      selected_vars <- rbind(gene_comphet_vars_df()[input$comphetTable_rows_selected, c("start","reg_id")],
-                             gene_vars_df()[input$variantsTable_rows_selected, c("start","reg_id")])
-      if (nrow(selected_vars)==1 & !is.na(selected_vars$reg_id)) {
-        reg_ids <- unlist(strsplit(selected_vars$reg_id, ","))
-        return(list(var_pos=selected_vars$start, reg_ids=reg_ids))
-      } else {
-        return(2)
-      }
-    } else {
-      return(0)
+    var1 <- NULL
+    var2 <- NULL
+    if(nrow(gene_comphet_vars_df())>0 & length(input$comphetTable_rows_selected) > 0) {
+      var1 <- gene_comphet_vars_df()[input$comphetTable_rows_selected, c("start","reg_id")]
     }
+    if(nrow(gene_vars_df()) & length(input$variantsTable_rows_selected) > 0) {
+      var2 <- gene_vars_df()[input$variantsTable_rows_selected, c("start","reg_id")]
+    }
+    vars <- rbind(var1, var2)
+    
+    if (is.null(vars)) {
+      selected_var <- list(status=0, var_pos=0, reg_ids=0)
+    } else if (nrow(vars)==0) {
+      selected_var <- list(status=0, var_pos=0, reg_ids=0)
+    } else if (nrow(vars)==1) {
+      if (is.na(vars$reg_id)) {
+        selected_var <- list(status=0, var_pos=0, reg_ids=0)
+      } else {
+      reg_ids <- unlist(strsplit(vars$reg_id, ","))
+      selected_var <- list(status=1, var_pos=vars$start, reg_ids=reg_ids)
+      callModule(SQlite_query,"GREENDB_query",db=GREENDB_file, var_position=selected_var$var_pos, regions=selected_var$reg_ids)
+      }
+    } else if (nrow(vars) > 1) {
+      selected_var <- list(status=2, var_pos=0, reg_ids=0)
+    }
+
+    message("status:", selected_var$status, "; var_pos:", selected_var$var_pos, "; reg_ids:", selected_var$reg_ids)
+    return(selected_var)
   })
   
   output$reg_regions_details <- renderUI({
-    if(inherits(selected_var(), "list")) {
+    if(selected_var()$status == 1) {
       query_results_UI("GREENDB_query", boxes=TRUE)
     } else {
       verbatimTextOutput("reg_region_detail_error")
@@ -2164,20 +2178,20 @@ server <- function(input, output, session) {
   })
   
   output$reg_region_detail_error <- renderText({
-    req(!inherits(selected_var(), "list"))
     text <- NULL
-    if (selected_var() > 0) {
+    if (selected_var()$status == 2) {
       text <- "You can only select a single variant and it must have regulatory region annotations"
-    } else if(selected_var() == 0) {
-      text <- "No variant selected"
+    } else if(selected_var()$status == 0) {
+      text <- "No variant selected or the variant has no regulatory region annotations"
     }
     return(text)
   })
   
-  observeEvent(selected_var(), {
-    req(inherits(selected_var(), "list"))
-    callModule(SQlite_query,"GREENDB_query",db=GREENDB_file, var_position=selected_var()$var_pos, regions=selected_var()$reg_ids)
-  })
+  #observeEvent(selected_var(), {
+  #  req(selected_var()$status == 1)
+  #  message("running GREENDB module")
+  #  callModule(SQlite_query,"GREENDB_query",db=GREENDB_file, var_position=selected_var()$var_pos, regions=selected_var()$reg_ids)
+  #})
   
   output$igv_region <- renderText({
       paste0("Generated session: ", IGV_session()$outfile)
@@ -2390,8 +2404,8 @@ server <- function(input, output, session) {
       cohort <- list()
       RV$cohort_files <- list(applied_genelist.txt = as.data.frame(RV$custom_genes),
                            applied_filters.json = RV$filters_json)
-      
-      for (sampleID in input$cohort_samples) {
+      registerDoParallel(cores=4)
+      sample_results <- foreach (sampleID=input$cohort_samples, .packages = c("dplyr","tidyr"), .verbose = T, .combine = combine, .multicombine = TRUE) %dopar% {
         #sampleID <- gsub("\\.RData[.enc]*","",file, perl = T)
         incProgress(1/n, detail = paste("Doing", sampleID))
         
@@ -2421,7 +2435,6 @@ server <- function(input, output, session) {
         
         cohort$GQ_cols_all <- which(colnames(cohort$data$variants_df) %in% paste("GQ", cohort$data$all_samples, sep="_"))
         cohort$GQ_cols_affected <- which(colnames(cohort$data$variants_df) %in% paste("GQ", cohort$data$affected_samples, sep="_"))
-        cohort$maxGQ <- max(cohort$data$variants_df[,..cohort$GQ_cols_all], na.rm = T)
         
         #Apply same filters
         cohort$vars_pass_filters <- callModule(getPASSVars_filters, "variants_filters", filters_settings$VARIANTS, cohort$data$variants_df, cohort$data$comphet_df)
@@ -2465,59 +2478,59 @@ server <- function(input, output, session) {
         #message("Final PASS count ", length(cohort$accepted_vars_list))
         
         #return variants dataframe with updated Class column (PASS/FILTER)
-        cohort$data$variants_df <- as.data.frame(cohort$data$variants_df %>% mutate(Class = ifelse(
-          rec_id %in% cohort$accepted_vars_list,
-          "PASS","FILTER") ) )
+        cohort$data$variants_df <- as.data.frame(cohort$data$variants_df %>% 
+                                                  filter(rec_id %in% cohort$accepted_vars_list) )
         
         #comphet results
-        cohort$filtered_vars_list <- cohort$data$variants_df$rec_id[cohort$data$variants_df$Class == "PASS"]
-        cohort$data$comphet_df <- as.data.frame(cohort$data$comphet_df %>% mutate(Class = ifelse(
-          v1 %in% cohort$filtered_vars_list & 
-            v2 %in% cohort$filtered_vars_list &
-            rec_id %in% cohort$vars_pass_segregation, "PASS", "FILTER")))
+        cohort$data$comphet_df <- as.data.frame(cohort$data$comphet_df %>% 
+                                filter(v1 %in% cohort$data$variants_df$rec_id,
+                                        v2 %in% cohort$data$variants_df$rec_id,
+                                        rec_id %in% intersect(cohort$vars_pass_segregation,cohort$vars_pass_filters$comphet)))
   
         #genes results
         cohort$filtered_vars_list <- unique(c(
-          cohort$data$variants_df$rec_id[cohort$data$variants_df$Class == "PASS"], 
-          cohort$data$comphet_df$rec_id[cohort$data$comphet_df$Class == "PASS"])) 
+          cohort$data$variants_df$rec_id, 
+          cohort$data$comphet_df$rec_id)) 
         
         #Filters on gene scores are applied
-        cohort$data$genes_df <- as.data.frame(cohort$data$genes_df %>% mutate(Class = ifelse(
-          variants %in% cohort$filtered_vars_list & 
-            gene %in% cohort$genes_pass_filters, "PASS", "FILTER")))    
+        cohort$data$genes_df <- as.data.frame(cohort$data$genes_df %>% 
+                                                filter(variants %in% cohort$filtered_vars_list,
+                                                       gene %in% cohort$genes_pass_filters))    
         
         #genes scores
-        cohort$filtered_genes_list <- unique(cohort$data$genes_df$gene[cohort$data$genes_df$Class == "PASS"]) 
-        cohort$data$genes_scores <- as.data.frame(cohort$data$genes_scores %>% mutate(Class = ifelse(
-          gene %in% cohort$filtered_genes_list, "PASS", "FILTER")))
+        cohort$data$genes_scores <- as.data.frame(cohort$data$genes_scores %>% 
+                                                    filter(gene %in% cohort$data$genes_df$gene))
         
         #Create results table
+        output <- list()
         cohort$data$genes_scores$caseID <- sampleID
         cohort$data$variants_df$caseID <- sampleID
         cols_to_remove <- c(paste("GQ", cohort$data$all_samples, sep="_"),
                             paste("GT", cohort$data$all_samples, sep="_"))
         cohort$data$variants_df <- cohort$data$variants_df %>% select(-all_of(cols_to_remove))
         
-        RV$cohort_files$genes.tsv = rbind(RV$cohort_files$genes.tsv, 
-                                       cohort$data$genes_scores %>% filter(Class == "PASS") %>% select(-Class))
-        RV$cohort_files$customGenes.tsv = rbind(RV$cohort_files$customGenes.tsv,
-                                             cohort$data$genes_scores %>% filter(Class == "PASS") %>% filter(gene %in% cohort$custom_genes) %>% select(-Class))
-        RV$cohort_files$variants.tsv = rbind(RV$cohort_files$variants.tsv,
-                                          cohort$data$variants_df %>% filter(Class == "PASS", gene %in% cohort$filtered_genes_list))
+        output$genes.tsv = rbind(output$cohort_files$genes.tsv, 
+                                       cohort$data$genes_scores)
+        output$customGenes.tsv = rbind(output$cohort_files$customGenes.tsv,
+                                             cohort$data$genes_scores %>% filter(gene %in% cohort$custom_genes))
+        output$variants.tsv = rbind(output$cohort_files$variants.tsv,
+                                          cohort$data$variants_df %>% filter(gene %in% cohort$data$genes_df$gene))
 
-        comphet_PASS_vars <- cohort$data$comphet_df %>% filter(Class == "PASS", gene %in% cohort$filtered_genes_list)
+        comphet_PASS_vars <- cohort$data$comphet_df %>% filter(gene %in% cohort$data$genes_df$gene)
         if (nrow(comphet_PASS_vars) > 0) {
-          message("There are comphet to save")
+          #message("There are comphet to save")
           comphet_to_save <- comphet_PASS_vars %>% 
             gather(key="Variant",value = "varID", v1:v2) %>% 
-            inner_join(., cohort$data$variants_df[cohort$data$variants_df$Class == "PASS",], by=c("varID"="rec_id")) %>%
-            select(-Class.x,-Class.y)
+            inner_join(., cohort$data$variants_df, by=c("varID"="rec_id"))
           
           comphet_to_save$caseID <- sampleID
           
-          RV$cohort_files$comphet.tsv = rbind(RV$cohort_files$comphet.tsv, comphet_to_save)
+          output$comphet.tsv = rbind(output$cohort_files$comphet.tsv, comphet_to_save)
         }
+        return(output)
       }
+      stopImplicitCluster()
+      RV$cohort_files <- c(RV$cohort_files, sample_results)
       RV$cohort_exit_status <- paste0("Finished with\n\t", nrow(RV$cohort_files$genes.tsv), " genes\n\t", nrow(RV$cohort_files$variants.tsv), " variants")
       callModule(downloadObj, id = "save_cohort",
                  output_prefix= "Cohort",
