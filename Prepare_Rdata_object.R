@@ -337,10 +337,12 @@ processing_results <- foreach (n = 1:total,
                     ),"o", "stop")
   
   #GADO data ----------
+  message("GADO")
   gado_score <- loadData(newlist$gado_file)
   newlist$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
   
   #COMPHET data -------
+  message("comphet")
   comphet_df <- loadData(newlist$comphet_file)
   #if (nrow(comphet_df) == 0) {next} #skip loading data if comphet empty
   comphet_df$ID <- paste0("CompHet_", comphet_df$rec_id)
@@ -348,6 +350,7 @@ processing_results <- foreach (n = 1:total,
   newlist$comphet_df <- comphet_df
   
   #VARIANTS data ------
+  message("Vars")
   variants_df <- loadData(newlist$variant_file)
   variants_df$Class <- "PASS"
   variants_df$internal_id <- paste(variants_df$chr,variants_df$start,variants_df$end,variants_df$ref,variants_df$alt, sep="_")
@@ -394,6 +397,7 @@ processing_results <- foreach (n = 1:total,
   }
   
   #SEGREGATION data ------------
+  message("segregation")
   if (nrow(newlist$comphet_df) > 0) {
     seg_df1 <- as.data.frame(
       newlist$comphet_df %>% select(rec_id,num_aff) %>% 
@@ -408,6 +412,7 @@ processing_results <- foreach (n = 1:total,
   newlist$segregation_df <- rbind(seg_df1, seg_df2)
   
   #GENES data -------------------- 
+  message("genes")
   #Genes scores are moved to a separate table (genes_scores)
   genes_df <- loadData(paste0(newlist$gene_file))
   genes_df$Class <- "PASS"
@@ -434,6 +439,7 @@ processing_results <- foreach (n = 1:total,
   newlist$genes_scores <- genes_scores
   
   #PED files ---------------
+  message("PED")
   #Read PED into kinship2 format, singleton cannot be displayed
   ped_df <- loadData(newlist$pedigree_file, header=F)
   ped_df$V5[ped_df$V5==1] <- "male"
@@ -454,6 +460,7 @@ processing_results <- foreach (n = 1:total,
   })
   
   #KNOWN VARS data ----------------
+  message("known_vars")
   newlist$known_vars <- loadData(newlist$known_variant_file)
   newlist$known_vars <- newlist$known_vars %>% separate_rows(known_ids, sep=",")
   newlist$known_vars$internal_id <- paste(newlist$known_vars$chr,newlist$known_vars$start,newlist$known_vars$end,newlist$known_vars$ref,newlist$known_vars$alt, sep="_")
@@ -461,6 +468,7 @@ processing_results <- foreach (n = 1:total,
   newlist$known_cosmic <- newlist$known_vars[grep("COSV[0-9]+",newlist$known_vars$known_ids,perl = T),]
   
   #ROH data --------------
+  message("ROH")
   newlist$ROH_data <- NULL
   newlist$ROH_ranges <- list()
   if (inherits(roh_files, "list")) {
@@ -497,6 +505,7 @@ processing_results <- foreach (n = 1:total,
   }
   
   #EXPANSION HUNTER (jsons) --------------
+  message("exp_hunter")
   newlist$ExpHunter <- NULL
   
   if (inherits(exphunter_files, "list")) {
@@ -538,12 +547,14 @@ processing_results <- foreach (n = 1:total,
   }
 
   #BAM FILES locations --------------
+  message("bam_files")
   newlist$bam_files <- NULL
   if(inherits(bam_files, "list")) {
     newlist$bam_files <- bam_files[newlist$all_samples]
   }
   
   #SMALL VARS / SV VCF locations -----------------
+  message("VCF_files")
   newlist$vcf_files <- NULL
   if(inherits(vcf_files, "list")) {
     newlist$vcf_files <- list(family_vcf = NULL, single_vcf = list())
@@ -559,6 +570,7 @@ processing_results <- foreach (n = 1:total,
   
   
   #SAVE DATA --------------------
+  message("save data")
   #Save the list containig processed data into an RDS object
   save_results <- saveData(newlist,outf=out_file)
   if (save_results == 1) {
