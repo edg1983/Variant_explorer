@@ -308,7 +308,7 @@ idx_df <- loadData(idx_file)
 total <- nrow(idx_df)
 message("Loaded var2reg idx file containing ", total, " datasets")
 message("#### START PROCESSING USING ", numCores, " THREADS ####")
-message("|", rep(" ", 50), "| 0%" )
+#message("|", rep(" ", 50), "| 0%" )
 registerDoParallel(numCores)
 processing_results <- foreach (n = 1:total, 
                                .combine=rbind, .inorder = F,
@@ -316,6 +316,7 @@ processing_results <- foreach (n = 1:total,
   #convert idx file line to list
   newlist <- as.list(idx_df[n,])
   newlist$releaseID <- releaseID
+  message("#### file ",n, " of ", total, " ", newlist$pedigree)
   #message(Sys.time(), " #### file ",n, " ", newlist$pedigree, " --- ", round((n/total) * 100, 2), " %")
   
   #Set output filename
@@ -568,13 +569,13 @@ processing_results <- foreach (n = 1:total,
     saved_files = 0
   }
   
-  write(out_file, file=log_file, append = TRUE)
-  N_completed <- length(scan(log_file, what="", sep="\n", quiet=T))
-  perc_completed <- round((N_completed / total) * 100,1)
-  message("\r|",
-          rep("=", round(perc_completed/2)),
-          rep(" ", 50-round(perc_completed/2)),
-          "| ",perc_completed,"%\r" )
+  #write(out_file, file=log_file, append = TRUE)
+  #N_completed <- length(scan(log_file, what="", sep="\n", quiet=T))
+  #perc_completed <- round((N_completed / total) * 100,1)
+  #message("\r|",
+  #        rep("=", round(perc_completed/2)),
+  #        rep(" ", 50-round(perc_completed/2)),
+  #        "| ",perc_completed,"%\r" )
 
   return(c(save_results,failed_files,good_peds))
 }
