@@ -1,6 +1,7 @@
 {
   "data_dir": "encrypted_data",
   "resource_dir": "Resources",
+  "user_dir": "user_data",
   "PanelApp_dir": "@resource_dir/PanelApp",
   "GeneLists_dir": "@resource_dir/geneLists",
   "HPO_dir": "@resource_dir/HPO",
@@ -57,6 +58,7 @@
   },
   "fill_na": {
     "fill_na_vars" : {
+      "d_score": 99,
       "max_pop_af": 0,
       "cohort_af": 0,
       "DANN_score": 99,

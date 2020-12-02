@@ -4,6 +4,8 @@
 
 operations <- c("equal" = "==", "greater than" = ">=", "less than" = "<=")
 
+RV <- reactiveValues()
+
 #This function set the expression on segregation column
 #This is set to >= for aff and <= for unaff columns when a number is provided
 #When NOT_ALLOWED is provided as value the filter is set to == 0 for the corresponding column
@@ -21,6 +23,22 @@ selectFilter <- function(var,operator,value) {
 
 segregationUI <- function(id, choices_affected, choices_unaffected) {
   ns <- NS(id)
+  
+  #A list of settings for seg models as a named list
+  #Each model contain a 5 values in the following order
+  #het_affected, het_unaffected, hom_affected, hom_unaffected, comphet_affected, sup_dnm
+  if (max(choices_unaffected) >= 2) {value_unaffected <- 2} else {value_unaffected <- max(choices_unaffected)}
+  RV$segregation_presets_values <- list(
+    perfect_recessive = c(0,value_unaffected,max(choices_affected),0,max(choices_affected),0),
+    perfect_dominant = c(max(choices_affected),0,0,0,0,0),
+    dnm_permissive = c(max(choices_affected),0,0,0,0,0),
+    dnm_highconf = c(max(choices_affected),0,0,0,0,max(choices_affected)),
+    free = c(0,0,0,0,0)
+  )
+  
+  segregation_presets <- tagList(
+    selectInput(ns("segregation_preset"), "Segregation model", choices = names(RV$segregation_presets_values), multiple=F, selected="free")
+  )
   
   homozygous_controls <- tagList(
     h4("Homozygous"),
@@ -48,15 +66,41 @@ segregationUI <- function(id, choices_affected, choices_unaffected) {
     h4("High-confident denovo"),
     selectInput(ns("dnm_affected"), "Affected carriers:", choices = choices_affected, multiple=FALSE, selected = "0"),
     selectInput(ns("dnm_affected_op"), "Operator:", choices = operations, multiple=FALSE, selected = ">=")
+  
   )
   
-  output <- tagList(fluidRow(
+  callModule(updateSegregationPresets, "segregation")
+  
+  output <- tagList(
+    fluidRow(column(6, segregation_presets)),
+    hr(),
+    fluidRow(
               column(4,homozygous_controls),
               column(4,heterozygous_controls),
               column(4,comphet_controls) ),
               fluidRow(column(4), column(4, align="center", dnm_controls), column(4))
             )
   #output <- tagList(fluidRow(output))
+}
+
+updateSegregationPresets <- function(input, output, session) {
+  observeEvent(input$segregation_preset,{
+    #het_affected, het_unaffected, hom_affected, hom_unaffected, comphet_affected, sup_dnm
+    values <- RV$segregation_presets_values[[input$segregation_preset]]
+    updateSelectInput(session, inputId = "het_affected",selected = values[1])
+    updateSelectInput(session, inputId = "het_unaffected",selected = values[2])
+    updateSelectInput(session, inputId = "hom_affected",selected = values[3])
+    updateSelectInput(session, inputId = "hom_unaffected",selected = values[4])
+    updateSelectInput(session, inputId = "comphet_affected",selected = values[5])
+    updateSelectInput(session, inputId = "dnm_affected",selected = values[6])
+    
+    updateSelectInput(session, inputId = "het_affected_op",selected = "==")
+    updateSelectInput(session, inputId = "het_unaffected_op",selected = "==")
+    updateSelectInput(session, inputId = "hom_affected_op",selected = "==")
+    updateSelectInput(session, inputId = "hom_unaffected_op",selected = "==")
+    updateSelectInput(session, inputId = "comphet_affected_op",selected = "==")
+    updateSelectInput(session, inputId = "dnm_affected_op",selected = ">=")
+  })
 }
 
 #cols_names is a named vector of 5 elements describing columns names for segregation counts

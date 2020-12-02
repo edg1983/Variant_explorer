@@ -2,6 +2,7 @@
     "GENES": {
       "DEFINITIONS": {
         "numeric_fields": { 
+            "gado_perc": ["Min GADO percentile", ">=", 0],
             "pLI_gnomad": ["Min gnomAD pLI", ">=", 0],
             "RVIS": ["Max RVIS intolerance", "<=", "max"],
             "GDI_phred": ["Max Gene Damage Index", "<=", "max"],
@@ -10,7 +11,7 @@
       },
       "GROUPS": {
         "global": {
-          "associated_values": ["pLI_gnomad", "GDI_phred", "RVIS", "EDS"]    
+          "associated_values": ["gado_perc", "pLI_gnomad", "GDI_phred", "RVIS", "EDS"]    
         }
       },
       "PRESETS": {
@@ -108,9 +109,13 @@
       },
       "GROUPS": {
         "global": {
-             "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "d_score", "LowMappability", "LowComplexity", "SegDup", "CADD_PhredScore", "cohort_het", "cohort_hom"]
+             "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "cohort_hom", "cohort_het"]
         },
-        "comphet": {"associated_values": ["consequence"] },
+        "small_variants": {
+            "definition": ["var_type", ["SNV","INDEL"]],
+            "associated_values": ["d_score", "LowMappability", "LowComplexity", "SegDup", "CADD_PhredScore"]
+        },
+        "comphet": {"associated_values": ["var_type", "consequence"] },
         "missense": {
             "definition": ["consequence", ["missense_variant"]],
             "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
@@ -129,6 +134,25 @@
         }
       },
       "PRESETS": {
+        "small_variants": {
+          "default": "moderate",  
+          "configuration": {
+            "strict": {
+                "logic": "AND",
+                "values": {
+                  "LowComplexity": true, 
+                  "SegDup": true,
+                  "CADD_PhredScore": 10    
+                }
+            },
+            "moderate": {
+                "logic": "OR",
+                "values": {
+                  "LowComplexity": true
+                }
+            }
+          }
+        },
         "missense": {
           "default": "balanced",
           "configuration": {
@@ -211,9 +235,7 @@
                     ],
                     "cohort_af": 0.05,
                     "max_pop_af": 0.001,
-                    "LowComplexity": true,
-                    "SegDup": true,
-                    "CADD_PhredScore": 10
+                    "cohort_hom": 10
                 }
             },
             "protein-altering rare": {
@@ -243,8 +265,7 @@
                       "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
                     ],
                     "cohort_af": 0.1,
-                    "max_pop_af": 0.01,
-                    "LowComplexity": true
+                    "max_pop_af": 0.01
                 }
             },
             "rare all": {
@@ -322,7 +343,7 @@
               }
             },
             "coding": {
-              "logic": "OR",
+              "logic": "AND",
               "values": {
                   "consequence": [
                       "exonic_sv",
@@ -334,7 +355,7 @@
               }
             },
             "all but introns": {
-              "logic": "OR",
+              "logic": "AND",
               "values": {
                   "consequence": [
                       "exonic_sv", "utr_sv",
@@ -345,6 +366,22 @@
                       "missense_variant", "synonymous_variant",
                       "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
                     ]
+              }
+            },
+            "structural variants": {
+              "logic": "AND",
+              "values": {
+                  "var_type": ["DEL","DUP","INV","DEL:ME"],
+                  "consequence": [
+                      "exonic_sv","utr_sv","enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"
+                    ]
+              }
+            },
+            "exonic SV": {
+              "logic": "AND",
+              "values": {
+                  "var_type": ["DEL","DUP","INV","DEL:ME"],
+                  "consequence": ["exonic_sv"]
               }
             }
           }
@@ -380,6 +417,8 @@
       "SegDup": "Segmental duplications",
       "TFBS": "Transcription Factors Binding Sites from ENCODE ChIP-seq experiments",
       "DNase": "DNase sensitivity peaks from ENCODE data. They usually identify transcriptional active regions and TF binding domains",
-      "UCNE": "Ultra-conserved non coding elements"
+      "UCNE": "Ultra-conserved non coding elements",
+      "cohort_hom": "Number of homozygous genotypes seen in the cohort",
+      "cohort_het": "Number of heterozygous genotypes seen in the cohort"
     }
   }

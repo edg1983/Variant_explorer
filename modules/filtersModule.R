@@ -1,5 +1,5 @@
 # MODULE FOR VARIANT FILTERS MANAGEMENT
-# Allow to configure groups of vars and apply specific filters to each group
+# Allows to configure groups of vars and apply specific filters to each group
 # Suppose a variants table and a gene scores table containing various annotations columns and a json config file
 # Filters are configured as follows:
 # global_filters | (var in group1 & (group1 filters)) | (var in group1 & (group1 filters)) ...
@@ -15,11 +15,10 @@
 #               an additional group reg_sources can be provided. This must contain field indicating the column
 #               then contains subgroups defining the various reg_db categories
 # GENES / VARIANTS:     allow to define filters groups and presets
-source("filterObject.R")
+source("modules/filterObject.R")
 
-#################
-### FUNCTIONS ###
-#################
+## FUNCTIONS ------------------------
+
 `%nin%` = Negate(`%in%`)
 
 intersectLists <- function(vector1, vector2) {
@@ -94,10 +93,8 @@ getDefaultValue <- function(var_name, ctrl_type, ctrl_value, na_values, df) {
   return(default)
 }
 
-#############################
-### USER INTERFACE GROUPS ###
-#############################
 
+## USER INTERFACE GROUPS ------------------------------
 # filters_settings = VARIANTS section of filters_settings json
 # variants_df = data frame of variants 
 # na_values = named list with na values (usually app_settings$fill_na$fill_na_vars)
@@ -145,26 +142,24 @@ filtersVariantsUI <- function(id, filters_settings, variants_df, na_values, tool
                                 variants_df = variants_df, 
                                 na_values = na_values, 
                                 factorsmap = filters_settings$FACTORSMAP,
-                                tooltips = tooltips)
+                                tooltips = tooltips,
+                                filters_settings = filters_settings)
     variants_boxes <- tagList(variants_boxes, group_box)  
   }
   
   return(variants_boxes)
 }
 
-##############
-### SERVER ###
-##############
-
+## SERVER ---------------------
 #Manage the update of filters values when preset or text input change
-observeFilters <- function(input, output, session, filters_settings, variants_df, na_values, tooltips) {
-  for (g in names(filters_settings$GROUPS)) {
-      callModule(observeInputs, g, 
-               variants_df = variants_df,
-               na_values = na_values,
-               filters_settings = filters_settings)
-  }
-}
+#observeFilters <- function(input, output, session, filters_settings, variants_df, na_values, tooltips) {
+#  for (g in names(filters_settings$GROUPS)) {
+#      callModule(observeInputs, g, 
+#               variants_df = variants_df,
+#               na_values = na_values,
+#               filters_settings = filters_settings)
+#  }
+#}
 
 #Make expression combining all filters for variants and return PASS variants ids
 getPASSVars_filters <- function(input, output, session, filters_settings, variants_df, comphet_df) {

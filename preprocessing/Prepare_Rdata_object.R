@@ -474,6 +474,10 @@ processing_results <- foreach (n = 1:total,
             ID = paste0("ROH_", 1:nrow(ROH_df)),
             value = ROH_df[[roh_cols$stop]] - ROH_df[[roh_cols$start]])
           
+          cols <- c(roh_cols$chrom,roh_cols$start,roh_cols$stop)
+          ROH_df <- ROH_df[, ..cols]
+          colnames(ROH_df) <- c("Chromosome","Start","End")
+          ROH_df$Length_bp <- ROH_df$End - ROH_df$Start
           ROH_df$Sample <- s
           newlist$ROH_data <- rbind(newlist$ROH_data,ROH_df)
         }

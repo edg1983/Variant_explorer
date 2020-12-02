@@ -26,8 +26,8 @@ GQfilterUI <- function(id, maxGQ, defaultGQ) {
 #This latter is useful right now since GQ filtering can not be done effectively on SVs, so we can ignore them
 GQfilterModule <- function(input, output, session, variants_df, GQ_cols, affected_cols, exclude_var_type=NULL) {
   
-  variants_df$aff_GQ <- rowSums(variants_df[,..affected_cols] >= input$GQ_value,na.rm = T)
-  variants_df$all_GQ <- rowSums(variants_df[,..GQ_cols] >= input$GQ_value,na.rm = T)
+  variants_df$aff_GQ <- rowSums(variants_df %>% select(all_of(affected_cols)) >= input$GQ_value,na.rm = T)
+  variants_df$all_GQ <- rowSums(variants_df %>% select(all_of(GQ_cols)) >= input$GQ_value,na.rm = T)
   n_samples <- length(GQ_cols)
   n_affected <- length(affected_cols)
   

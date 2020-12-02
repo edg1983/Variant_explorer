@@ -237,7 +237,7 @@ getDefaultValue <- function(var_name, ctrl_type, ctrl_value, na_values, df) {
 #   - AND / OR logic
 #   - Preset if present in settings json
 
-filterObjectUI <- function(id, group_name, group_definition, group_presets, vars_type, vars_default, vars_label, variants_df, na_values, factorsmap, tooltips) {
+filterObjectUI <- function(id, group_name, group_definition, group_presets, vars_type, vars_default, vars_label, variants_df, na_values, factorsmap, tooltips, filters_settings) {
   ns <- NS(id)
   
   vars_type <- vars_type
@@ -283,6 +283,7 @@ filterObjectUI <- function(id, group_name, group_definition, group_presets, vars
         controls_layout
     )
   )
+  callModule(observeInputs, id, filters_settings=filters_settings, na_values=na_values, variants_df=variants_df)
   return(group_box)
 }
 
