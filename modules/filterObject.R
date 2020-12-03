@@ -440,7 +440,7 @@ loadSettings <- function(input, output, session, filters_settings, filters_json)
     }
   }
   vars_type[["LOGIC"]] <- "factors_fields"
-  vars_type[["PRESET"]] <- "factors_fields"
+  vars_type[["PRESETS"]] <- "factors_fields"
   
   filters_values <- filters_json[[group_name]] 
   

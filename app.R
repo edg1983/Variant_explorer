@@ -480,25 +480,25 @@ ui <- dashboardPage(
         fileInput(inputId = "custom_bed",label = "Region BED:", multiple=FALSE, accept=".bed", placeholder = "region bed file"),
         
         sidebarMenu(id = "tabs",
-            menuItem("Variants overview", tabName = "overview", icon = icon("th")),
-            menuItem("Create custom genes list", tabName = "custom_genes_list_builder", icon = icon("th")),
-            menuItem("Filters settings", icon = icon("th"),
+            menuItem("Variants overview", tabName = "overview", icon = icon("eye")),
+            menuItem("Create custom genes list", tabName = "custom_genes_list_builder", icon = icon("list")),
+            menuItem("Filters settings", icon = icon("filter"),
               menuSubItem("Overview", tabName = "filters_overview_tab"),
               menuSubItem("Variants", tabName = "variants_filters_tab"),
               menuSubItem("Segregation", tabName = "segregation_filters_tab"),
               menuSubItem("Genes", tabName = "genes_filters_tab"),
               menuSubItem("Regions and ROH", tabName = "regions_filters_tab")
             ),
-            menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("th")),
-            menuItem("Results", icon = icon("th"),
+            menuItem("Filter explorer", tabName = "filter_explorer", icon = icon("chart-line")),
+            menuItem("Results", icon = icon("list-ol"),
                 menuSubItem("Filtered genes", tabName = "filter_results_genes"),
                 menuSubItem("Filtered variants", tabName = "filter_results_variants"),
                 menuSubItem("PanelApp and gene lists", tabName = "gene_lists")
             ),
-            menuItem("Gene details", tabName = "gene_details", icon = icon("th")),
+            menuItem("Gene details", tabName = "gene_details", icon = icon("search-plus")),
             menuItemOutput("exphunter_menu"),
-            menuItem("Known variants", tabName= "known_variants", icon = icon("th")),
-            menuItem("Saved variants", tabName= "preferred_vars", icon = icon("th")),
+            menuItem("Known variants", tabName= "known_variants", icon = icon("university")),
+            menuItem("Saved variants", tabName= "preferred_vars", icon = icon("bookmark")),
             menuItemOutput("coverage_menu")
             #menuItem("Cohort analysis", tabName= "cohort_analysis", icon = icon("th"))
         )
@@ -627,7 +627,7 @@ ui <- dashboardPage(
                     fluidRow(column(3,actionButton("set_filters","Configure filters"), align="center"),
                              column(3,actionButton("apply_filters","Apply filters"), align="center"),
                              column(3,downloadObjUI("get_json_filters", label = "Save filters settings"),
-                                    br(),
+                                    hr(),
                                     actionButton("latest_filter_button",label = "Load latest used filters"),
                                     align="center"),
                              column(3,
@@ -780,12 +780,12 @@ server <- function(input, output, session) {
   output$exphunter_menu <- renderMenu({
     req(inherits(RV$data, "list"))
     if(!is.null(RV$data$ExpHunter))
-      menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("th"))
+      menuItem("Expansion Hunter", tabName= "expansion_hunter", icon = icon("sort-amount-down-alt"))
   })
   
   output$coverage_menu <- renderMenu({
     if( !is.null(Coverage_dir) & length(list.files(Coverage_dir, pattern = ".bed.gz")) > 0)
-      menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("th"))
+      menuItem("Explore coverage", tabName= "coverage_explorer", icon = icon("chart-area"))
   })
   
   ## Load Files --------------------
@@ -1627,7 +1627,7 @@ server <- function(input, output, session) {
     shiny::validate(need(RV$filtered_applied, "No filters applied, please set filters first"))
     tagList(
     h3("Summary of filters effect"),
-    plotOutput("filters_funnel", width="100%"),
+    withSpinner(plotOutput("filters_funnel", width="100%")),
     
     box(title = "Filters impact detail", id = "filters_impact_detail", status = "primary", solidHeader = TRUE,
         collapsible = TRUE, collapsed = TRUE, width = 12,
@@ -1663,7 +1663,8 @@ server <- function(input, output, session) {
       "ROH" = RV$vars_pass_ROH,
       "GQ" = RV$vars_pass_GQ,
       "Variants" = RV$vars_pass_filters$vars,
-      "Segregation" = segregation_vars
+      "Segregation" = segregation_vars,
+      "GADO" = RV$genes_pass_filters
     )
     
     tot_vars <- list(
@@ -1677,8 +1678,7 @@ server <- function(input, output, session) {
       value = NULL
     )
     
-    diagrams <- list()
-    for (group in names(var_groups)) {
+    for (group in var_groups) {
       switch(group,
              "exonic" = {df <- RV$data$variants_df %>% filter(consequence %in% exonic_vars)},
              "regulatory" = {df <- RV$data$variants_df %>% filter(consequence %in% reg_vars)},
@@ -1688,20 +1688,29 @@ server <- function(input, output, session) {
       tot_vars$group = c(tot_vars$group, group)
       tot_vars$value = c(tot_vars$value, nrow(df))
       
-      for (step in var_steps) {
+      for (step in names(var_steps)) {
+        if (step == "GADO") {
+          df <- df %>% filter(gene %in% var_steps[[step]])
+          steps_vars$step = c(steps_vars$step, step)
+          steps_vars$group = c(steps_vars$group, group)
+          steps_vars$value = c(steps_vars$value, nrow(df)) 
+        }
         df <- df %>% filter(rec_id %in% var_steps[[step]])
         steps_vars$step = c(steps_vars$step, step)
         steps_vars$group = c(steps_vars$group, group)
         steps_vars$value = c(steps_vars$value, nrow(df))
       }
-      counts_df <- bind_rows(tot_vars,steps_vars)
     }
+    
+    counts_df <- bind_rows(tot_vars,steps_vars)
+    counts_df$step <- factor(counts_df$step,
+                             levels = c("Unfiltered","BED","ROH","GQ","Variants","Segregation","GADO"))
     
     ggplot(counts_df, aes(x=step,y=value,label=value)) + 
       geom_bar(stat="identity") + geom_label() + 
       labs(x="Filter steps", y="N records") +
       theme(axis.text.x = element_text(angle=45, hjust=1)) +
-      facet_wrap(~group, ncol = 2)
+      facet_wrap(~group, ncol = 2, scales="free_y")
     
   })  
   

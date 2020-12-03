@@ -9,26 +9,26 @@
       "cohort_hom": 299,
       "max_pop_af": 0.01,
       "LOGIC": "AND",
-      "PRESETS": "protein-altering rare",
-      "consequence": ["exonic_sv", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant"]
+      "PRESETS": "balanced",
+      "consequence": ["exonic_sv", "3_prime_UTR_variant", "5_prime_UTR_variant", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant", "synonymous_variant", "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant"]
     },
     "small_variants": {
-      "CADD_PhredScore": 0.001,
+      "CADD_PhredScore": 5,
       "LowComplexity": true,
       "PRESETS": "moderate",
-      "LOGIC": "OR",
+      "LOGIC": "AND",
       "SegDup": false,
       "LowMappability": false,
       "d_score": 0
     },
     "comphet": [],
     "missense": {
-      "LOGIC": "OR",
+      "LOGIC": "AND",
       "MCAP_score": 0,
-      "REVEL_score": 0.2,
-      "CADD_PhredScore": 5,
-      "DANN_score": 0.2,
-      "PRESETS": "permissive"
+      "REVEL_score": 0.3,
+      "CADD_PhredScore": 10,
+      "DANN_score": 0.3,
+      "PRESETS": "balanced"
     },
     "splice": {
       "SpliceAI_INDEL_SpliceAI_max": 0.2,
@@ -57,17 +57,17 @@
     }
   },
   "SEGREGATION": {
-    "hom_affected": "1",
+    "hom_affected": "0",
     "hom_unaffected": "0",
     "hom_affected_op": "==",
     "het_affected": "0",
     "dnm_affected_op": ">=",
     "hom_unaffected_op": "==",
     "het_affected_op": "==",
-    "segregation_preset": "perfect_recessive",
-    "het_unaffected": "2",
+    "segregation_preset": "free",
+    "het_unaffected": "0",
     "het_unaffected_op": "==",
-    "comphet_affected": "1",
+    "comphet_affected": "0",
     "dnm_affected": "0",
     "comphet_affected_op": "=="
   },

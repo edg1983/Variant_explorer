@@ -146,9 +146,10 @@
                 }
             },
             "moderate": {
-                "logic": "OR",
+                "logic": "AND",
                 "values": {
-                  "LowComplexity": true
+                  "LowComplexity": true,
+                  "CADD_PhredScore": 5
                 }
             }
           }
@@ -329,7 +330,7 @@
           }
         },
         "comphet": {
-          "default": "all but introns",
+          "default": "coding",
           "configuration": {
             "LoF": {
               "logic": "AND",
