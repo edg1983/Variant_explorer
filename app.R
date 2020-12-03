@@ -826,8 +826,10 @@ server <- function(input, output, session) {
           RV$data$variants_df <- as.data.frame(RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars))
           RV$data$variants_df$Class <- "PASS"
           
-          RV$data$comphet_df <- as.data.frame(RV$data$comphet_df)
-          RV$data$comphet_df$Class <- "PASS"
+          if (nrow(RV$data$comphet_df)>0) {
+            RV$data$comphet_df <- as.data.frame(RV$data$comphet_df)
+            RV$data$comphet_df$Class <- "PASS"
+          }
           
           RV$data$segregation_df <- as.data.frame(RV$data$segregation_df)
           RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
@@ -1652,10 +1654,11 @@ server <- function(input, output, session) {
   })
   
   output$filters_funnel <- renderPlot({
-    comphet_segregation <- RV$data$comphet_df %>% filter(
-      rec_id %in% RV$vars_pass_segregation) %>% 
+    comphet_segregation <- RV$data$comphet_df %>% 
+      filter(rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet)) %>% 
       gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
-    segregation_vars <- unique(c(RV$vars_pass_segregation, comphet_segregation$varID))
+   
+    segregation_vars <- unique(c(RV$vars_pass_segregation, comphet_segregation$VarID))
     
     var_groups <- c("exonic","regulatory","structural")
     var_steps <- list(
@@ -1664,7 +1667,7 @@ server <- function(input, output, session) {
       "GQ" = RV$vars_pass_GQ,
       "Variants" = RV$vars_pass_filters$vars,
       "Segregation" = segregation_vars,
-      "GADO" = RV$genes_pass_filters
+      "Genes" = RV$genes_pass_filters
     )
     
     tot_vars <- list(
@@ -1689,22 +1692,23 @@ server <- function(input, output, session) {
       tot_vars$value = c(tot_vars$value, nrow(df))
       
       for (step in names(var_steps)) {
-        if (step == "GADO") {
+        if (step == "Genes") {
           df <- df %>% filter(gene %in% var_steps[[step]])
           steps_vars$step = c(steps_vars$step, step)
           steps_vars$group = c(steps_vars$group, group)
           steps_vars$value = c(steps_vars$value, nrow(df)) 
+        } else {
+          df <- df %>% filter(rec_id %in% var_steps[[step]])
+          steps_vars$step = c(steps_vars$step, step)
+          steps_vars$group = c(steps_vars$group, group)
+          steps_vars$value = c(steps_vars$value, nrow(df))
         }
-        df <- df %>% filter(rec_id %in% var_steps[[step]])
-        steps_vars$step = c(steps_vars$step, step)
-        steps_vars$group = c(steps_vars$group, group)
-        steps_vars$value = c(steps_vars$value, nrow(df))
       }
     }
     
     counts_df <- bind_rows(tot_vars,steps_vars)
     counts_df$step <- factor(counts_df$step,
-                             levels = c("Unfiltered","BED","ROH","GQ","Variants","Segregation","GADO"))
+                             levels = c("Unfiltered","BED","ROH","GQ","Variants","Segregation","Genes"))
     
     ggplot(counts_df, aes(x=step,y=value,label=value)) + 
       geom_bar(stat="identity") + geom_label() + 
