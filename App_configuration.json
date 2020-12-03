@@ -11,7 +11,8 @@
   "var_groups": {
     "consequence_groups": {
       "reg_vars": ["enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant"],
-      "lof_vars": ["frameshift", "exonic_sv","stop lost","stop gain","start loss","splice_acceptor_variant","splice_donor_variant"]
+      "lof_vars": ["frameshift", "exonic_sv","stop lost","stop gain","start loss","splice_acceptor_variant","splice_donor_variant"],
+      "exonic_vars": ["frameshift", "exonic_sv","stop lost","stop gain","start loss","splice_acceptor_variant","splice_donor_variant","missense_variant","synonymous_variant","3_prime_UTR_variant","5_prime_UTR_variant"]
     },
     "var_type_groups": {
       "sv_vars": ["DEL","DUP","INV","DEL:ME"],
@@ -81,6 +82,7 @@
       "Reg_constraint": 99
     },
     "fill_na_genes" : {
+      "gado_perc": 99, 
       "GDI_phred": -99,
       "RVIS": -99,
       "pLI_gnomad": 99,

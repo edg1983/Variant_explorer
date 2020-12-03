@@ -5,47 +5,49 @@
     "global": {
       "cohort_het": 297,
       "cohort_af": 0.1,
-      "var_type": ["SNV", "INDEL", "DUP", "DEL", "DEL:ME", "INV"],
+      "var_type": ["SNV", "INDEL", "DUP", "DEL:ME", "DEL", "INV"],
       "cohort_hom": 299,
       "max_pop_af": 0.01,
       "LOGIC": "AND",
+      "PRESETS": "protein-altering rare",
       "consequence": ["exonic_sv", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant"]
     },
     "small_variants": {
       "CADD_PhredScore": 0.001,
       "LowComplexity": true,
+      "PRESETS": "moderate",
       "LOGIC": "OR",
       "SegDup": false,
       "LowMappability": false,
       "d_score": 0
     },
-    "comphet": {
-      "var_type": ["SNV", "INDEL", "DUP", "DEL", "DEL:ME", "INV"],
-      "consequence": ["exonic_sv", "3_prime_UTR_variant", "5_prime_UTR_variant", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant", "synonymous_variant", "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"],
-      "LOGIC": "AND"
-    },
+    "comphet": [],
     "missense": {
-      "LOGIC": "AND",
+      "LOGIC": "OR",
       "MCAP_score": 0,
-      "REVEL_score": 0.3,
-      "CADD_PhredScore": 10,
-      "DANN_score": 0.3
+      "REVEL_score": 0.2,
+      "CADD_PhredScore": 5,
+      "DANN_score": 0.2,
+      "PRESETS": "permissive"
     },
     "splice": {
       "SpliceAI_INDEL_SpliceAI_max": 0.2,
+      "PRESETS": "moderate",
       "SpliceAI_SNP_SpliceAI_max": 0.2,
       "LOGIC": "OR"
     },
     "intronic": {
+      "PRESETS": "strict",
       "SpliceAI_SNP_SpliceAI_max": 0.8,
       "LOGIC": "OR",
-      "SpliceAI_INDEL_SpliceAI_max": 0.3
+      "SpliceAI_INDEL_SpliceAI_max": 0.26
     },
     "regulatory": {
       "LOGIC": "OR",
-      "reg_type": ["closest_gene", "reg_db"],
+      "PRESETS": "FDR 50%",
+      "reg_type": ["reg_db", "closest_gene"],
       "UCNE": false,
-      "db_source": ["BENGI", "ENCODE-HMM", "DECRES", "HACER", "JungEtAl2019", "SegWey", "EnsemblRegBuild", "FulcoEtAl2019", "FANTOM5", "FOCS", "VISTA", "RefSeqRegBuild", "EPD6", "GasperiniEtAl2019"],
+      "db_source": ["ENCODE-HMM", "DECRES", "HACER", "EnsemblRegBuild", "SegWey", "BENGI", "JungEtAl2019", "FulcoEtAl2019", "FOCS", "FANTOM5", "VISTA", "RefSeqRegBuild", "EPD6", "GasperiniEtAl2019"],
       "DNase": false,
       "ReMM_score": 0.9,
       "LinSight": 0.8,
@@ -55,17 +57,17 @@
     }
   },
   "SEGREGATION": {
-    "hom_affected": "0",
+    "hom_affected": "1",
     "hom_unaffected": "0",
     "hom_affected_op": "==",
-    "het_affected": "1",
+    "het_affected": "0",
     "dnm_affected_op": ">=",
     "hom_unaffected_op": "==",
     "het_affected_op": "==",
-    "segregation_preset": "dnm_permissive",
-    "het_unaffected": "0",
+    "segregation_preset": "perfect_recessive",
+    "het_unaffected": "2",
     "het_unaffected_op": "==",
-    "comphet_affected": "0",
+    "comphet_affected": "1",
     "dnm_affected": "0",
     "comphet_affected_op": "=="
   },
@@ -75,18 +77,19 @@
   },
   "GENES": {
     "global": {
-      "gado_perc": 0.349,
+      "gado_perc": 0,
       "LOGIC": "OR",
-      "RVIS": 100,
+      "RVIS": 99.99,
       "pLI_gnomad": 0,
       "GDI_phred": 42.913,
+      "PRESETS": "no filter",
       "EDS": 0.089
     }
   },
   "ROH": {
     "bed_filter": false,
     "bed_limit": 250,
-    "sample_select": "G166944A"
+    "sample_select": "G169136P"
   },
   "BED": []
 }

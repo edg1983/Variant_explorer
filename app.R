@@ -1,10 +1,10 @@
 # VARIANT EXPLORER
 # Author: Edoardo Giacopuzzi
+# Contact: edoardo.giacopuzzi@well.ox.ac.uk
 # Explore and filter annotated variants from var2reg
 
-# Input are encrypted RData objects created with Prepare_Rdata_object.R     
+# Input are (encrypted) RData objects created with Prepare_Rdata_object.R     
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
-
 
 ## CONSTANTS --------------------
 APP_VERSION <- "1.2.4"
@@ -190,7 +190,8 @@ makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_files, 
 
 ## CHECK AND LOAD PACKAGES ----------------
 # Install missing packages
-packages.cran <- c("foreach","doParallel","tibble","R.utils","RSQLite","data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
+# pkgs "doParallel", "foreach" needed for cohort mode, now disabled
+packages.cran <- c("tibble","R.utils","RSQLite","data.table","cyphr","shiny","shinyBS","stringr", "DT", "dplyr", "plotly", "kinship2", "tidyr", "shinydashboard", "gridExtra", "ggplot2", "jsonlite", "ontologyIndex")
 new.packages <- packages.cran[!(packages.cran %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {install.packages(new.packages)}
 
@@ -254,6 +255,7 @@ format1 <- theme(axis.text.x = element_text(angle=45, hjust=1, size=12),
 
 ##consequence groups for various variant categories
 reg_vars <- app_settings$var_groups$consequence_groups$reg_vars 
+exonic_vars <- app_settings$var_groups$consequence_groups$exonic_vars
 
 ##var_type groups for various variant categories
 sv_vars <- app_settings$var_groups$var_type_groups$sv_vars
@@ -625,6 +627,7 @@ ui <- dashboardPage(
                     fluidRow(column(3,actionButton("set_filters","Configure filters"), align="center"),
                              column(3,actionButton("apply_filters","Apply filters"), align="center"),
                              column(3,downloadObjUI("get_json_filters", label = "Save filters settings"),
+                                    br(),
                                     actionButton("latest_filter_button",label = "Load latest used filters"),
                                     align="center"),
                              column(3,
@@ -822,12 +825,23 @@ server <- function(input, output, session) {
       if (inherits(RV$data, "list")) {
           RV$data$variants_df <- as.data.frame(RV$data$variants_df %>% replace_na(app_settings$fill_na$fill_na_vars))
           RV$data$variants_df$Class <- "PASS"
+          
           RV$data$comphet_df <- as.data.frame(RV$data$comphet_df)
           RV$data$comphet_df$Class <- "PASS"
+          
           RV$data$segregation_df <- as.data.frame(RV$data$segregation_df)
           RV$data$segregation_df$sup_dnm[RV$data$segregation_df$sup_dnm < 0] <- 0
-          RV$data$genes_scores <- RV$data$genes_scores %>% mutate(gado_perc=1-(row_number()/nrow(.))) %>% relocate(gado_perc, .after="gado_zscore")
-          RV$data$genes_scores$gado_perc[is.na(RV$data$genes_scores$gado_zscore)] <- NA
+          
+          genes_scores_valid <- RV$data$genes_scores %>% 
+            filter(!is.na(gado_zscore)) %>%
+            arrange(dplyr::desc(gado_zscore)) %>%
+            mutate(gado_perc=1-(row_number()/nrow(.)))
+          genes_scores_na <- RV$data$genes_scores %>% 
+            filter(is.na(gado_zscore)) %>%
+            mutate(gado_perc=NA)
+          genes_scores_perc <- rbind(genes_scores_valid,genes_scores_na)
+          
+          RV$data$genes_scores <- genes_scores_perc %>% relocate(gado_perc, .after="gado_zscore")
           RV$data$genes_scores <- as.data.frame(RV$data$genes_scores %>% replace_na(app_settings$fill_na$fill_na_genes))
           RV$data$genes_scores$Class <- "PASS"
           
@@ -1378,7 +1392,7 @@ server <- function(input, output, session) {
       updateTabItems(session, "tabs", "filter_results_genes")
     }) 
     
-  
+    #Load latest filters if they are present
     observeEvent(input$latest_filter_button,{
       latest_file <- paste0(user_dir,"/Last_filters.json")
       
@@ -1613,12 +1627,17 @@ server <- function(input, output, session) {
     shiny::validate(need(RV$filtered_applied, "No filters applied, please set filters first"))
     tagList(
     h3("Summary of filters effect"),
-    fluidRow(
-      column(4,withSpinner(plotOutput("summary_variants_filters", width = "100%"))), 
-      column(4,withSpinner(plotOutput("summary_genes_filters", width = "100%"))),
-      column(4,withSpinner(plotOutput("variants_filters_plot", width = "100%")))
+    plotOutput("filters_funnel", width="100%"),
+    
+    box(title = "Filters impact detail", id = "filters_impact_detail", status = "primary", solidHeader = TRUE,
+        collapsible = TRUE, collapsed = TRUE, width = 12,
+      fluidRow(
+        column(6,withSpinner(plotOutput("summary_variants_filters", width = "100%"))), 
+        column(4),
+        column(4,withSpinner(plotOutput("summary_genes_filters", width = "100%")))
+      ),
+      withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=plot_axes[["variants_bar_options"]]), plotly=FALSE)),    
     ),
-    withSpinner(plotSelectedUI("variants_barplot", variables=list("x"=plot_axes[["variants_bar_options"]]), plotly=FALSE)),    
     
     box(title = "Genes filters scatter", id = "gene_filters_scatter_box", status = "primary", solidHeader = TRUE,
         collapsible = TRUE, collapsed = TRUE, width = 12,
@@ -1632,10 +1651,64 @@ server <- function(input, output, session) {
     )
   })
   
+  output$filters_funnel <- renderPlot({
+    comphet_segregation <- RV$data$comphet_df %>% filter(
+      rec_id %in% RV$vars_pass_segregation) %>% 
+      gather(key="Variant",value="VarID",v1:v2) %>% select(VarID)
+    segregation_vars <- unique(c(RV$vars_pass_segregation, comphet_segregation$varID))
+    
+    var_groups <- c("exonic","regulatory","structural")
+    var_steps <- list(
+      "BED" = RV$vars_pass_BED,
+      "ROH" = RV$vars_pass_ROH,
+      "GQ" = RV$vars_pass_GQ,
+      "Variants" = RV$vars_pass_filters$vars,
+      "Segregation" = segregation_vars
+    )
+    
+    tot_vars <- list(
+      step = NULL,
+      group = NULL,
+      value = NULL
+    )
+    steps_vars <- list(
+      step = NULL,
+      group = NULL,
+      value = NULL
+    )
+    
+    diagrams <- list()
+    for (group in names(var_groups)) {
+      switch(group,
+             "exonic" = {df <- RV$data$variants_df %>% filter(consequence %in% exonic_vars)},
+             "regulatory" = {df <- RV$data$variants_df %>% filter(consequence %in% reg_vars)},
+             "structural" = {df <- RV$data$variants_df %>% filter(var_type %in% sv_vars)},
+      )
+      tot_vars$step = c(tot_vars$step, "Unfiltered")
+      tot_vars$group = c(tot_vars$group, group)
+      tot_vars$value = c(tot_vars$value, nrow(df))
+      
+      for (step in var_steps) {
+        df <- df %>% filter(rec_id %in% var_steps[[step]])
+        steps_vars$step = c(steps_vars$step, step)
+        steps_vars$group = c(steps_vars$group, group)
+        steps_vars$value = c(steps_vars$value, nrow(df))
+      }
+      counts_df <- bind_rows(tot_vars,steps_vars)
+    }
+    
+    ggplot(counts_df, aes(x=step,y=value,label=value)) + 
+      geom_bar(stat="identity") + geom_label() + 
+      labs(x="Filter steps", y="N records") +
+      theme(axis.text.x = element_text(angle=45, hjust=1)) +
+      facet_wrap(~group, ncol = 2)
+    
+  })  
+  
   output$summary_variants_filters <- renderPlot({
       req(nrow(filters_summ_vars())>0)
       #ggplotly(dynamicTicks = T,
-          ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class,label=round(Count,2))) + geom_bar(stat="identity") + 
+          ggplot(filters_summ_vars(), aes(x=Filter,y=Count,fill=Class,label=round(Count,3))) + geom_bar(stat="identity") + 
             geom_label(data=filters_summ_vars() %>% filter(Class=="PASS")) + 
             labs(y="% variants") + theme(axis.text.x = element_text(angle=45, hjust=1))
       #)
@@ -1648,23 +1721,6 @@ server <- function(input, output, session) {
             geom_label(data=filters_summ_genes() %>% filter(Class=="PASS")) +
             labs(y="% genes") + theme(axis.text.x = element_text(angle=45, hjust=1))
       #)
-  })
-  
-  output$variants_filters_plot <- renderPlot({
-    req(inherits(RV$data,"list"))
-    counts <- callModule(getPASScounts_filters,"variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
-    print(str(counts))
-    counts_df <- NULL
-    for (n in names(counts$tot)) {
-      counts_df <- rbind(counts_df, c(n,counts$PASS[[n]],counts$tot[[n]]))
-    }
-    counts_df <- as.data.frame(counts_df, stringsAsFactors=F)
-    counts_df$V2 <- as.numeric(counts_df$V2)
-    counts_df$V3 <- as.numeric(counts_df$V3)
-    counts_df$pct <- counts_df$V2/counts_df$V3
-    ggplot(counts_df, aes(x=V1, y=pct, label=round(pct,3))) + geom_bar(stat="identity") + geom_label() + 
-      labs(y="% variants", x="filter group", title="Variants filter groups") + 
-      theme(axis.text.x=element_text(angle=45, hjust = 1))
   })
   
   callModule(plotModule, "genes_scatter", plot_data = RV$data$genes_scores, missingValues = c(99,-99), plotType = "scatter", plotOptions = list("size" = 1), variables = list("color"="Class", "label"="gene"))

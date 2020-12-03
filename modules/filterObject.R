@@ -419,7 +419,7 @@ getDF <- function(input, output, session, group_name) {
 getJSON <- function(input, output, session) {
   filters_json <- list()
   ctrl_names <- names(input)
-  remove <- grep("TXTSET|PRESETS", ctrl_names)
+  remove <- grep("TXTSET", ctrl_names)
   ctrl_names <- ctrl_names[-remove]
     for (n in ctrl_names) {
       filters_json[[n]] <- input[[n]]
@@ -440,6 +440,7 @@ loadSettings <- function(input, output, session, filters_settings, filters_json)
     }
   }
   vars_type[["LOGIC"]] <- "factors_fields"
+  vars_type[["PRESET"]] <- "factors_fields"
   
   filters_values <- filters_json[[group_name]] 
   
