@@ -5,6 +5,7 @@
 
 # Input are (encrypted) RData objects created with Prepare_Rdata_object.R     
 # Each object contains data from VARAN V2 and var2reg, ROH data and Exp Hunter data
+# R objects are prepared from var2reg and other outputs using scripts in preprocessing folder
 
 ## CONSTANTS --------------------
 APP_VERSION <- "1.2.4"
