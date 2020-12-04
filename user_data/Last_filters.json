@@ -5,12 +5,12 @@
     "global": {
       "cohort_het": 297,
       "cohort_af": 0.1,
-      "var_type": ["SNV", "INDEL", "DUP", "DEL", "DEL:ME", "INV"],
+      "var_type": ["SNV", "INDEL", "DUP", "DEL:ME", "DEL", "INV"],
       "cohort_hom": 299,
       "max_pop_af": 0.01,
       "LOGIC": "AND",
-      "PRESETS": "protein-altering rare",
-      "consequence": ["exonic_sv", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant"]
+      "PRESETS": "balanced",
+      "consequence": ["exonic_sv", "3_prime_UTR_variant", "5_prime_UTR_variant", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant", "synonymous_variant", "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"]
     },
     "small_variants": {
       "CADD_PhredScore": 5,
@@ -23,12 +23,12 @@
     },
     "comphet": [],
     "missense": {
-      "LOGIC": "OR",
-      "MCAP_score": 0.001,
-      "REVEL_score": 0.2,
-      "CADD_PhredScore": 5,
-      "DANN_score": 0.2,
-      "PRESETS": "permissive"
+      "LOGIC": "AND",
+      "MCAP_score": 0,
+      "REVEL_score": 0.3,
+      "CADD_PhredScore": 10,
+      "DANN_score": 0.3,
+      "PRESETS": "balanced"
     },
     "splice": {
       "SpliceAI_INDEL_SpliceAI_max": 0.2,
@@ -45,15 +45,15 @@
     "regulatory": {
       "LOGIC": "OR",
       "PRESETS": "FDR 50%",
-      "reg_type": ["closest_gene", "reg_db"],
+      "reg_type": ["reg_db", "closest_gene"],
       "UCNE": false,
-      "db_source": ["BENGI", "ENCODE-HMM", "DECRES", "HACER", "JungEtAl2019", "SegWey", "EnsemblRegBuild", "FulcoEtAl2019", "FANTOM5", "FOCS", "VISTA", "RefSeqRegBuild", "EPD6", "GasperiniEtAl2019"],
+      "db_source": ["ENCODE-HMM", "HACER", "EnsemblRegBuild", "JungEtAl2019", "BENGI", "SegWey", "FOCS", "DECRES", "FulcoEtAl2019", "FANTOM5", "EPD6", "VISTA", "RefSeqRegBuild", "GasperiniEtAl2019"],
       "DNase": false,
       "ReMM_score": 0.9,
       "LinSight": 0.8,
       "NCBoost_score": 0.25,
       "Reg_constraint": 0,
-      "TFBS": false
+      "TFBS": true
     }
   },
   "SEGREGATION": {
@@ -89,7 +89,7 @@
   "ROH": {
     "bed_filter": false,
     "bed_limit": 250,
-    "sample_select": "G180905Q"
+    "sample_select": "G177312G"
   },
   "BED": []
 }

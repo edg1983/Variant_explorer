@@ -182,13 +182,16 @@ plotModule <- function(input, output, session, plot_data, plotType, missingValue
       p <- ggplot()
       filtered_df <- filtered_df[,c(x,y,color)]
       
-      if (RV$x_min != "" & RV$x_max != "" & RV$x_min != FALSE & RV$x_max != FALSE) {
-        filtered_df <- filtered_df[filtered_df[[x]] >= RV$x_min & filtered_df[[x]] <= RV$x_max,] 
-      }
-      
-      if (RV$y_min != "" & RV$y_max != "" & RV$y_min != FALSE & RV$y_max != FALSE) {
-        filtered_df <- filtered_df[filtered_df[[y]] >= RV$y_min & filtered_df[[y]] <= RV$y_max,] 
-      }
+      tryCatch({
+        if (RV$x_min != "" & RV$x_max != "" & RV$x_min != FALSE & RV$x_max != FALSE) {
+          filtered_df <- filtered_df[filtered_df[[x]] >= RV$x_min & filtered_df[[x]] <= RV$x_max,] 
+        }
+        
+        if (RV$y_min != "" & RV$y_max != "" & RV$y_min != FALSE & RV$y_max != FALSE) {
+          filtered_df <- filtered_df[filtered_df[[y]] >= RV$y_min & filtered_df[[y]] <= RV$y_max,] 
+        }
+      }, error=function(cond) {}
+      )
       
       #check if color variable has been required and how many levels are in color columns
       if (!is.null(color)) {

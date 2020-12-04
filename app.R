@@ -365,6 +365,7 @@ gene_anno[["GO_CC"]] <- readGMT(getResource("c5.cc.v7.0.symbols.gmt"))
 message("Load GTeX data")
 GTeX_file <- gzfile(getResource("GTEx_v8_median_TPM.gct.gz"))
 GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
+tissues_choices <- c("All", colnames(GTeX_data)[c(-1,-2)])
 
 ## Load PanelApp index table
 #PanelApp index table contains an id column with panel id number
@@ -627,7 +628,7 @@ ui <- dashboardPage(
                     fluidRow(column(3,actionButton("set_filters","Configure filters"), align="center"),
                              column(3,actionButton("apply_filters","Apply filters"), align="center"),
                              column(3,downloadObjUI("get_json_filters", label = "Save filters settings"),
-                                    hr(),
+                                    br(), br(),
                                     actionButton("latest_filter_button",label = "Load latest used filters"),
                                     align="center"),
                              column(3,
@@ -1363,35 +1364,47 @@ server <- function(input, output, session) {
       
       accepted_vars_list <- base::unique(c(accepted_vars_list, comphet_single_vars$VarID))
       
-      #Update Class column (PASS/FILTER)
-      RV$data$variants_df <- RV$data$variants_df %>% 
-        mutate(Class = ifelse(rec_id %in% accepted_vars_list, "PASS","FILTER"))
+      #If no variants pass after var filers + segregation trigger a warning and stop
+      if (length(accepted_vars_list) == 0) {
+        removeModal()
+        modalDialog(title="Filter warning!", "Variants and segregation filters resulted in no output")
+      } else {
+        #Update Class column (PASS/FILTER)
+        RV$data$variants_df <- RV$data$variants_df %>% 
+          mutate(Class = ifelse(rec_id %in% accepted_vars_list, "PASS","FILTER"))
+        
+        ## COMPHET
+        RV$filtered_vars_list <- RV$data$variants_df$rec_id[RV$data$variants_df$Class == "PASS"]
+        RV$data$comphet_df <- RV$data$comphet_df %>% 
+          mutate(Class = ifelse(
+            v1 %in% RV$filtered_vars_list & 
+            v2 %in% RV$filtered_vars_list &
+            rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet), "PASS", "FILTER"))
+        
+        ## GENES
+        RV$filtered_vars_list <- base::unique(c(
+          RV$filtered_vars_list, 
+          RV$data$comphet_df$rec_id[RV$data$comphet_df$Class == "PASS"])) 
       
-      ## COMPHET
-      RV$filtered_vars_list <- RV$data$variants_df$rec_id[RV$data$variants_df$Class == "PASS"]
-      RV$data$comphet_df <- RV$data$comphet_df %>% 
-        mutate(Class = ifelse(
-          v1 %in% RV$filtered_vars_list & 
-          v2 %in% RV$filtered_vars_list &
-          rec_id %in% intersect(RV$vars_pass_segregation,RV$vars_pass_filters$comphet), "PASS", "FILTER"))
-      
-      ## GENES
-      RV$filtered_vars_list <- base::unique(c(
-        RV$filtered_vars_list, 
-        RV$data$comphet_df$rec_id[RV$data$comphet_df$Class == "PASS"])) 
-    
-      RV$filtered_genes_list <- RV$data$genes_df %>% 
-        filter(variants %in% RV$filtered_vars_list, gene %in% RV$genes_pass_filters) %>%
-        pull(gene) %>% base::unique()
-      
-      RV$data$genes_scores <- RV$data$genes_scores %>% 
-        mutate(Class = ifelse(gene %in% RV$filtered_genes_list, "PASS", "FILTER"))
-      
-      RV$filtered_applied <- TRUE
-      write_json(RV$filters_json, path=paste0(user_dir, "/Last_filters.json"), pretty=T, auto_unbox=T)
-      
-      removeModal()
-      updateTabItems(session, "tabs", "filter_results_genes")
+        RV$filtered_genes_list <- RV$data$genes_df %>% 
+          filter(variants %in% RV$filtered_vars_list, gene %in% RV$genes_pass_filters) %>%
+          pull(gene) %>% base::unique()
+        
+        #If no genes pass after filers trigger a warning and stop
+        if (length(RV$filtered_genes_list) == 0) {
+          removeModal()
+          modalDialog(title="Filter warning!", "Genes filters resulted in no output for filtered variants")
+        } else {
+          RV$data$genes_scores <- RV$data$genes_scores %>% 
+            mutate(Class = ifelse(gene %in% RV$filtered_genes_list, "PASS", "FILTER"))
+          
+          RV$filtered_applied <- TRUE
+          write_json(RV$filters_json, path=paste0(user_dir, "/Last_filters.json"), pretty=T, auto_unbox=T)
+          
+          removeModal()
+          updateTabItems(session, "tabs", "filter_results_genes")
+        }
+      }
     }) 
     
     #Load latest filters if they are present
@@ -1749,6 +1762,15 @@ server <- function(input, output, session) {
           column(8, withSpinner(plotlyOutput("GADO_rank"))),
           column(4, withSpinner(plotlyOutput("GADO_distribution")))
         ),
+        hr(),
+        fluidRow(
+          column(8,selectInput("expressed_in", "Genes expressed in", choices = tissues_choices, selected="All", multiple=T,width = "100%")),
+          column(3,
+                 selectInput("exp_level", "Expression level", choices = c("min (2 TPM)"=2, "mid (5 TPM)"=5), selected="min (2 TPM)", multiple=F),
+                 actionButton("apply_exp_filter","Apply"),
+                 align = "center")
+        ),
+        br(),
         DT::dataTableOutput("genesTable"),
         h3("Custom list genes"),
         DT::dataTableOutput("customGenesTable"),
@@ -1790,8 +1812,31 @@ server <- function(input, output, session) {
           ggplotly( GADO_dist )
        })
       
+      observeEvent(input$apply_exp_filter, {
+        showModal(modalDialog("Apply tissue expression filter...", footer=NULL))
+        if (input$expressed_in == "" | is.null(input$expressed_in)) {
+          tissues <- "All"
+        } else {
+          tissues <- input$expressed_in
+        }
+        if ("All" %in% tissues) {
+          RV$exp_genes <- NULL
+        } else {
+          exp_data <- GTeX_data[, c("Description",tissues)]
+          exp_data$pass <- apply(exp_data[-1],1,function(x) sum(x >= input$exp_level, na.rm=T))
+          RV$exp_genes <- exp_data$Description[exp_data$pass > 0] 
+        }
+        removeModal()
+      })
+      
       candidate_genes_df <- reactive({
-          as.data.frame(RV$data$genes_scores %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% select(-Class))
+        if (is.null(RV$exp_genes)) {
+          RV$data$genes_scores %>% filter(Class == "PASS") %>% mutate(row_idx = row_number()) %>% select(-Class)
+        } else {
+          RV$data$genes_scores %>% 
+            filter(Class == "PASS", gene %in% RV$exp_genes) %>% 
+            mutate(row_idx = row_number()) %>% select(-Class)
+        }
       })
       
       output$genesTable <- DT::renderDataTable({
@@ -1892,17 +1937,24 @@ server <- function(input, output, session) {
       })
       
       variants_pass_df <- reactive ({
+        comphet_vars <- RV$data$comphet_df %>% filter(Class == "PASS") %>% 
+          gather(key="variant",value = "varID", v1:v2) %>% pull(varID)
         if (input$vars_results_genes == "ALL GENES") {
-          RV$data$variants_df %>% filter(Class == "PASS")
+          RV$data$variants_df %>% filter(Class == "PASS", rec_id %nin% comphet_vars)
         } else {
-          RV$data$variants_df %>% filter(Class == "PASS", gene %in% RV$custom_genes$gene)
+          RV$data$variants_df %>% filter(Class == "PASS", rec_id %nin% comphet_vars, gene %in% RV$custom_genes$gene)
         }
       })
       
       comphet_pass_df <- reactive ({
           comphet_details <- RV$data$comphet_df %>% filter(Class == "PASS") %>% gather(key="variant",value = "varID", v1:v2) %>% select(-variant, -gene) %>% distinct()
           comphet_details <- merge(comphet_details,RV$data$variants_df[RV$data$variants_df$Class == "PASS",], by.x="varID",by.y="rec_id")
-          as.data.frame(comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id))   
+          comphet_details <- comphet_details %>% select(-Class.x,-Class.y,) %>% arrange(rec_id)
+          if (input$vars_results_genes == "ALL GENES") {
+            comphet_details
+          } else {
+            comphet_details %>% filter(gene %in% RV$custom_genes$gene)
+          }
       })
       
       output$vars_results_table <- DT::renderDataTable({
@@ -2098,6 +2150,9 @@ server <- function(input, output, session) {
               collapsible = TRUE, collapsed = TRUE,
               uiOutput("reg_regions_details")
           ),
+          box(title = "GTeX median expression", id = "gtex_expression", status = "info", solidHeader = TRUE, width=12,
+              collapsible = TRUE, collapsed = TRUE,
+              plotOutput("gtex_plot") ),
           box(title = "PanelApp and ClinVar", id = "panelapp_clinvar_details", status = "info", solidHeader = TRUE, width = 12,
               collapsible = TRUE, collapsed = TRUE,
               h3("PanelApp panels"),
@@ -2111,10 +2166,7 @@ server <- function(input, output, session) {
               DT::dataTableOutput("hpo_detail_tab")),
           box(title = "Pathways and ontology", id = "path_go_details", status = "info", solidHeader = TRUE, width = 12,
               collapsible = TRUE, collapsed = TRUE,
-              div(DT::dataTableOutput("geneInfo"),style="font-size: 75%") ),
-          box(title = "GTeX median expression", id = "gtex_expression", status = "info", solidHeader = TRUE, width=12,
-              collapsible = TRUE, collapsed = TRUE,
-              plotOutput("gtex_plot") )
+              div(DT::dataTableOutput("geneInfo"),style="font-size: 75%") )
         )
       })
     
