@@ -1368,7 +1368,7 @@ server <- function(input, output, session) {
       #If no variants pass after var filers + segregation trigger a warning and stop
       if (length(accepted_vars_list) == 0) {
         removeModal()
-        modalDialog(title="Filter warning!", "Variants and segregation filters resulted in no output")
+        showModal(modalDialog(title="Filter warning!", "Variants and segregation filters resulted in no output"))
       } else {
         #Update Class column (PASS/FILTER)
         RV$data$variants_df <- RV$data$variants_df %>% 
@@ -1394,7 +1394,7 @@ server <- function(input, output, session) {
         #If no genes pass after filers trigger a warning and stop
         if (length(RV$filtered_genes_list) == 0) {
           removeModal()
-          modalDialog(title="Filter warning!", "Genes filters resulted in no output for filtered variants")
+          showModal(modalDialog(title="Filter warning!", "Genes filters resulted in no output for filtered variants"))
         } else {
           RV$data$genes_scores <- RV$data$genes_scores %>% 
             mutate(Class = ifelse(gene %in% RV$filtered_genes_list, "PASS", "FILTER"))
@@ -1640,7 +1640,7 @@ server <- function(input, output, session) {
     
   ## Filter Explorer tab ----------------------------------
   output$filters_explorer_tab <- renderUI({
-    shiny::validate(need(RV$filtered_applied, "No filters applied, please set filters first"))
+    shiny::validate(need(RV$filtered_applied, "No filters applied or filters resulted in no candidate genes"))
     tagList(
     h3("Summary of filters effect"),
     withSpinner(plotOutput("filters_funnel", width="100%")),

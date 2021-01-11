@@ -5,12 +5,12 @@
     "global": {
       "cohort_het": 297,
       "cohort_af": 0.1,
-      "var_type": ["SNV", "INDEL", "DUP", "DEL:ME", "DEL", "INV"],
+      "var_type": ["DUP", "DEL", "DEL:ME", "INV"],
       "cohort_hom": 299,
       "max_pop_af": 0.01,
       "LOGIC": "AND",
       "PRESETS": "balanced",
-      "consequence": ["exonic_sv", "3_prime_UTR_variant", "5_prime_UTR_variant", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "stop_lost", "start_lost", "missense_variant", "synonymous_variant", "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"]
+      "consequence": ["exonic_sv", "3_prime_UTR_variant", "5_prime_UTR_variant", "frameshift_variant", "splice_acceptor_variant", "splice_donor_variant", "splice_region_variant", "stop_gained", "start_lost", "missense_variant", "synonymous_variant", "enhancer_variant", "promoter_variant", "silencer_variant", "bivalent_variant", "insulator_variant"]
     },
     "small_variants": {
       "CADD_PhredScore": 5,
@@ -47,27 +47,27 @@
       "PRESETS": "FDR 50%",
       "reg_type": ["reg_db", "closest_gene"],
       "UCNE": false,
-      "db_source": ["ENCODE-HMM", "HACER", "EnsemblRegBuild", "JungEtAl2019", "BENGI", "SegWey", "FOCS", "DECRES", "FulcoEtAl2019", "FANTOM5", "EPD6", "VISTA", "RefSeqRegBuild", "GasperiniEtAl2019"],
+      "db_source": ["HACER", "BENGI", "EnsemblRegBuild", "ENCODE-HMM", "JungEtAl2019", "SegWey", "DECRES", "FulcoEtAl2019", "FOCS", "FANTOM5", "EPD6", "RefSeqRegBuild", "VISTA", "GasperiniEtAl2019"],
       "DNase": false,
       "ReMM_score": 0.9,
       "LinSight": 0.8,
       "NCBoost_score": 0.25,
       "Reg_constraint": 0,
-      "TFBS": true
+      "TFBS": false
     }
   },
   "SEGREGATION": {
-    "hom_affected": "1",
+    "hom_affected": "0",
     "hom_unaffected": "0",
     "hom_affected_op": "==",
-    "het_affected": "0",
+    "het_affected": "1",
     "dnm_affected_op": ">=",
     "hom_unaffected_op": "==",
     "het_affected_op": "==",
-    "segregation_preset": "perfect_recessive",
-    "het_unaffected": "2",
+    "segregation_preset": "dnm_permissive",
+    "het_unaffected": "0",
     "het_unaffected_op": "==",
-    "comphet_affected": "1",
+    "comphet_affected": "0",
     "dnm_affected": "0",
     "comphet_affected_op": "=="
   },
@@ -89,7 +89,7 @@
   "ROH": {
     "bed_filter": false,
     "bed_limit": 250,
-    "sample_select": "G177312G"
+    "sample_select": "G169129A"
   },
   "BED": []
 }
