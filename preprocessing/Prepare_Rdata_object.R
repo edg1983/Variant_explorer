@@ -337,6 +337,7 @@ processing_results <- foreach (n = 1:total,
   
   #GADO data ----------
   gado_score <- loadData(newlist$gado_file)
+  newlist$HPOs <- colnames(gado_score)[grep("HP"), colnames(gado_score)]
   newlist$gado90 <- quantile(gado_score$Zscore, .9)[[1]]
   
   #COMPHET data -------

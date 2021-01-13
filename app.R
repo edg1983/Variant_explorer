@@ -8,7 +8,7 @@
 # R objects are prepared from var2reg and other outputs using scripts in preprocessing folder
 
 ## CONSTANTS --------------------
-APP_VERSION <- "1.2.4"
+APP_VERSION <- "1.2.5"
 vis_cols <- c("gene","chr","start","end","ref","alt","var_type","consequence","known_ids","max_pop_af","cohort_af")
 
 ## FUNCTIONS --------------------------
@@ -189,6 +189,14 @@ makeIGVxml <- function(region, affected_samples, unaffected_samples, VCF_files, 
   return(xml_text)
 }
 
+#Create a warning dialog if no ids pass the filters
+filtersWarning <- function(filtered_ids, filter_group) {
+  if (length(filtered_ids) == 0) {
+    removeModal()
+    showModal(modalDialog(title="Filter warning!", paste0(filter_group, " filters resulted in no output")))
+  }
+}
+
 ## CHECK AND LOAD PACKAGES ----------------
 # Install missing packages
 # pkgs "doParallel", "foreach" needed for cohort mode, now disabled
@@ -227,6 +235,7 @@ source("modules/intersectBedModule.R")
 source("modules/GQModule.R")
 source("modules/filtersModule.R")
 source("modules/SQliteModule.R")
+source("modules/genotypesModule.R")
 
 ## ENVIRONMENT CONFIG ----------------------------
 ## Read config files
@@ -366,7 +375,7 @@ gene_anno[["GO_CC"]] <- readGMT(getResource("c5.cc.v7.0.symbols.gmt"))
 message("Load GTeX data")
 GTeX_file <- gzfile(getResource("GTEx_v8_median_TPM.gct.gz"))
 GTeX_data <- read.table(GTeX_file,sep="\t",header=T, stringsAsFactors = F)
-tissues_choices <- c("All", colnames(GTeX_data)[c(-1,-2)])
+tissues_choices <- c("Any", colnames(GTeX_data)[c(-1,-2)])
 
 ## Load PanelApp index table
 #PanelApp index table contains an id column with panel id number
@@ -395,7 +404,7 @@ message(n, " panels loaded")
 ## Load additional genes list
 message("Load gene lists")
 #Expect a GeneLists_index.tsv file in the genelist folder
-#This file must contain an id column and this ids mus match lists file name
+#This file must contain an id column and this ids must match lists file name
 #Example: list1.tsv, id=list1
 geneLists_file <- getResource("GeneLists_index.tsv")
 geneLists_data <- read.table(geneLists_file, sep="\t", header = T, stringsAsFactors = F)
@@ -653,6 +662,18 @@ ui <- dashboardPage(
             tabItem(tabName = "segregation_filters_tab", 
                     fluidRow(column(12, align="center",actionButton("next_segregation_filters", "Save and next"))),
                     hr(),
+                    fluidRow(column(12, align="center",
+                      selectInput("seg_geno_filters", label = "Apply filters:",
+                                  choices=c("Segregation only"=1,
+                                            "Genotype only"=2,
+                                            "Segregation OR genotype"=3,
+                                            "Segregation AND genotype"=4),
+                                  selected="Segregation only",
+                                  multiple=F)
+                    )),
+                    box(title = "Genotype quality filters", id = "GQ_box", status = "primary", solidHeader = TRUE,
+                        collapsible = FALSE, width=12,
+                      uiOutput("GQfilter_controls")),
                     box(title = "Segregation filters", id = "segregation_box", status = "primary", solidHeader = TRUE,
                         collapsible = TRUE, width=12,
                         fluidRow(
@@ -661,7 +682,10 @@ ui <- dashboardPage(
                         uiOutput("segregation_controls"),
                         "Number of affected / unaffected carrying the variant with the given genotype",
                         "Homozygous and heterozygous conditions evaluated as AND, comphet as OR",
-                        uiOutput("GQfilter_controls")
+                    ),
+                    box(title = "Genotype filters", id = "genotype_box", status = "primary", solidHeader = TRUE,
+                        collapsible = TRUE, width=12,
+                        uiOutput("genotype_controls")
                     ) 
             ),
             tabItem(tabName = "genes_filters_tab",
@@ -815,9 +839,9 @@ server <- function(input, output, session) {
       RV$filtered_applied <- FALSE
       
       showModal(
-        modalDialog(paste0("loading ", input$CaseCode, "...\nPlease wait"), footer = NULL)
+        modalDialog(paste0("loading ", input$CaseCode, "...Please wait"), footer = NULL)
       )
-      #message("loading ", paste0(data_dir,"/",input$CaseCode,".RData[.enc]"))
+
       #Load data from plain or encrypted object
       if (file_test("-f", paste0(data_dir,"/",input$CaseCode,".RData.enc"))) {
           RV$data <- decrypt_datafile(paste0(data_dir,"/",input$CaseCode,".RData.enc"), pwd = input$pwd)
@@ -887,6 +911,9 @@ server <- function(input, output, session) {
           RV$GQ_cols_all <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$all_samples, sep="_"))
           RV$GQ_cols_affected <- which(colnames(RV$data$variants_df) %in% paste("GQ", RV$data$affected_samples, sep="_"))
           RV$maxGQ <- max(RV$data$variants_df[,RV$GQ_cols_all], na.rm = T)
+          
+          RV$GT_cols_affected <- colnames(RV$data$variants_df)[colnames(RV$data$variants_df) %in% paste("GT", RV$data$affected_samples, sep="_")]
+          RV$GT_cols_unaffected <- colnames(RV$data$variants_df)[colnames(RV$data$variants_df) %in% paste("GT", RV$data$unaffected_samples, sep="_")]
           
       } else {
           RV$notifications[["decrypt"]] <- notificationItem(
@@ -1012,7 +1039,11 @@ server <- function(input, output, session) {
   output$case_HPO_terms <- renderTable(align = "c", rownames = F, striped = T, {
     shiny::validate(need(inherits(RV$data, "list"), "Please load a case"),
                     need(cohort_HPO, "No phenotype data present"))
-    HPO_ids <- base::unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
+    if (length(RV$data$HPOs) > 0) {
+      HPO_ids <- RV$data$HPOs
+    } else {
+      HPO_ids <- base::unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
+    }
     HPO_table <- HPO_obo[HPO_obo$HPO_id %in% HPO_ids,]  
   })
   
@@ -1259,7 +1290,11 @@ server <- function(input, output, session) {
   
   observeEvent(input$hpo_profile_set, {
     req(inherits(RV$data, "list"), cohort_HPO)
-    HPO_ids <- base::unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
+    if (length(RV$data$HPOs) > 0) {
+      HPO_ids <- RV$data$HPOs
+    } else {
+      HPO_ids <- base::unique(cohort_HPO$HPO[cohort_HPO$CaseID == RV$data$pedigree])
+    }
     updateTextAreaInput(session, "hpo_profile_txt", value = paste(HPO_ids, collapse="\n"))  
   })
   
@@ -1307,14 +1342,36 @@ server <- function(input, output, session) {
       #VARIANTS FILTER
       RV$vars_pass_filters <- callModule(getPASSVars_filters, "variants_filters", filters_settings$VARIANTS, RV$data$variants_df, RV$data$comphet_df)
       message("PASS VARS FILTERS ", length(RV$vars_pass_filters$vars))
+      filtersWarning(RV$vars_pass_filters$vars, "Variants")
       
       #GENE SCORES FILTER
       RV$genes_pass_filters <- callModule(getPASSGenes_filters, "genes_filters", filters_settings$GENES, RV$data$genes_scores)
       message("PASS GENES FILTERS ", length(RV$genes_pass_filters))
+      filtersWarning(RV$genes_pass_filters, "Genes")
       
       #SEGREGATION FILTER
-      RV$vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
+      switch(input$seg_geno_filters,
+             "1" = {
+               vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
+               RV$vars_pass_segregation <- vars_pass_segregation
+               },
+             "2" = {
+               vars_pass_genotype <- callModule(genotypeModule, "genotype", vars_df = RV$data$variants_df)
+               RV$vars_pass_segregation <- vars_pass_genotype
+               },
+             "3" = {
+               vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
+               vars_pass_genotype <- callModule(genotypeModule, "genotype", vars_df = RV$data$variants_df)
+               RV$vars_pass_segregation <- unique(c(vars_pass_genotype,vars_pass_segregation))
+               },
+             "4" = {
+               vars_pass_segregation <- callModule(segregationModule, "segregation", segregation_df = RV$data$segregation_df, cols_names = segregation_cols)
+               vars_pass_genotype <- callModule(genotypeModule, "genotype", vars_df = RV$data$variants_df)
+               RV$vars_pass_segregation <- unique(intersect(vars_pass_genotype,vars_pass_segregation))
+               }
+             )
       message("PASS SEGREGATION ", length(RV$vars_pass_segregation))
+      filtersWarning(RV$vars_pass_segregation, "Segregation and genotype")
       
       #ROH FILTER
       #call the bed regions module and get rec_id for variants in the ROH regions
@@ -1325,6 +1382,7 @@ server <- function(input, output, session) {
         RV$vars_pass_ROH <- RV$data$variants_df$rec_id
       }
       message("PASS ROH ", length(RV$vars_pass_ROH))
+      filtersWarning(RV$vars_pass_ROH, "ROH")
       
       #BED REGIONS FILTER
       #call the bed regions module and get rec_id for variants in the custom BED regions
@@ -1334,6 +1392,7 @@ server <- function(input, output, session) {
         RV$vars_pass_BED <- RV$data$variants_df$rec_id
       }
       message("PASS BED ", length(RV$vars_pass_BED))
+      filtersWarning(RV$vars_pass_BED, "Custom BED")
       
       #Get rec_id for variants passing the GQ filter
       RV$vars_pass_GQ <- callModule(GQfilterModule, "GQ_filter", 
@@ -1342,6 +1401,7 @@ server <- function(input, output, session) {
                                  affected_cols = RV$GQ_cols_affected,
                                  exclude_var_type = sv_vars)
       message("PASS GQ ", length(RV$vars_pass_GQ))
+      filtersWarning(RV$vars_pass_GQ, "GQ")
       
       req(RV$vars_pass_GQ, RV$vars_pass_BED, RV$vars_pass_ROH, RV$vars_pass_segregation, RV$vars_pass_filters)
       RV$effective_filters <- rbind(RV$vars_filters_df, RV$segregation_filters_df, RV$genes_filters_df, RV$regions_filters_df) #TABLES OF FILTERS
@@ -1368,7 +1428,7 @@ server <- function(input, output, session) {
       #If no variants pass after var filers + segregation trigger a warning and stop
       if (length(accepted_vars_list) == 0) {
         removeModal()
-        showModal(modalDialog(title="Filter warning!", "Variants and segregation filters resulted in no output"))
+        showModal(modalDialog(title="Filter warning!", "Combinign variants and segregation filters resulted in no output"))
       } else {
         #Update Class column (PASS/FILTER)
         RV$data$variants_df <- RV$data$variants_df %>% 
@@ -1394,7 +1454,7 @@ server <- function(input, output, session) {
         #If no genes pass after filers trigger a warning and stop
         if (length(RV$filtered_genes_list) == 0) {
           removeModal()
-          showModal(modalDialog(title="Filter warning!", "Genes filters resulted in no output for filtered variants"))
+          showModal(modalDialog(title="Filter warning!", "Genes filters resulted in no output when applied to filtered variants"))
         } else {
           RV$data$genes_scores <- RV$data$genes_scores %>% 
             mutate(Class = ifelse(gene %in% RV$filtered_genes_list, "PASS", "FILTER"))
@@ -1422,12 +1482,15 @@ server <- function(input, output, session) {
           callModule(loadSettings_filters, "genes_filters", filters_settings$GENES, filters_json$GENES)
           callModule(loadSettings_regions, "ROH_filter", filters_json$ROH)
           callModule(loadSettings_regions, "bed_filter", filters_json$BED)
+          callModule(loadSettings_genotype, "genotype", filters_json$GENOTYPE)
+          updateSelectInput(session, inputId = "seg_geno_filters",selected = filters_json$SEG_GENO_OPTION)
   
           #update filter settings summary data frames
           RV$vars_filters_df <- callModule(getDF_filters, "variants_filters", filters_settings$VARIANTS)
           df1 <- callModule(getDF_segregation, "segregation")
           df2 <- callModule(getDF_GQ, "GQ_filter")
-          RV$segregation_filters_df <- rbind(df1, df2)
+          df3 <- callModule(getDF_genotype, "genotype")
+          RV$segregation_filters_df <- rbind(df1, df2, df3)
           RV$genes_filters_df <- callModule(getDF_filters, "genes_filters", filters_settings$GENES)
           df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
           df2 <- callModule(getDF_regions, "ROH_filter", "ROH")
@@ -1477,12 +1540,15 @@ server <- function(input, output, session) {
       genes_json <- callModule(getJSON_filters, "genes_filters", filters_settings$GENES)
       ROH_json <- callModule(getJSON_regions, "ROH_filter")
       BED_json <- callModule(getJSON_regions, "bed_filter")
+      genotype_json <- callModule(getJSON_genotype, "genotype")
       
       RV$filters_json <- list(
         APP_VERSION = APP_VERSION,
         DATA_VERSION = RV$data$releaseID,
         VARIANTS = variants_json,
         SEGREGATION = segregation_json,
+        GENOTYPE = genotype_json,
+        SEG_GENO_OPTION = input$seg_geno_filters,
         GQ = GQ_json,
         GENES = genes_json,
         ROH = ROH_json,
@@ -1503,6 +1569,8 @@ server <- function(input, output, session) {
         callModule(loadSettings_filters, "genes_filters", filters_settings$GENES, filters_json$GENES)
         callModule(loadSettings_regions, "ROH_filter", filters_json$ROH)
         callModule(loadSettings_regions, "bed_filter", filters_json$BED)
+        callModule(loadSettings_genotype, "genotype", filters_json$GENOTYPE)
+        updateSelectInput(session, inputId = "seg_geno_filters",selected = filters_json$SEG_GENO_OPTION)
         
         #force module controls update
         #callModule(observeFilters, "variants_filters", 
@@ -1514,7 +1582,8 @@ server <- function(input, output, session) {
         RV$vars_filters_df <- callModule(getDF_filters, "variants_filters", filters_settings$VARIANTS)
         df1 <- callModule(getDF_segregation, "segregation")
         df2 <- callModule(getDF_GQ, "GQ_filter")
-        RV$segregation_filters_df <- rbind(df1, df2)
+        df3 <- callModule(getDF_genotype, "genotype")
+        RV$segregation_filters_df <- rbind(df1, df2, df3)
         RV$genes_filters_df <- callModule(getDF_filters, "genes_filters", filters_settings$GENES)
         df1 <- callModule(getDF_regions, "bed_filter", "custom BED")
         df2 <- callModule(getDF_regions, "ROH_filter", "ROH")
@@ -1577,11 +1646,12 @@ server <- function(input, output, session) {
       #             na_values = app_settings$fill_na$fill_na_vars)
       #})
 
-    ## Segregation filters tab -----------------------------------
+    ## Segregation/genotype filters tab -----------------------------------
     observeEvent(input$next_segregation_filters, {
       df1 <- callModule(getDF_segregation, "segregation")
       df2 <- callModule(getDF_GQ, "GQ_filter")
-      RV$segregation_filters_df <- rbind(df1, df2)
+      df3 <- callModule(getDF_genotype, "genotype")
+      RV$segregation_filters_df <- rbind(df1, df2, df3)
       updateTabItems(session, "tabs", "genes_filters_tab")
     })
     
@@ -1592,6 +1662,11 @@ server <- function(input, output, session) {
     
     output$GQfilter_controls <- renderUI({
       GQfilterUI("GQ_filter",maxGQ = RV$maxGQ, defaultGQ=10)    
+    })
+    
+    output$genotype_controls <- renderUI({
+      shiny::validate(need(inherits(RV$data, "list"), "No data loaded" ))
+      genotypeUI("genotype", GT_cols_affected = RV$GT_cols_affected, GT_cols_unaffected = RV$GT_cols_unaffected)
     })
     
     ## Genes filters tab -----------------------
@@ -1765,12 +1840,14 @@ server <- function(input, output, session) {
         ),
         hr(),
         fluidRow(
-          column(8,selectInput("expressed_in", "Genes expressed in", choices = tissues_choices, selected="All", multiple=T,width = "100%")),
-          column(3,
-                 selectInput("exp_level", "Expression level", choices = c("min (2 TPM)"=2, "mid (5 TPM)"=5), selected="min (2 TPM)", multiple=F),
-                 actionButton("apply_exp_filter","Apply"),
-                 align = "center")
-        ),
+          column(6,selectInput("expressed_in", "Genes expressed in", choices = tissues_choices, selected="Any", multiple=T,width = "100%")),
+          column(3, align = "center",
+                 selectInput("exp_level", "Expression level", choices = c("min (2 TPM)"=2, "mid (5 TPM)"=5), selected="min (2 TPM)", multiple=F)
+          ),
+          column(1, align = "center",
+                 actionButton("apply_exp_filter","Apply", style="position:fixed; display: flex; align-items: center; justify-content: center"),
+                 )
+          ),
         br(),
         DT::dataTableOutput("genesTable"),
         h3("Custom list genes"),
@@ -1816,11 +1893,11 @@ server <- function(input, output, session) {
       observeEvent(input$apply_exp_filter, {
         showModal(modalDialog("Apply tissue expression filter...", footer=NULL))
         if (input$expressed_in == "" | is.null(input$expressed_in)) {
-          tissues <- "All"
+          tissues <- "Any"
         } else {
           tissues <- input$expressed_in
         }
-        if ("All" %in% tissues) {
+        if ("Any" %in% tissues) {
           RV$exp_genes <- NULL
         } else {
           exp_data <- GTeX_data[, c("Description",tissues)]
@@ -2425,7 +2502,7 @@ server <- function(input, output, session) {
         selected_var <- list(status=2, var_pos=0, reg_ids=0)
       }
   
-      message("status:", selected_var$status, "; var_pos:", selected_var$var_pos, "; reg_ids:", selected_var$reg_ids)
+      #message("status:", selected_var$status, "; var_pos:", selected_var$var_pos, "; reg_ids:", selected_var$reg_ids)
       return(selected_var)
     })
     
@@ -2515,14 +2592,6 @@ server <- function(input, output, session) {
         
         ggplotly(cov_plot, tooltip = c("color","y"), dynamicTicks = T)
     })
-    
-    outputOptions(output, "vars_filters_UI", suspendWhenHidden = FALSE)
-    outputOptions(output, "segregation_controls", suspendWhenHidden = FALSE)
-    outputOptions(output, "GQfilter_controls", suspendWhenHidden = FALSE)
-    outputOptions(output, "genes_filters_UI", suspendWhenHidden = FALSE)
-    outputOptions(output, "custom_bed_check", suspendWhenHidden = FALSE)
-    outputOptions(output, "ROH_filters_UI", suspendWhenHidden = FALSE)    
-    
   ## Known variants tab --------------------------
     output$known_clinvar_tab <- DT::renderDataTable({
       ok_cols <- c(vis_cols,
@@ -2866,6 +2935,14 @@ server <- function(input, output, session) {
       }
     })
 
+  ## Ensure filter sections are initialized --------------
+    outputOptions(output, "vars_filters_UI", suspendWhenHidden = FALSE)
+    outputOptions(output, "segregation_controls", suspendWhenHidden = FALSE)
+    outputOptions(output, "GQfilter_controls", suspendWhenHidden = FALSE)
+    outputOptions(output, "genes_filters_UI", suspendWhenHidden = FALSE)
+    outputOptions(output, "custom_bed_check", suspendWhenHidden = FALSE)
+    outputOptions(output, "ROH_filters_UI", suspendWhenHidden = FALSE)
+    outputOptions(output, "genotype_controls", suspendWhenHidden = FALSE)
   ## CLOSING OPERATIONS ---------------- 
     onStop(function() {
       df <- isolate(RV$saved_vars)

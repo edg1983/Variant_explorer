@@ -33,7 +33,7 @@ segregationUI <- function(id, choices_affected, choices_unaffected) {
     perfect_dominant = c(max(choices_affected),0,0,0,0,0),
     dnm_permissive = c(max(choices_affected),0,0,0,0,0),
     dnm_highconf = c(max(choices_affected),0,0,0,0,max(choices_affected)),
-    free = c(0,0,0,0,0)
+    free = c(0,0,0,0,0,0)
   )
   
   segregation_presets <- tagList(
