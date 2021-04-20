@@ -488,14 +488,16 @@ processing_results <- foreach (n = 1:total,
     #Prepare ROH intersection for affected samples
     if (newlist$n_affected > 1) {
       affected_withROH <- intersect(newlist$affected_samples, names(newlist$ROH_ranges))
-      intersect_ROH <- newlist$ROH_ranges[[affected_withROH[1]]]
-      if (!is.null(affected_withROH)) {
-        for (sID in affected_withROH[-1]) {
-          intersect_ROH <- GenomicRanges::intersect(intersect_ROH, newlist$ROH_ranges[[sID]])
+      if (length(affected_withROH > 1)) {
+        intersect_ROH <- newlist$ROH_ranges[[affected_withROH[1]]]
+        if (!is.null(affected_withROH)) {
+          for (sID in affected_withROH[-1]) {
+            intersect_ROH <- GenomicRanges::intersect(intersect_ROH, newlist$ROH_ranges[[sID]])
+          }
+          newlist$ROH_ranges$AFFECTED_SHARED <- intersect_ROH
+          newlist$ROH_ranges$AFFECTED_SHARED$value <- width(newlist$ROH_ranges$AFFECTED_SHARED)
+          newlist$ROH_ranges$AFFECTED_SHARED$ID <- paste0("ROH_", 1:length(newlist$ROH_ranges$AFFECTED_SHARED))
         }
-        newlist$ROH_ranges$AFFECTED_SHARED <- intersect_ROH
-        newlist$ROH_ranges$AFFECTED_SHARED$value <- width(newlist$ROH_ranges$AFFECTED_SHARED)
-        newlist$ROH_ranges$AFFECTED_SHARED$ID <- paste0("ROH_", 1:length(newlist$ROH_ranges$AFFECTED_SHARED))
       }
     }
   }
