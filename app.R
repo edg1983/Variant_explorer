@@ -8,7 +8,7 @@
 # R objects are prepared from var2reg and other outputs using scripts in preprocessing folder
 
 ## CONSTANTS --------------------
-APP_VERSION <- "1.2.5"
+APP_VERSION <- "1.2.6"
 vis_cols <- c("gene","chr","start","end","ref","alt","var_type","consequence","known_ids","max_pop_af","cohort_af")
 
 ## FUNCTIONS --------------------------
@@ -239,8 +239,28 @@ source("modules/genotypesModule.R")
 
 ## ENVIRONMENT CONFIG ----------------------------
 ## Read config files
-app_settings <- read_json("App_configuration.json")
-filters_settings <- read_json("Filters_settings.json")
+app_settings_json <- NULL
+filter_settings_json <- NULL
+while (is.null(app_settings_json)) {
+  rstudioapi::showDialog("Prepare enviornment", "Please select your app configuration file in the next step")
+  app_settings_json <- rstudioapi::selectFile(caption = "Select app configuration",
+                                              label = "Open",
+                                              path = dirname(rstudioapi::getSourceEditorContext()$path),
+                                              filter = "JSON files (*.json)",
+                                              existing = TRUE)
+}
+
+while (is.null(filter_settings_json)) {
+  rstudioapi::showDialog("Prepare enviornment", "Please select your filter settings file in the next step")
+  filter_settings_json <- rstudioapi::selectFile(caption = "Select filter settings",
+                                              label = "Open",
+                                              path = dirname(rstudioapi::getSourceEditorContext()$path),
+                                              filter = "JSON files (*.json)",
+                                              existing = TRUE)
+}
+
+app_settings <- read_json(app_settings_json)
+filters_settings <- read_json(filter_settings_json)
 
 #Set data dirs from config
 data_dir <- app_settings$data_dir

@@ -1,0 +1,93 @@
+{
+  "data_dir": "encrypted_data",
+  "resource_dir": "Resources",
+  "user_dir": "user_data",
+  "PanelApp_dir": "@resource_dir/PanelApp",
+  "GeneLists_dir": "@resource_dir/geneLists",
+  "HPO_dir": "@resource_dir/HPO",
+  "coverage_dir": "@resource_dir/coverage",
+  "GREENDB": "@resource_dir/RegulatoryRegions.db",
+  "compute_cohort_GADO": false,
+  "var_groups": {
+    "consequence_groups": {
+      "reg_vars": ["enhancer_variant","promoter_variant","bivalent_variant","silencer_variant","insulator_variant"],
+      "lof_vars": ["frameshift", "exonic_sv","stop lost","stop gain","start loss","splice_acceptor_variant","splice_donor_variant"],
+      "exonic_vars": ["frameshift", "exonic_sv","stop lost","stop gain","start loss","splice_acceptor_variant","splice_donor_variant","missense_variant","synonymous_variant","3_prime_UTR_variant","5_prime_UTR_variant"]
+    },
+    "var_type_groups": {
+      "sv_vars": ["DEL","DUP","INV","DEL:ME"],
+      "small_vars": ["SNV","INDEL"]
+    }
+  },
+  "segregation_cols": {
+    "het_affected": "het_aff", 
+    "het_unaffected": "het_unaff", 
+    "hom_affected": "hom_aff", 
+    "hom_unaffected": "hom_unaff", 
+    "comphet_affected": "comphet_aff",
+    "dnm_affected": "sup_dnm"
+  },
+  "plot_axes": {
+    "genes_axes_options": {
+      "GADO Zscore": "gado_zscore", 
+      "Exomiser Pheno score": "exomiser_gene_pheno_score",
+      "gnomAD pLI": "pLI_gnomad",
+      "GDI phred": "GDI_phred",
+      "RVIS intolerance": "RVIS",
+      "EDS reg space score": "EDS"
+    },
+    "variants_axes_options": {
+      "Maximum population AF": "max_pop_af",
+      "d score": "d_score",
+      "CADD phred": "CADD_PhredScore", 
+      "DANN score": "DANN_score",
+      "ReMM score": "ReMM_score",
+      "SpliceAI score": "SpliceAI_SNP_SpliceAI_max",
+      "dbscSNV splice score": "dbscSNV_ada",
+      "phyloP100 conservation": "PhyloP100",
+      "REVEL score": "REVEL_score",
+      "MCAP score": "MCAP_score",
+      "LinSight score": "LinSight"
+    },
+    "variants_bar_options": {
+      "Region type": "reg_type",
+      "Variant consequence": "consequence",
+      "Variant type": "var_type",
+      "PanelApp": "PanelApp",
+      "Chromosome": "chr"
+    }
+  },
+  "fill_na": {
+    "fill_na_vars" : {
+      "d_score": 99,
+      "max_pop_af": 0,
+      "cohort_af": 0,
+      "FATHMM_MKLNC_score": 99,
+      "DANN_score": 99,
+      "CADD_PhredScore": 99,
+      "LoF_tolerance": -99,
+      "FIRE_score": 99,
+      "LinSight": 99,
+      "ReMM_score": 99,
+      "dbscSNV_ada": 99,
+      "dbscSNV_rf": 99,
+      "PhyloP100": -99,
+      "REVEL_score": 99,
+      "ExPECTO_MAX_VALUE": 99,
+      "NCBoost_score": 99,
+      "dbNSFP_PP2_HDIV": 99,
+      "dbNSFP_PP2_HVAR": 99,
+      "SpliceAI_SNP_SpliceAI_max": 99,
+      "SpliceAI_INDEL_SpliceAI_max": 99,
+      "MCAP_score": 99,
+      "Reg_constraint": 99
+    },
+    "fill_na_genes" : {
+      "gado_perc": 99, 
+      "GDI_phred": -99,
+      "RVIS": -99,
+      "pLI_gnomad": 99,
+      "EDS": 99
+    }
+  }
+}
