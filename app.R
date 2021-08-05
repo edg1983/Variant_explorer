@@ -8,7 +8,7 @@
 # R objects are prepared from var2reg and other outputs using scripts in preprocessing folder
 
 ## CONSTANTS --------------------
-APP_VERSION <- "1.2.6"
+APP_VERSION <- "1.2.7"
 vis_cols <- c("gene","chr","start","end","ref","alt","var_type","consequence","known_ids","max_pop_af","cohort_af")
 
 ## FUNCTIONS --------------------------
@@ -259,7 +259,10 @@ while (is.null(filter_settings_json)) {
                                               existing = TRUE)
 }
 
+message("Loading app settings")
 app_settings <- read_json(app_settings_json)
+
+message("Loading filter settings")
 filters_settings <- read_json(filter_settings_json)
 
 #Set data dirs from config
@@ -1445,10 +1448,10 @@ server <- function(input, output, session) {
       
       accepted_vars_list <- base::unique(c(accepted_vars_list, comphet_single_vars$VarID))
       
-      #If no variants pass after var filers + segregation trigger a warning and stop
+      #If no variants pass after var filters + segregation trigger a warning and stop
       if (length(accepted_vars_list) == 0) {
         removeModal()
-        showModal(modalDialog(title="Filter warning!", "Combinign variants and segregation filters resulted in no output"))
+        showModal(modalDialog(title="Filter warning!", "Combining variants and segregation filters resulted in no output"))
       } else {
         #Update Class column (PASS/FILTER)
         RV$data$variants_df <- RV$data$variants_df %>% 
@@ -1471,7 +1474,7 @@ server <- function(input, output, session) {
           filter(variants %in% RV$filtered_vars_list, gene %in% RV$genes_pass_filters) %>%
           pull(gene) %>% base::unique()
         
-        #If no genes pass after filers trigger a warning and stop
+        #If no genes pass after filters trigger a warning and stop
         if (length(RV$filtered_genes_list) == 0) {
           removeModal()
           showModal(modalDialog(title="Filter warning!", "Genes filters resulted in no output when applied to filtered variants"))

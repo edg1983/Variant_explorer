@@ -56,7 +56,10 @@ groupDescription <- function(group_name, definition) {
   } else if (group_name == "comphet") {
     out_text <- "At least one of the comphet variants must pass these filters"
   } else {
-    out_text <- paste0("Applied when ", definition[1], " included in: ", paste(definition[2][[1]], collapse=","))
+    out_text <- "Applied when"
+    for (d in definition) {
+      out_text <- paste0(out_text, "\n", d[1], " included in: ", paste(d[2][[1]], collapse=","))
+    }
   }
   return(out_text)
 }
@@ -360,9 +363,9 @@ getFilterExpression <- function(input, output, session, group_name, group_defini
   ns <- session$ns
   
   #Build a group_def variable with the group definition
-  group_def <- list()
-  group_def$field <- group_definition[[1]]
-  group_def$values <- group_definition[[2]]
+  #group_def <- list()
+  #group_def$field <- group_definition[[1]]
+  #group_def$values <- group_definition[[2]]
   
   #make a named list associated to the group: NAME=var_id, VALUE=value from control
   filters_values <- list() 
@@ -388,7 +391,16 @@ getFilterExpression <- function(input, output, session, group_name, group_defini
     filter_expr <- expr(!(!!group_expr))
   } else {
     #for group filters a group_expr and a filter_expr are combined to evaluate vars only in the selected group
-    groupid_expr <- expr(!!as.name(group_def$field) %in% !!group_def$values)
+    groupid_expr <- NULL
+    for (gd in group_definition) {
+      if (is.null(groupid_expr)) {
+        groupid_expr <- expr(!!as.name(gd[[1]]) %in% !!gd[[2]])
+      } else {
+        groupid_expr <- expr(!!groupid_expr & !!as.name(gd[[1]]) %in% !!gd[[2]])
+      }
+    }
+    
+    #groupid_expr <- expr(!!as.name(group_def$field) %in% !!group_def$values)
     groupfilters_expr <- makeGroupExpression(logic = input$LOGIC,
                                              filters_operations = vars_operation,
                                              filters_values = filters_values,

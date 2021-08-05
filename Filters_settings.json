@@ -112,25 +112,29 @@
              "associated_values": ["var_type", "consequence", "cohort_af", "max_pop_af", "cohort_hom", "cohort_het"]
         },
         "small_variants": {
-            "definition": ["var_type", ["SNV","INDEL"]],
+            "definition": [["var_type", ["SNV","INDEL"]]],
             "associated_values": ["d_score", "LowMappability", "LowComplexity", "SegDup", "CADD_PhredScore"]
         },
         "comphet": {"associated_values": ["var_type", "consequence"] },
         "missense": {
-            "definition": ["consequence", ["missense_variant"]],
+            "definition": [["consequence", ["missense_variant"]]],
             "associated_values": ["CADD_PhredScore", "DANN_score", "REVEL_score", "MCAP_score"]
         },
         "splice": {
-            "definition": ["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]],
+            "definition": [["consequence", ["splice_acceptor_variant","splice_donor_variant","splice_region_variant"]]],
             "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
         },
         "intronic": {
-          "definition": ["consequence", ["intron_variant"]],
+          "definition": [["consequence", ["intron_variant"]]],
           "associated_values": ["SpliceAI_SNP_SpliceAI_max", "SpliceAI_INDEL_SpliceAI_max"]
         },
-        "regulatory": {
-            "definition": ["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],
+        "regulatory_smallvars": {
+            "definition": [["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],["var_type",["SNV","INDEL"]]],
             "associated_values": ["ReMM_score", "NCBoost_score", "LinSight", "Reg_constraint", "reg_type", "db_source", "DNase", "TFBS", "UCNE"]
+        },
+        "regulatory_SV": {
+            "definition": [["consequence", ["enhancer_variant","promoter_variant","silencer_variant","bivalent_variant", "insulator_variant"]],["var_type",["DEL","DUP","INV","INS"]]],
+            "associated_values": ["reg_type", "db_source"]
         }
       },
       "PRESETS": {
@@ -287,7 +291,7 @@
             }
           }
         },
-        "regulatory": {
+        "regulatory_smallvars": {
           "default": "FDR 50%",  
           "configuration": {
             "max strict": {
@@ -325,6 +329,23 @@
                     "ReMM_score": 0.2,
                     "LinSight": 0.06,
                     "NCBoost_score": 0.06
+                }
+            }
+          }
+        },
+        "regulatory_SV": {
+          "default": "all genes",  
+          "configuration": {
+            "strict": {
+                "logic": "AND",
+                "values": {
+                    "reg_type": "reg_db"
+                }
+            },
+            "all genes": {
+                "logic": "AND",
+                "values": {
+                    "reg_type": ["reg_db", "closest_gene"]                
                 }
             }
           }

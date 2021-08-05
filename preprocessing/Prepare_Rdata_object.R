@@ -429,6 +429,7 @@ processing_results <- foreach (n = 1:total,
   }
   
   genes_df <- rbind(genes_df, genes_with_comphet)
+  genes_df$variants <- gsub("\\[|\\]|'| ","",genes_df$variants) #Needed to parse vids from new cohort_varan
   genes_df <- as.data.frame(genes_df %>% separate_rows(variants, sep=","))
   newlist$genes_df <- genes_df
   newlist$genes_scores <- genes_scores
